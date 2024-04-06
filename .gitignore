@@ -123,3 +123,7 @@ dsac/examples/echo.network.select/static/config.json
 dsac/examples/dist.registry.replication/static/config.json
 
 __pycache__
+
+.ccache/
+build_release/
+build_debug/
