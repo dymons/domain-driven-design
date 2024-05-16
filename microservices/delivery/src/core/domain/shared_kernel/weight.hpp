@@ -10,10 +10,10 @@ class Weight {
   explicit Weight(int weight) : weight_(weight) {}
 
  public:
-  static auto Create(int weight) -> Weight;
+  [[nodiscard]] static auto Create(int weight) -> Weight;
 
   template <typename Self>
-  constexpr decltype(auto) GetWeight(this Self&& self) {
+  [[nodiscard]] constexpr decltype(auto) GetWeight(this Self&& self) {
     return std::forward<Self>(self).weight_;
   }
 
