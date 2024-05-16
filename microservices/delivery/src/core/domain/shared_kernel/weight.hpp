@@ -39,7 +39,7 @@ class Weight {
 
   /*!
     \brief
-        Get the weight value of the value object
+        Get the weight
   */
   template <typename Self>
   [[nodiscard]] constexpr decltype(auto) GetWeight(this Self&& self) {
@@ -48,7 +48,7 @@ class Weight {
 
   /*!
     \brief
-        Operator for comparing two Weight objects
+        Comparing two Weight objects
   */
   constexpr auto operator<=>(Weight const&) const = default;
 };
