@@ -20,7 +20,8 @@ UTEST(WeightShould, ReturnErrorWhenParamsIsInCorrectOnCreated) {
 
   // Act & Assert
   for (auto const weight : {0, -1}) {
-    EXPECT_THROW(auto const _ = Weight::Create(weight), InvalidArgument);
+    EXPECT_THROW(auto const _ = Weight::Create(weight),
+                 InvalidArgumentException);
   }
 }
 

@@ -12,7 +12,7 @@ class Weight {
 
   /*!
     \brief
-        User constructor, constructs an Weight with predefined weight.
+        User constructor, constructs a Weight with predefined weight.
   */
   explicit Weight(int weight) : weight_(weight) {}
 
