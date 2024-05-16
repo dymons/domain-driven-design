@@ -1,6 +1,7 @@
-#include "weight.hpp"
-
 #include <userver/utest/utest.hpp>
+
+#include "exceptions.hpp"
+#include "weight.hpp"
 
 namespace delivery::core::domain::shared_kernel {
 
@@ -12,6 +13,15 @@ UTEST(WeightShould, BeCorrectWhenParamsIsCorrectOnCreated) {
 
   // Assert
   EXPECT_EQ(weight.GetWeight(), 10);
+}
+
+UTEST(WeightShould, ReturnErrorWhenParamsIsInCorrectOnCreated) {
+  // Arrange
+
+  // Act & Assert
+  for (auto const unexpected_weight : {0, -1}) {
+    EXPECT_THROW(Weight::Create(unexpected_weight), InvalidArgument);
+  }
 }
 
 UTEST(WeightShould, BeEqualWhenAllPropertiesIsEqual) {

@@ -17,7 +17,7 @@ class Weight {
     return std::forward<Self>(self).weight_;
   }
 
-  auto operator<=>(Weight const&) const = default;
+  constexpr auto operator<=>(Weight const&) const = default;
 };
 
 }  // namespace delivery::core::domain::shared_kernel
