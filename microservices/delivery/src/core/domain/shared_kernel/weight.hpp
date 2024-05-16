@@ -24,7 +24,7 @@ class Weight {
     \param weight
         The weight in kilograms
 
-    \throw InvalidArgument
+    \throw ArgumentException
         During construction, check that the weight takes a positive value
 
     \return
