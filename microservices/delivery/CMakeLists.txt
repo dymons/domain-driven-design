@@ -18,6 +18,8 @@ userver_setup_environment()
 add_library(${PROJECT_NAME}_objs OBJECT
     src/hello.hpp
     src/hello.cpp
+    src/core/domain/shared_kernel/weight.hpp
+    src/core/domain/shared_kernel/weight.cpp
 )
 target_link_libraries(${PROJECT_NAME}_objs PUBLIC userver-core)
 
