@@ -31,25 +31,25 @@ using ParseException = formats::yaml::ParseException;
 /// If YAML has value that starts with an `$`, then such value is treated as
 /// a variable from `config_vars`. For example if `config_vars` contains
 /// `variable: 42` and the YAML is following:
-/// @snippet core/src/yaml_config/yaml_config_test.cpp  sample vars
+/// @snippet universal/src/yaml_config/yaml_config_test.cpp  sample vars
 /// Then the result of `yaml["some_element"]["some"].As<int>()` is `42`.
 ///
 /// If YAML key ends on '#env' and the mode is YamlConfig::Mode::kEnvAllowed,
 /// then the value of the key is searched in
 /// environment variables of the process and returned as a value. For example:
-/// @snippet core/src/yaml_config/yaml_config_test.cpp  sample env
+/// @snippet universal/src/yaml_config/yaml_config_test.cpp  sample env
 ///
 /// If YAML key ends on '#fallback', then the value of the key is used as a
 /// fallback for environment and `$` variables. For example for the following
 /// YAML with YamlConfig::Mode::kEnvAllowed:
-/// @snippet core/src/yaml_config/yaml_config_test.cpp  sample multiple
+/// @snippet universal/src/yaml_config/yaml_config_test.cpp  sample multiple
 /// The result of `yaml["some_element"]["some"].As<int>()` is the value of
 /// `variable` from `config_vars` if it exists; otherwise the value is the
 /// contents of the environment variable `SOME_ENV_VARIABLE` if it exists;
 /// otherwise the value if `100500`, from the fallback.
 ///
 /// Another example:
-/// @snippet core/src/yaml_config/yaml_config_test.cpp  sample env fallback
+/// @snippet universal/src/yaml_config/yaml_config_test.cpp  sample env fallback
 /// With YamlConfig::Mode::kEnvAllowed the result of
 /// `yaml["some_element"]["value"].As<int>()` is the value of `ENV_NAME`
 /// environment variable if it exists; otherwise it is `5`.
@@ -153,19 +153,19 @@ class YamlConfig {
   /// @brief Returns value of *this converted to T.
   /// @throw Anything derived from std::exception.
   template <typename T>
-  T As() const;
+  auto As() const;
 
   /// @brief Returns value of *this converted to T or T(args) if
   /// this->IsMissing().
   /// @throw Anything derived from std::exception.
   template <typename T, typename First, typename... Rest>
-  T As(First&& default_arg, Rest&&... more_default_args) const;
+  auto As(First&& default_arg, Rest&&... more_default_args) const;
 
   /// @brief Returns value of *this converted to T or T() if this->IsMissing().
   /// @throw Anything derived from std::exception.
   /// @note Use as `value.As<T>({})`
   template <typename T>
-  T As(DefaultConstructed) const;
+  auto As(DefaultConstructed) const;
 
   /// @brief Returns true if *this holds a `key`.
   /// @throw Nothing.
@@ -188,10 +188,19 @@ class YamlConfig {
   formats::yaml::Value yaml_;
   formats::yaml::Value config_vars_;
   Mode mode_{Mode::kSecure};
+
+  friend bool Parse(const YamlConfig& value, formats::parse::To<bool>);
+  friend int64_t Parse(const YamlConfig& value, formats::parse::To<int64_t>);
+  friend uint64_t Parse(const YamlConfig& value, formats::parse::To<uint64_t>);
+  friend double Parse(const YamlConfig& value, formats::parse::To<double>);
+  friend std::string Parse(const YamlConfig& value,
+                           formats::parse::To<std::string>);
 };
 
+using Value = YamlConfig;
+
 template <typename T>
-T YamlConfig::As() const {
+auto YamlConfig::As() const {
   static_assert(formats::common::impl::kHasParse<YamlConfig, T>,
                 "There is no `Parse(const yaml_config::YamlConfig&, "
                 "formats::parse::To<T>)`"
@@ -203,35 +212,30 @@ T YamlConfig::As() const {
   return Parse(*this, formats::parse::To<T>{});
 }
 
-template <>
-bool YamlConfig::As<bool>() const;
+bool Parse(const YamlConfig& value, formats::parse::To<bool>);
 
-template <>
-int64_t YamlConfig::As<int64_t>() const;
+int64_t Parse(const YamlConfig& value, formats::parse::To<int64_t>);
 
-template <>
-uint64_t YamlConfig::As<uint64_t>() const;
+uint64_t Parse(const YamlConfig& value, formats::parse::To<uint64_t>);
 
-template <>
-double YamlConfig::As<double>() const;
+double Parse(const YamlConfig& value, formats::parse::To<double>);
 
-template <>
-std::string YamlConfig::As<std::string>() const;
+std::string Parse(const YamlConfig& value, formats::parse::To<std::string>);
 
 template <typename T, typename First, typename... Rest>
-T YamlConfig::As(First&& default_arg, Rest&&... more_default_args) const {
+auto YamlConfig::As(First&& default_arg, Rest&&... more_default_args) const {
   if (IsMissing()) {
     // intended raw ctor call, sometimes casts
     // NOLINTNEXTLINE(google-readability-casting)
-    return T(std::forward<First>(default_arg),
-             std::forward<Rest>(more_default_args)...);
+    return decltype(As<T>())(std::forward<First>(default_arg),
+                             std::forward<Rest>(more_default_args)...);
   }
   return As<T>();
 }
 
 template <typename T>
-T YamlConfig::As(YamlConfig::DefaultConstructed) const {
-  return IsMissing() ? T() : As<T>();
+auto YamlConfig::As(YamlConfig::DefaultConstructed) const {
+  return IsMissing() ? decltype(As<T>())() : As<T>();
 }
 
 /// @brief Wrapper for handy python-like iteration over a map

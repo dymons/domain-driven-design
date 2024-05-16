@@ -1,8 +1,8 @@
 #include <userver/congestion_control/component.hpp>
 
 #include <congestion_control/watchdog.hpp>
-#include <server/congestion_control/sensor.hpp>
 #include <userver/congestion_control/config.hpp>
+#include <userver/server/congestion_control/sensor.hpp>
 
 #include <userver/components/component.hpp>
 #include <userver/components/statistics_storage.hpp>
@@ -65,23 +65,25 @@ struct Component::Impl {
   server::congestion_control::Limiter server_limiter;
   Controller server_controller;
 
-  utils::statistics::Entry statistics_holder;
-
-  // must go after all sensors/limiters
-  Watchdog wd;
-  concurrent::AsyncEventSubscriberScope config_subscription;
   std::atomic<bool> fake_mode;
   std::atomic<bool> force_disabled{false};
   std::atomic<size_t> last_activate_factor{1};
+
+  // These subscriptions and tasks must be the last fields!
+  Watchdog wd;
+  utils::statistics::Entry statistics_holder;
+  concurrent::AsyncEventSubscriberScope config_subscription;
+  // See the comment above before adding new fields.
 
   Impl(dynamic_config::Source dynamic_config, server::Server& server,
        engine::TaskProcessor& tp, bool fake_mode)
       : dynamic_config(dynamic_config),
         server(server),
-        server_sensor(server, tp),
+        server_sensor(tp),
         server_controller(kServerControllerName, dynamic_config),
         fake_mode(fake_mode) {
     server_limiter.RegisterLimitee(server);
+    server_sensor.RegisterRequestsSource(server);
   }
 };
 
@@ -173,6 +175,10 @@ void Component::ExtendWriter(utils::statistics::Writer& writer) {
 
 server::congestion_control::Limiter& Component::GetServerLimiter() {
   return pimpl_->server_limiter;
+}
+
+server::congestion_control::Sensor& Component::GetServerSensor() {
+  return pimpl_->server_sensor;
 }
 
 yaml_config::Schema Component::GetStaticConfigSchema() {

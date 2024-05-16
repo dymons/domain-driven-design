@@ -54,6 +54,8 @@ include(SetupCAres)
 include(SetupProtobuf)
 include(DownloadUsingCPM)
 
+set(USERVER_GPRC_BUILD_FROM_SOURCE ON)
+
 CPMAddPackage(
     NAME gRPC
     VERSION 1.59.1
@@ -90,6 +92,9 @@ set(USERVER_GENERATE_PROTOS_AT_BUILD_TIME TRUE)
 write_package_stub(gRPC)
 if (NOT TARGET "gRPC::grpc++")
     add_library(gRPC::grpc++ ALIAS grpc++)
+endif()
+if (NOT TARGET "gRPC::grpc_cpp_plugin")
+    add_executable(gRPC::grpc_cpp_plugin ALIAS grpc_cpp_plugin)
 endif()
 if (NOT TARGET "gRPC::grpcpp_channelz")
     add_library(gRPC::grpcpp_channelz ALIAS grpcpp_channelz)

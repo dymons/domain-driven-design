@@ -92,7 +92,7 @@ Postgres::Postgres(const ComponentConfig& config,
 
   initial_settings_.topology_settings.max_replication_lag =
       config["max_replication_lag"].As<std::chrono::milliseconds>(
-          kDefaultMaxReplicationLag);
+          storages::postgres::kDefaultMaxReplicationLag);
 
   initial_settings_.pool_settings =
       pg_config.pool_settings.GetOptional(name_).value_or(
@@ -102,6 +102,8 @@ Postgres::Postgres(const ComponentConfig& config,
           config.As<storages::postgres::ConnectionSettings>());
   initial_settings_.conn_settings.pipeline_mode =
       initial_config[storages::postgres::kPipelineModeKey];
+  initial_settings_.conn_settings.omit_describe_mode =
+      initial_config[storages::postgres::kOmitDescribeInExecuteModeKey];
   initial_settings_.statement_metrics_settings =
       pg_config.statement_metrics_settings.GetOptional(name_).value_or(
           config.As<storages::postgres::StatementMetricsSettings>());
@@ -183,10 +185,15 @@ void Postgres::OnConfigUpdate(const dynamic_config::Snapshot& cfg) {
   const auto pool_settings =
       pg_config.pool_settings.GetOptional(name_).value_or(
           initial_settings_.pool_settings);
+  const auto topology_settings =
+      pg_config.topology_settings.GetOptional(name_).value_or(
+          initial_settings_.topology_settings);
   auto connection_settings =
       pg_config.connection_settings.GetOptional(name_).value_or(
           initial_settings_.conn_settings);
   connection_settings.pipeline_mode = cfg[storages::postgres::kPipelineModeKey];
+  connection_settings.omit_describe_mode =
+      cfg[storages::postgres::kOmitDescribeInExecuteModeKey];
   const auto statement_metrics_settings =
       pg_config.statement_metrics_settings.GetOptional(name_).value_or(
           initial_settings_.statement_metrics_settings);
@@ -196,6 +203,7 @@ void Postgres::OnConfigUpdate(const dynamic_config::Snapshot& cfg) {
     cluster->SetHandlersCommandControl(pg_config.handlers_command_control);
     cluster->SetQueriesCommandControl(pg_config.queries_command_control);
     cluster->SetPoolSettings(pool_settings);
+    cluster->SetTopologySettings(topology_settings);
     cluster->SetConnectionSettings(connection_settings);
     cluster->SetStatementMetricsSettings(statement_metrics_settings);
   }
@@ -319,7 +327,7 @@ properties:
         enum:
          - auto
          - manual
-        description: how to learn a connection pool size
+        description: how to learn the `max_pool_size`
 )");
 }
 

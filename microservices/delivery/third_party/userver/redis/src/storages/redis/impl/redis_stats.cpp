@@ -85,8 +85,10 @@ const std::string_view kCommandTypes[] = {
     "srandmember",
     "srem",
     "sscan",
+    "ssubscribe",
     "strlen",
     "subscribe",
+    "sunsubscribe",
     "time",
     "ttl",
     "type",
@@ -128,7 +130,7 @@ void DumpMetric(utils::statistics::Writer& writer,
     const auto state = static_cast<Redis::State>(i);
     writer["cluster_states"].ValueWithLabels(
         stats.Get(state),
-        {"redis_instance_state", redis::Redis::StateToString(state)});
+        {"redis_instance_state", redis::StateToString(state)});
   }
 }
 
@@ -196,7 +198,13 @@ InstanceStatistics SentinelStatistics::GetShardGroupTotalStatistics() const {
 
 void DumpMetric(utils::statistics::Writer& writer,
                 const InstanceStatistics& stats, bool real_instance) {
-  writer["reconnects"] = stats.reconnects;
+  // Note about sensor duplication with 'v2' suffix:
+  // We have to duplicate metrics with different sensor name to change
+  // their type to RATE. Unfortunately, we can't change existing metrics
+  // because it will break dashboards/alerts for all current users.
+
+  writer["reconnects"] = stats.reconnects.Load().value;
+  writer["reconnects.v2"] = stats.reconnects;
 
   if (stats.settings.IsRequestSizesEnabled()) {
     writer["request_sizes"] = stats.request_size_percentile;
@@ -218,7 +226,10 @@ void DumpMetric(utils::statistics::Writer& writer,
 
   for (size_t i = 0; i < kReplyStatusMap.size(); ++i) {
     writer["errors"].ValueWithLabels(
-        stats.error_count[i],
+        stats.error_count[i].Load().value,
+        {"redis_error", ToString(static_cast<ReplyStatus>(i))});
+    writer["errors.v2"].ValueWithLabels(
+        stats.error_count[i].Load(),
         {"redis_error", ToString(static_cast<ReplyStatus>(i))});
   }
 
@@ -232,7 +243,7 @@ void DumpMetric(utils::statistics::Writer& writer,
       const auto state = static_cast<Redis::State>(i);
       writer["state"].ValueWithLabels(
           static_cast<int>(stats.state == state),
-          {"redis_instance_state", redis::Redis::StateToString(state)});
+          {"redis_instance_state", redis::StateToString(state)});
     }
 
     long long session_time_ms =
@@ -271,9 +282,16 @@ void DumpMetric(utils::statistics::Writer& writer,
                                    {"redis_error", "redis_not_ready"});
   if (stats.internal.is_autotoplogy.load()) {
     writer["cluster_topology_checks"] =
-        stats.internal.cluster_topology_checks.load();
+        stats.internal.cluster_topology_checks.Load().value;
     writer["cluster_topology_updates"] =
-        stats.internal.cluster_topology_updates.load();
+        stats.internal.cluster_topology_updates.Load().value;
+    // We have to duplicate metrics with different sensor name to change
+    // their type to RATE. Unfortunately, we can't change existing metrics
+    // because it will break dashboards/alerts for all current users.
+    writer["cluster_topology_checks.v2"] =
+        stats.internal.cluster_topology_checks.Load();
+    writer["cluster_topology_updates.v2"] =
+        stats.internal.cluster_topology_updates.Load();
   }
 
   ConnStateStatistic conn_stat_masters;

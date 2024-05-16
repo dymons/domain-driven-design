@@ -1,8 +1,9 @@
 #pragma once
 
 #include <memory>
-#include <regex>
 #include <string>
+
+#include <boost/regex.hpp>
 
 #include <userver/utest/utest.hpp>
 
@@ -17,7 +18,6 @@
 #include <userver/dynamic_config/storage_mock.hpp>
 #include <userver/dynamic_config/test_helpers.hpp>
 #include "storages/redis/impl/keyshard_impl.hpp"
-#include "userver/utils/impl/userver_experiments.hpp"
 
 USERVER_NAMESPACE_BEGIN
 
@@ -34,8 +34,6 @@ class RedisClusterClientTest : public ::testing::Test {
 
   static void SetUpTestSuite() {
     static auto config_mock = MakeDynamicConfigStorage();
-    utils::impl::UserverExperimentsScope scope;
-    scope.Set(utils::impl::kRedisClusterAutoTopologyExperiment, true);
     auto configs_source = config_mock.GetSource();
     thread_pools_ = std::make_shared<redis::ThreadPools>(
         redis::kDefaultSentinelThreadPoolSize,
@@ -47,7 +45,7 @@ class RedisClusterClientTest : public ::testing::Test {
 
     subscribe_sentinel_ = redis::SubscribeSentinel::Create(
         thread_pools_, GetTestsuiteRedisClusterSettings(), "none",
-        configs_source, "pub", true, {});
+        configs_source, "pub", true, {}, {});
     subscribe_sentinel_->WaitConnectedDebug();
 
     auto info_reply =
@@ -56,10 +54,10 @@ class RedisClusterClientTest : public ::testing::Test {
     ASSERT_TRUE(info_reply->data.IsString());
     const auto info = info_reply->data.GetString();
 
-    std::regex redis_version_regex(R"(redis_version:(\d+.\d+.\d+))");
-    std::smatch redis_version_matches;
+    boost::regex redis_version_regex(R"(redis_version:(\d+.\d+.\d+))");
+    boost::smatch redis_version_matches;
     ASSERT_TRUE(
-        std::regex_search(info, redis_version_matches, redis_version_regex));
+        boost::regex_search(info, redis_version_matches, redis_version_regex));
     version_ = MakeVersion(redis_version_matches[1]);
   }
 
@@ -109,9 +107,9 @@ class RedisClusterClientTest : public ::testing::Test {
   std::shared_ptr<storages::redis::SubscribeClient> subscribe_client_{};
 
   static Version MakeVersion(std::string from) {
-    std::regex rgx(R"((\d+).(\d+).(\d+))");
-    std::smatch matches;
-    const auto result = std::regex_search(from, matches, rgx);
+    boost::regex rgx(R"((\d+).(\d+).(\d+))");
+    boost::smatch matches;
+    const auto result = boost::regex_search(from, matches, rgx);
     EXPECT_TRUE(result);
     if (!result) return {};
     return {std::stoi(matches[1]), std::stoi(matches[2]),
@@ -129,8 +127,7 @@ class RedisClusterClientTest : public ::testing::Test {
         }
       }
     )"));
-    return dynamic_config::StorageMock(
-        docs_map, {{redis::kRedisAutoTopologyEnabled, true}});
+    return dynamic_config::StorageMock(docs_map, {});
   }
 };
 

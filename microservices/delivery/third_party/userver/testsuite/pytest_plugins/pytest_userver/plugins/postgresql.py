@@ -3,9 +3,12 @@ Plugin that imports the required fixtures to start the database
 and adjusts the PostgreSQL "dbconnection" static config value.
 """
 
+from contextlib import contextmanager
 import typing
 
 import pytest
+
+from pytest_userver import sql
 
 
 pytest_plugins = [
@@ -15,6 +18,34 @@ pytest_plugins = [
 
 
 USERVER_CONFIG_HOOKS = ['userver_pg_config']
+
+
+class RegisteredNtrx:
+    def __init__(self, testpoint):
+        self._registered_ntrx = set()
+        self._testpoint = testpoint
+
+    def _enable_failure(self, name: str) -> None:
+        self._registered_ntrx.add(name)
+
+        @self._testpoint(f'pg_ntrx_execute::{name}')
+        def _failure_tp(data):
+            return {'inject_failure': self.is_failure_enabled(name)}
+
+    def _disable_failure(self, name: str) -> None:
+        if self.is_failure_enabled(name):
+            self._registered_ntrx.remove(name)
+
+    def is_failure_enabled(self, name: str) -> bool:
+        return name in self._registered_ntrx
+
+    @contextmanager
+    def mock_failure(self, name: str):
+        self._enable_failure(name)
+        try:
+            yield
+        finally:
+            self._disable_failure(name)
 
 
 @pytest.fixture(scope='session')
@@ -52,7 +83,8 @@ def userver_pg_config(pgsql_local):
         postgre_dbs = {
             name: params
             for name, params in components.items()
-            if params and 'dbconnection' in params
+            if params
+            and ('dbconnection' in params or 'dbconnection#env' in params)
         }
 
         if len(postgre_dbs) > 1:
@@ -71,47 +103,22 @@ def userver_pg_config(pgsql_local):
     return _patch_config
 
 
-class RegisteredTrx:
-    """
-    RegisteredTrx maintains transaction fault injection state to test
-    transaction failure code path.
-
-    You may enable specific transaction failure calling `enable_trx_failure`
-    on that transaction name. After that, the transaction's `Commit` method
-    will throw an exception.
-
-    If you don't need a fault injection anymore (e.g. you want to test
-    a successfull retry), you may call `disable_trx_failure` afterwards.
-
-    @ingroup userver_testsuite
-
-    @snippet postgresql/functional_tests/integration_tests/tests/test_trx_failure.py fault injection
-    """  # noqa: E501
-
-    def __init__(self):
-        self._registered_trx = set()
-
-    def enable_failure(self, name):
-        self._registered_trx.add(name)
-
-    def disable_failure(self, name):
-        if self.is_failure_enabled(name):
-            self._registered_trx.remove(name)
-
-    def is_failure_enabled(self, name):
-        return name in self._registered_trx
-
-
 @pytest.fixture
-def userver_pg_trx(testpoint) -> typing.Generator[RegisteredTrx, None, None]:
+def userver_pg_trx(
+        testpoint,
+) -> typing.Generator[sql.RegisteredTrx, None, None]:
     """
     The fixture maintains transaction fault injection state using
     RegisteredTrx class.
 
-    @see RegisteredTrx
-    """
+    @see pytest_userver.sql.RegisteredTrx
 
-    registered = RegisteredTrx()
+    @snippet postgresql/functional_tests/integration_tests/tests/test_trx_failure.py  fault injection
+
+    @ingroup userver_testsuite_fixtures
+    """  # noqa: E501
+
+    registered = sql.RegisteredTrx()
 
     @testpoint('pg_trx_commit')
     def _pg_trx_tp(data):
@@ -119,3 +126,19 @@ def userver_pg_trx(testpoint) -> typing.Generator[RegisteredTrx, None, None]:
         return {'trx_should_fail': should_fail}
 
     yield registered
+
+
+@pytest.fixture
+def userver_pg_ntrx(testpoint) -> typing.Generator[RegisteredNtrx, None, None]:
+    """
+    The fixture maintains single query fault injection state using
+    RegisteredNtrx class.
+
+    @see pytest_userver.plugins.postgresql.RegisteredNtrx
+
+    @snippet postgresql/functional_tests/integration_tests/tests/test_ntrx_failure.py  fault injection
+
+    @ingroup userver_testsuite_fixtures
+    """  # noqa: E501
+
+    yield RegisteredNtrx(testpoint)

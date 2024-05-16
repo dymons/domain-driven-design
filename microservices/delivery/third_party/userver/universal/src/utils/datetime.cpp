@@ -8,6 +8,7 @@
 
 #include <cctz/time_zone.h>
 #include <boost/lexical_cast.hpp>
+#include <boost/numeric/conversion/cast.hpp>
 
 #include <userver/utils/assert.hpp>
 #include <userver/utils/mock_now.hpp>
@@ -19,24 +20,32 @@ namespace utils::datetime {
 namespace {
 
 // https://msdn.microsoft.com/en-us/library/system.datetime.maxvalue(v=vs.110).aspx
-constexpr int64_t kMaxDotNetTicks = 3155378975999999999L;
+constexpr std::int64_t kMaxDotNetTicks = 3155378975999999999L;
 
 // https://msdn.microsoft.com/en-us/library/z2xf7zzk(v=vs.110).aspx
 // python:
 // (datetime.datetime(1970, 1, 1) - datetime.datetime(1, 1, 1)).total_seconds()
-constexpr int64_t k100NanosecondsIntervalsBetweenDotNetAndPosixTimeStart =
+constexpr std::int64_t k100NanosecondsIntervalsBetweenDotNetAndPosixTimeStart =
     62135596800L * 10000000L;  // sec to 100nanosec
-constexpr int64_t kNanosecondsIs100Nanoseconds = 100;
+constexpr std::int64_t kNanosecondsIs100Nanoseconds = 100;
 
-cctz::time_zone GetTimezone(const std::string& tzname) {
+std::optional<cctz::time_zone> GetOptionalTimezone(const std::string& tzname) {
 #if defined(BSD) && !defined(__APPLE__)
-  if (tzname == "GMT") return GetTimezone("UTC");
+  if (tzname == "GMT") return GetOptionalTimezone("UTC");
 #endif
   cctz::time_zone tz;
   if (!load_time_zone(tzname, &tz)) {
-    throw TimezoneLookupError(tzname);
+    return std::nullopt;
   }
   return tz;
+}
+
+cctz::time_zone GetTimezone(const std::string& tzname) {
+  auto tz = GetOptionalTimezone(tzname);
+  if (!tz.has_value()) {
+    throw TimezoneLookupError(tzname);
+  }
+  return *tz;
 }
 
 const cctz::time_zone& GetLocalTimezone() {
@@ -107,6 +116,16 @@ std::string Timestring(std::chrono::system_clock::time_point tp,
   return cctz::format(format, tp, GetTimezone(timezone));
 }
 
+std::optional<std::chrono::system_clock::time_point> OptionalStringtime(
+    const std::string& timestring, const std::string& timezone,
+    const std::string& format) {
+  auto tz = GetOptionalTimezone(timezone);
+  if (!tz.has_value()) {
+    return std::nullopt;
+  }
+  return OptionalStringtime(timestring, *tz, format);
+}
+
 std::string LocalTimezoneTimestring(std::chrono::system_clock::time_point tp,
                                     const std::string& format) {
   return cctz::format(format, tp, GetLocalTimezone());
@@ -172,17 +191,17 @@ std::uint32_t ParseDayTime(const std::string& str) {
   if (str[2] != ':' || (str.size() == 8 && str[5] != ':'))
     throw std::invalid_argument(std::string("Failed to parse time from ") +
                                 str);
-  uint8_t hours = 0;
-  uint8_t minutes = 0;
-  uint8_t seconds = 0;
+  std::uint8_t hours = 0;
+  std::uint8_t minutes = 0;
+  std::uint8_t seconds = 0;
 
   try {
-    hours = boost::numeric_cast<uint8_t>(
+    hours = boost::numeric_cast<std::uint8_t>(
         boost::lexical_cast<int>(std::string(str, 0, 2)));
-    minutes = boost::numeric_cast<uint8_t>(
+    minutes = boost::numeric_cast<std::uint8_t>(
         boost::lexical_cast<int>(std::string(str, 3, 2)));
     if (str.size() == 8)
-      seconds = boost::numeric_cast<uint8_t>(
+      seconds = boost::numeric_cast<std::uint8_t>(
           boost::lexical_cast<int>(std::string(str, 6, 2)));
 
   } catch (const std::exception& ex) {
@@ -240,7 +259,7 @@ std::string TimestampToString(const time_t timestamp) {
   return {buffer.data(), kStringLen};
 }
 
-int64_t TimePointToTicks(
+std::int64_t TimePointToTicks(
     const std::chrono::system_clock::time_point& tp) noexcept {
   if (tp == std::chrono::system_clock::time_point::max())
     return kMaxDotNetTicks;
@@ -251,7 +270,8 @@ int64_t TimePointToTicks(
              kNanosecondsIs100Nanoseconds;
 }
 
-std::chrono::system_clock::time_point TicksToTimePoint(int64_t ticks) noexcept {
+std::chrono::system_clock::time_point TicksToTimePoint(
+    std::int64_t ticks) noexcept {
   if (ticks == kMaxDotNetTicks)
     return std::chrono::system_clock::time_point::max();
   return std::chrono::system_clock::time_point(

@@ -2,43 +2,20 @@
 Start the service in testsuite.
 """
 
+# pylint: disable=redefined-outer-name
 import logging
 import pathlib
-import sys
 import time
-import traceback
 import typing
 
 import pytest
 
-from testsuite.logging import logger
 from testsuite.utils import url_util
 
-from ..utils import colorize
 from ..utils import net
 
 
 logger_testsuite = logging.getLogger(__name__)
-
-
-class ColorLogger(logger.Logger):
-    def __init__(
-            self, *, writer: logger.LineLogger, verbose, colors_enabled,
-    ) -> None:
-        super().__init__(writer)
-        self._colorizer = colorize.Colorizer(
-            verbose=verbose, colors_enabled=colors_enabled,
-        )
-
-    def log_service_line(self, line) -> None:
-        line = self._colorizer.colorize_line(line)
-        if line:
-            self.writeline(line)
-
-    def log_entry(self, entry: dict) -> None:
-        line = self._colorizer.colorize_row(entry)
-        if line:
-            self.writeline(line)
 
 
 def pytest_addoption(parser) -> None:
@@ -68,21 +45,8 @@ def pytest_addoption(parser) -> None:
     )
 
 
-def pytest_override_testsuite_logger(  # pylint: disable=invalid-name
-        config, line_logger: logger.LineLogger, colors_enabled: bool,
-) -> typing.Optional[logger.Logger]:
-    pretty_logs = config.option.service_logs_pretty
-    if not pretty_logs:
-        return None
-    return ColorLogger(
-        writer=line_logger,
-        verbose=pretty_logs == 'verbose',
-        colors_enabled=colors_enabled,
-    )
-
-
-@pytest.fixture(name='service_env', scope='session')
-def _service_env():
+@pytest.fixture(scope='session')
+def service_env():
     """
     Override this to pass extra environment variables to the service.
 
@@ -92,9 +56,9 @@ def _service_env():
     return None
 
 
-@pytest.fixture(name='service_http_ping_url', scope='session')
-async def _service_http_ping_url(
-        service_config_yaml, service_baseurl,
+@pytest.fixture(scope='session')
+async def service_http_ping_url(
+        service_config, service_baseurl,
 ) -> typing.Optional[str]:
     """
     Returns the service HTTP ping URL that is used by the testsuite to detect
@@ -106,16 +70,16 @@ async def _service_http_ping_url(
 
     @ingroup userver_testsuite_fixtures
     """
-    components = service_config_yaml['components_manager']['components']
+    components = service_config['components_manager']['components']
     ping_handler = components.get('handler-ping')
     if ping_handler:
         return url_util.join(service_baseurl, ping_handler['path'])
     return None
 
 
-@pytest.fixture(name='service_non_http_health_checks', scope='session')
-def _service_non_http_health_checks(  # pylint: disable=invalid-name
-        service_config_yaml,
+@pytest.fixture(scope='session')
+def service_non_http_health_checks(  # pylint: disable=invalid-name
+        service_config,
 ) -> net.HealthChecks:
     """
     Returns a health checks info.
@@ -128,7 +92,7 @@ def _service_non_http_health_checks(  # pylint: disable=invalid-name
     @ingroup userver_testsuite_fixtures
     """
 
-    return net.get_health_checks_info(service_config_yaml)
+    return net.get_health_checks_info(service_config)
 
 
 @pytest.fixture(scope='session')
@@ -138,11 +102,10 @@ async def service_daemon(
         service_env,
         service_http_ping_url,
         service_config_path_temp,
-        service_config_yaml,
+        service_config,
         service_binary,
         service_non_http_health_checks,
         testsuite_logger,
-        _userver_log_handler,
 ):
     """
     Configures the health checking to use service_http_ping_url fixture value
@@ -192,41 +155,5 @@ async def service_daemon(
             ping_url=service_http_ping_url,
             health_check=health_check,
             env=service_env,
-            stderr_handler=_userver_log_handler,
     ) as scope:
         yield scope
-
-
-@pytest.fixture(scope='session')
-def _userver_log_handler(pytestconfig, testsuite_logger, _uservice_logfile):
-    service_logs_pretty = pytestconfig.option.service_logs_pretty
-    if not service_logs_pretty and not bool(_uservice_logfile):
-        return None
-
-    if service_logs_pretty:
-        logger_plugin = pytestconfig.pluginmanager.getplugin(
-            'testsuite_logger',
-        )
-        logger_plugin.enable_logs_suspension()
-
-    def log_handler(line_binary):
-        if _uservice_logfile:
-            _uservice_logfile.write(line_binary)
-        try:
-            line = line_binary.decode('utf-8').rstrip('\r\n')
-            testsuite_logger.log_service_line(line)
-        # flake8: noqa
-        except:
-            traceback.print_exc(file=sys.stderr)
-
-    return log_handler
-
-
-@pytest.fixture(scope='session')
-def _uservice_logfile(pytestconfig):
-    path = pytestconfig.option.service_logs_file
-    if not path:
-        yield None
-    else:
-        with path.open('wb') as fp:
-            yield fp

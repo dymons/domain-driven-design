@@ -8,7 +8,6 @@
 
 #include <storages/redis/impl/sentinel.hpp>
 #include <storages/redis/impl/subscription_storage.hpp>
-#include <storages/redis/impl/subscription_storage_switcher.hpp>
 
 USERVER_NAMESPACE_BEGIN
 
@@ -34,13 +33,14 @@ class SubscribeSentinel : protected Sentinel {
       const secdist::RedisSettings& settings, std::string shard_group_name,
       dynamic_config::Source dynamic_config_source,
       const std::string& client_name, bool is_cluster_mode,
+      const CommandControl& command_control,
       const testsuite::RedisControl& testsuite_redis_control);
   static std::shared_ptr<SubscribeSentinel> Create(
       const std::shared_ptr<ThreadPools>& thread_pools,
       const secdist::RedisSettings& settings, std::string shard_group_name,
       dynamic_config::Source dynamic_config_source,
       const std::string& client_name, ReadyChangeCallback ready_callback,
-      bool is_cluster_mode,
+      bool is_cluster_mode, const CommandControl& command_control,
       const testsuite::RedisControl& testsuite_redis_control);
 
   SubscriptionToken Subscribe(
@@ -50,6 +50,10 @@ class SubscribeSentinel : protected Sentinel {
   SubscriptionToken Psubscribe(
       const std::string& pattern,
       const Sentinel::UserPmessageCallback& message_callback,
+      CommandControl control = CommandControl());
+  SubscriptionToken Ssubscribe(
+      const std::string& channel,
+      const Sentinel::UserMessageCallback& message_callback,
       CommandControl control = CommandControl());
 
   PubsubClusterStatistics GetSubscriberStatistics(
@@ -61,8 +65,8 @@ class SubscribeSentinel : protected Sentinel {
       const std::shared_ptr<CommandControl>& cc) override;
 
   void SetRebalanceMinInterval(std::chrono::milliseconds interval);
-  void SetClusterAutoTopology(bool auto_topology);
 
+  using Sentinel::IsInClusterMode;
   using Sentinel::Restart;
   using Sentinel::SetConfigDefaultCommandControl;
   using Sentinel::ShardsCount;

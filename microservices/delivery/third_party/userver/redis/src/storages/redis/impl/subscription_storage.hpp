@@ -48,17 +48,33 @@ class SubscriptionStorageBase
  public:
   using ServerWeights = std::unordered_map<ServerId, size_t, ServerIdHasher>;
   using CommandCb = std::function<void(size_t shard, CommandPtr command)>;
+  using ShardedCommandCb =
+      std::function<void(const std::string& channel, CommandPtr command)>;
+  struct ChannelName {
+    ChannelName() = default;
+    ChannelName(std::string channel, bool pattern, bool sharded)
+        : channel(std::move(channel)), pattern(pattern), sharded(sharded) {}
+
+    std::string channel;
+    bool pattern{false};
+    bool sharded{false};
+  };
 
   virtual ~SubscriptionStorageBase() = default;
 
   virtual void SetSubscribeCallback(CommandCb) = 0;
   virtual void SetUnsubscribeCallback(CommandCb) = 0;
+  virtual void SetShardedSubscribeCallback(ShardedCommandCb) = 0;
+  virtual void SetShardedUnsubscribeCallback(ShardedCommandCb) = 0;
 
   virtual SubscriptionToken Subscribe(const std::string& channel,
                                       Sentinel::UserMessageCallback cb,
                                       CommandControl control) = 0;
   virtual SubscriptionToken Psubscribe(const std::string& pattern,
                                        Sentinel::UserPmessageCallback cb,
+                                       CommandControl control) = 0;
+  virtual SubscriptionToken Ssubscribe(const std::string& pattern,
+                                       Sentinel::UserMessageCallback cb,
                                        CommandControl control) = 0;
 
   virtual void Unsubscribe(SubscriptionId subscription_id) = 0;
@@ -86,6 +102,10 @@ class SubscriptionStorageBase
                              Sentinel::UserMessageCallback cb,
                              CommandControl control,
                              SubscriptionId external_id) = 0;
+  virtual void SsubscribeImpl(const std::string& channel,
+                              Sentinel::UserMessageCallback cb,
+                              CommandControl control,
+                              SubscriptionId external_id) = 0;
   virtual void PsubscribeImpl(const std::string& pattern,
                               Sentinel::UserPmessageCallback cb,
                               CommandControl control,
@@ -111,6 +131,7 @@ class SubscriptionStorageBase
     }
 
     void AccountMessage(ServerId server_id, size_t message_size);
+    void AccountDiscardedByOverflow(size_t discarded);
   };
 
  protected:
@@ -120,14 +141,7 @@ class SubscriptionStorageBase
       ServerId, const std::string& pattern, const std::string& channel,
       const std::string& message)>;
 
-  struct ChannelName {
-    ChannelName() = default;
-    ChannelName(std::string channel, bool pattern)
-        : channel(std::move(channel)), pattern(pattern) {}
-
-    std::string channel;
-    bool pattern{false};
-  };
+  using SubscribedCallbackOutcome = Sentinel::Outcome;
 
   struct RebalanceState {
     RebalanceState(size_t shard_idx, ServerWeights weights);
@@ -136,11 +150,12 @@ class SubscriptionStorageBase
     ServerWeights weights;
     size_t sum_weights{0};
     size_t total_connections{0};
-    std::unordered_map<ServerId, std::vector<std::pair<ChannelName, FsmPtr>>,
-                       ServerIdHasher>
+    // Use std::map instead of std::unordered_map because we rely on fact that
+    // iterators are never invalidated on inserts in RebalanceMoveSubscriptions
+    // method
+    std::map<ServerId, std::vector<std::pair<ChannelName, FsmPtr>>>
         subscriptions_by_server;
-    std::unordered_map<ServerId, size_t, ServerIdHasher>
-        need_subscription_count;
+    std::map<ServerId, size_t> need_subscription_count;
   };
 
   template <typename CallbackMap, typename PcallbackMap>
@@ -164,7 +179,7 @@ class SubscriptionStorageBase
                        const FsmPtr& fsm);
 
     template <class Map>
-    bool DoUnsubscribe(Map& callback_map, SubscriptionId id);
+    bool DoUnsubscribe(Map& callback_map, SubscriptionId id, bool sharded);
 
     CommandPtr PrepareUnsubscribeCommand(const ChannelName& channel_name);
 
@@ -184,13 +199,16 @@ class SubscriptionStorageBase
     void OnPmessage(ServerId server_id, const std::string& pattern,
                     const std::string& channel, const std::string& message,
                     size_t shard_idx);
+    void OnSmessage(ServerId server_id, const std::string& channel,
+                    const std::string& message, size_t shard_idx);
     size_t GetChannelsCountApprox() const;
     PubsubShardStatistics GetShardStatistics(size_t shard_idx) const;
     RawPubsubClusterStatistics GetStatistics() const;
 
-    void RebalanceGatherSubscriptions(RebalanceState& state,
-                                      CallbackMap& callback_map,
-                                      PcallbackMap& pcallback_map);
+    template <typename Map>
+    static void RebalanceGatherSubscriptions(RebalanceState& state,
+                                             Map& callback_map, bool pattern,
+                                             bool sharded);
     void RebalanceCalculateNeedCount(RebalanceState& state);
 
     void RebalanceMoveSubscriptions(RebalanceState& state);
@@ -200,6 +218,9 @@ class SubscriptionStorageBase
     SubscriptionToken Subscribe(const std::string& channel,
                                 Sentinel::UserMessageCallback cb,
                                 CommandControl control);
+    SubscriptionToken Ssubscribe(const std::string& channel,
+                                 Sentinel::UserMessageCallback cb,
+                                 CommandControl control);
     SubscriptionToken Psubscribe(const std::string& channel,
                                  Sentinel::UserPmessageCallback cb,
                                  CommandControl control);
@@ -208,8 +229,11 @@ class SubscriptionStorageBase
     mutable std::mutex mutex_;
     CommandCb subscribe_callback_;
     CommandCb unsubscribe_callback_;
+    ShardedCommandCb sharded_subscribe_callback_;
+    ShardedCommandCb sharded_unsubscribe_callback_;
     CallbackMap callback_map_;
     PcallbackMap pattern_callback_map_;
+    CallbackMap sharded_callback_map_;
     CommandControl common_command_control_;
     size_t shards_count_{0};
     SubscriptionStorageBase& implemented_;
@@ -223,14 +247,22 @@ class SubscriptionStorage : public SubscriptionStorageBase {
       const std::shared_ptr<ThreadPools>& thread_pools, size_t shards_count,
       bool is_cluster_mode,
       std::shared_ptr<const std::vector<std::string>> shard_names);
+  SubscriptionStorage(
+      size_t shards_count, bool is_cluster_mode,
+      std::shared_ptr<const std::vector<std::string>> shard_names);
   ~SubscriptionStorage() override;
 
   void SetSubscribeCallback(CommandCb) override;
   void SetUnsubscribeCallback(CommandCb) override;
+  void SetShardedSubscribeCallback(ShardedCommandCb) override;
+  void SetShardedUnsubscribeCallback(ShardedCommandCb) override;
 
   SubscriptionToken Subscribe(const std::string& channel,
                               Sentinel::UserMessageCallback cb,
                               CommandControl control) override;
+  SubscriptionToken Ssubscribe(const std::string& channel,
+                               Sentinel::UserMessageCallback cb,
+                               CommandControl control) override;
   SubscriptionToken Psubscribe(const std::string& pattern,
                                Sentinel::UserPmessageCallback cb,
                                CommandControl control) override;
@@ -255,6 +287,9 @@ class SubscriptionStorage : public SubscriptionStorageBase {
   void SubscribeImpl(const std::string& channel,
                      Sentinel::UserMessageCallback cb, CommandControl control,
                      SubscriptionId external_id) override;
+  void SsubscribeImpl(const std::string& channel,
+                      Sentinel::UserMessageCallback cb, CommandControl control,
+                      SubscriptionId external_id) override;
   void PsubscribeImpl(const std::string& pattern,
                       Sentinel::UserPmessageCallback cb, CommandControl control,
                       SubscriptionId external_id) override;

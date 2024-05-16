@@ -10,6 +10,7 @@
 
 #include <userver/formats/json/exception.hpp>
 
+#include <formats/json/impl/are_equal.hpp>
 #include <formats/json/impl/exttypes.hpp>
 #include <formats/json/impl/json_tree.hpp>
 #include <formats/json/impl/types_impl.hpp>
@@ -40,8 +41,9 @@ template <typename T>
 auto CheckedNotTooNegative(T x, const Value& value) {
   if (x <= -1) {
     throw ConversionException(
-        "Cannot convert to unsigned value from negative " + value.GetPath() +
-        '=' + std::to_string(x));
+        "Cannot convert to unsigned value from negative value = " +
+            std::to_string(x),
+        value.GetPath());
   }
   return x;
 }
@@ -80,17 +82,20 @@ impl::Value MakeJsonStringViewValue(std::string_view view) {
 }  // namespace impl
 
 Value::Value()
-    : root_{impl::VersionedValuePtr::Create(::rapidjson::Type::kNullType)},
-      value_ptr_{root_.Get()} {}
+    : holder_{impl::VersionedValuePtr::Create(::rapidjson::Type::kNullType)},
+      root_ptr_for_path_{holder_.Get()},
+      value_ptr_{holder_.Get()} {}
 
 Value::Value(Value&& other) noexcept
-    : root_{std::move(other.root_)},
+    : holder_{std::move(other.holder_)},
+      root_ptr_for_path_{other.root_ptr_for_path_},
       value_ptr_{std::exchange(other.value_ptr_, nullptr)},
       depth_{other.depth_},
       lazy_detached_path_{std::move(other.lazy_detached_path_)} {}
 
 Value& Value::operator=(Value&& other) noexcept {
-  root_ = std::move(other.root_);
+  holder_ = std::move(other.holder_);
+  root_ptr_for_path_ = std::exchange(other.root_ptr_for_path_, nullptr);
   value_ptr_ = std::exchange(other.value_ptr_, nullptr);
   depth_ = other.depth_;
   lazy_detached_path_ = std::move(other.lazy_detached_path_);
@@ -99,23 +104,26 @@ Value& Value::operator=(Value&& other) noexcept {
 }
 
 Value::Value(impl::VersionedValuePtr root) noexcept
-    : root_(std::move(root)), value_ptr_(root_.Get()) {}
+    : holder_(std::move(root)),
+      root_ptr_for_path_{holder_.Get()},
+      value_ptr_(holder_.Get()) {}
 
 Value::Value(EmplaceEnabler, const impl::VersionedValuePtr& root,
-             const impl::Value& value, int depth)
-    : Value(root, &value, depth) {}
-
-Value::Value(impl::VersionedValuePtr root, const impl::Value* value_ptr,
+             const impl::Value* root_ptr_for_path, const impl::Value* value_ptr,
              int depth)
-    : root_(std::move(root)),
+    : holder_(root),
+      // NOLINTNEXTLINE(cppcoreguidelines-pro-type-const-cast)
+      root_ptr_for_path_(const_cast<impl::Value*>(root_ptr_for_path)),
       // NOLINTNEXTLINE(cppcoreguidelines-pro-type-const-cast)
       value_ptr_(const_cast<impl::Value*>(value_ptr)),
       depth_(depth) {}
 
-Value::Value(impl::VersionedValuePtr root,
+Value::Value(EmplaceEnabler, const impl::VersionedValuePtr& root,
+             impl::Value* root_ptr_for_path,
              LazyDetachedPath&& lazy_detached_path)
-    : root_{std::move(root)},
-      lazy_detached_path_{std::move(lazy_detached_path)} {}
+    : holder_(root),
+      root_ptr_for_path_(root_ptr_for_path),
+      lazy_detached_path_(std::move(lazy_detached_path)) {}
 
 Value Value::operator[](std::string_view key) const {
   if (!IsMissing()) {
@@ -124,19 +132,23 @@ Value Value::operator[](std::string_view key) const {
       auto it = GetNative().FindMember(
           impl::Value(::rapidjson::StringRef(key.data(), key.size())));
       if (it != GetNative().MemberEnd()) {
-        return {root_, &it->value, depth_ + 1};
+        return {EmplaceEnabler{}, holder_, root_ptr_for_path_, &it->value,
+                depth_ + 1};
       }
     }
 
-    return {root_, LazyDetachedPath{value_ptr_, depth_, key}};
+    return {EmplaceEnabler{}, holder_, root_ptr_for_path_,
+            LazyDetachedPath{value_ptr_, depth_, key}};
   }
 
-  return {root_, lazy_detached_path_.Chain(key)};
+  return {EmplaceEnabler{}, holder_, root_ptr_for_path_,
+          lazy_detached_path_.Chain(key)};
 }
 
 Value Value::operator[](std::size_t index) const {
   CheckInBounds(index);
-  return {root_, &GetNative()[static_cast<int>(index)], depth_ + 1};
+  return {EmplaceEnabler{}, holder_, root_ptr_for_path_,
+          &GetNative()[static_cast<int>(index)], depth_ + 1};
 }
 
 Value::const_iterator Value::begin() const {
@@ -182,17 +194,15 @@ std::size_t Value::GetSize() const {
 }
 
 bool Value::operator==(const Value& other) const {
-  return GetNative() == other.GetNative();
+  return impl::AreEqual(&GetNative(), &other.GetNative());
 }
 
-bool Value::operator!=(const Value& other) const {
-  return GetNative() != other.GetNative();
-}
+bool Value::operator!=(const Value& other) const { return !(*this == other); }
 
-bool Value::IsMissing() const noexcept { return root_ && !value_ptr_; }
+bool Value::IsMissing() const noexcept { return holder_ && !value_ptr_; }
 
 bool Value::IsNull() const noexcept {
-  return !IsMissing() && (!root_ || GetNative().IsNull());
+  return !IsMissing() && (!holder_ || GetNative().IsNull());
 }
 
 bool Value::IsBool() const noexcept {
@@ -243,57 +253,57 @@ bool Value::IsObject() const noexcept {
   return !IsMissing() && GetNative().IsObject();
 }
 
-template <>
-bool Value::As<bool>() const {
-  CheckNotMissing();
-  const auto& native = GetNative();
+bool Parse(const Value& value, parse::To<bool>) {
+  value.CheckNotMissing();
+  const auto& native = value.GetNative();
   if (native.IsTrue()) return true;
   if (native.IsFalse()) return false;
-  throw TypeMismatchException(GetExtendedType(), impl::booleanValue, GetPath());
+  throw TypeMismatchException(value.GetExtendedType(), impl::booleanValue,
+                              value.GetPath());
 }
 
-template <>
-int64_t Value::As<int64_t>() const {
-  CheckNotMissing();
-  const auto& native = GetNative();
+double Parse(const Value& value, parse::To<double>) {
+  value.CheckNotMissing();
+  const auto& native = value.GetNative();
+  if (native.IsDouble()) return native.GetDouble();
+  if (native.IsInt64()) return static_cast<double>(native.GetInt64());
+  if (native.IsUint64()) return static_cast<double>(native.GetUint64());
+  throw TypeMismatchException(value.GetExtendedType(), impl::realValue,
+                              value.GetPath());
+}
+
+std::int64_t Parse(const Value& value, parse::To<std::int64_t>) {
+  value.CheckNotMissing();
+  const auto& native = value.GetNative();
   if (native.IsInt64()) return native.GetInt64();
   if (native.IsDouble()) {
     const double val = native.GetDouble();
     if (IsNonOverflowingIntegral<int64_t>(val))
       return static_cast<int64_t>(val);
   }
-  throw TypeMismatchException(GetExtendedType(), impl::intValue, GetPath());
+  throw TypeMismatchException(value.GetExtendedType(), impl::intValue,
+                              value.GetPath());
 }
 
-template <>
-uint64_t Value::As<uint64_t>() const {
-  CheckNotMissing();
-  const auto& native = GetNative();
+std::uint64_t Parse(const Value& value, parse::To<std::uint64_t>) {
+  value.CheckNotMissing();
+  const auto& native = value.GetNative();
   if (native.IsUint64()) return native.GetUint64();
   if (native.IsDouble()) {
     const double val = native.GetDouble();
     if (IsNonOverflowingIntegral<uint64_t>(val))
       return static_cast<uint64_t>(val);
   }
-  throw TypeMismatchException(GetExtendedType(), impl::uintValue, GetPath());
+  throw TypeMismatchException(value.GetExtendedType(), impl::uintValue,
+                              value.GetPath());
 }
 
-template <>
-double Value::As<double>() const {
-  CheckNotMissing();
-  const auto& native = GetNative();
-  if (native.IsDouble()) return native.GetDouble();
-  if (native.IsInt64()) return static_cast<double>(native.GetInt64());
-  if (native.IsUint64()) return static_cast<double>(native.GetUint64());
-  throw TypeMismatchException(GetExtendedType(), impl::realValue, GetPath());
-}
-
-template <>
-std::string Value::As<std::string>() const {
-  CheckNotMissing();
-  const auto& native = GetNative();
+std::string Parse(const Value& value, parse::To<std::string>) {
+  value.CheckNotMissing();
+  const auto& native = value.GetNative();
   if (native.IsString()) return {native.GetString(), native.GetStringLength()};
-  throw TypeMismatchException(GetExtendedType(), impl::stringValue, GetPath());
+  throw TypeMismatchException(value.GetExtendedType(), impl::stringValue,
+                              value.GetPath());
 }
 
 template <>
@@ -376,10 +386,15 @@ bool Value::HasMember(std::string_view key) const {
 
 std::string Value::GetPath() const {
   if (value_ptr_ != nullptr) {
-    return impl::MakePath(root_.Get(), value_ptr_, depth_);
+    return impl::MakePath(root_ptr_for_path_, value_ptr_, depth_);
   } else {
-    return lazy_detached_path_.Get(root_.Get());
+    return lazy_detached_path_.Get(root_ptr_for_path_);
   }
+}
+
+void Value::DropRootPath() {
+  root_ptr_for_path_ = value_ptr_;
+  depth_ = 0;
 }
 
 Value Value::Clone() const {
@@ -390,15 +405,15 @@ void Value::EnsureNotMissing() const {
   // We should never get here if the value is missing, in the first place.
   CheckNotMissing();
 
-  UINVARIANT(!!root_, "A moved-from Value is accessed");
+  UINVARIANT(!!holder_, "A moved-from Value is accessed");
 
   UINVARIANT(value_ptr_ != nullptr,
              "Something is terribly broken in userver json");
 }
 
-bool Value::IsRoot() const noexcept { return root_.Get() == value_ptr_; }
+bool Value::IsRoot() const noexcept { return holder_.Get() == value_ptr_; }
 
-bool Value::IsUniqueReference() const { return root_.IsUnique(); }
+bool Value::IsUniqueReference() const { return holder_.IsUnique(); }
 
 const impl::Value& Value::GetNative() const {
   EnsureNotMissing();
@@ -497,6 +512,11 @@ Value::LazyDetachedPath Value::LazyDetachedPath::Chain(
       formats::common::MakeChildPath(std::move(result.virtual_path_), key);
 
   return result;
+}
+
+std::chrono::microseconds Parse(const Value& value,
+                                parse::To<std::chrono::microseconds>) {
+  return ParseJsonDuration<std::chrono::microseconds>(value);
 }
 
 std::chrono::milliseconds Parse(const Value& value,

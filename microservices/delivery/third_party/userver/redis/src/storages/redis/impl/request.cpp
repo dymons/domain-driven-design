@@ -2,7 +2,7 @@
 
 #include <userver/tracing/in_place_span.hpp>
 
-#include <userver/storages/redis/impl/exception.hpp>
+#include <userver/storages/redis/exception.hpp>
 #include <userver/storages/redis/impl/reply.hpp>
 
 #include <storages/redis/impl/command.hpp>
@@ -124,6 +124,10 @@ ReplyPtr Request::Get() {
           "Redis request wait was aborted due to task cancellation");
   }
   UINVARIANT(false, "Invalid FutureStatus enum value");
+}
+
+engine::impl::ContextAccessor* Request::TryGetContextAccessor() noexcept {
+  return future_.TryGetContextAccessor();
 }
 
 }  // namespace redis

@@ -62,12 +62,23 @@ void CheckHeaderName(std::string_view name) {
 }
 
 void CheckHeaderValue(std::string_view value) {
-  for (char c : value) {
+  bool check_failed = false;
+
+  // this gets autovectorized, and we optimize for happy path here
+  for (const char c : value) {
     auto code = static_cast<uint8_t>(c);
-    if (code < 32 || code == 127) {
-      throw std::runtime_error(
-          std::string("invalid character in header value: '") + c + "' (#" +
-          std::to_string(code) + ")");
+    check_failed |= code < 32 || code == 127;
+  }
+
+  if (check_failed) {
+    // in a presumably rare scenarios of the check failing we do a second loop
+    for (const char c : value) {
+      auto code = static_cast<uint8_t>(c);
+      if (code < 32 || code == 127) {
+        throw std::runtime_error(
+            std::string("invalid character in header value: '") + c + "' (#" +
+            std::to_string(code) + ")");
+      }
     }
   }
 }
@@ -112,9 +123,16 @@ void OutputHeader(USERVER_NAMESPACE::http::headers::HeadersString& header,
 
 HttpResponse::HttpResponse(const HttpRequestImpl& request,
                            request::ResponseDataAccounter& data_accounter)
-    : ResponseBase(data_accounter),
-      request_(request),
-      headers_end_(engine::SingleConsumerEvent::NoAutoReset()) {}
+    : HttpResponse{request, data_accounter, std::chrono::steady_clock::now(),
+                   utils::StrCaseHash{}} {}
+
+HttpResponse::HttpResponse(const HttpRequestImpl& request,
+                           request::ResponseDataAccounter& data_accounter,
+                           std::chrono::steady_clock::time_point now,
+                           utils::StrCaseHash hasher)
+    : ResponseBase{data_accounter, now},
+      request_{request},
+      cookies_{0, hasher} {}
 
 HttpResponse::~HttpResponse() = default;
 
@@ -344,29 +362,46 @@ std::size_t HttpResponse::SetBodyNotStreamed(
 std::size_t HttpResponse::SetBodyStreamed(
     engine::io::RwBase& socket,
     USERVER_NAMESPACE::http::headers::HeadersString& header) {
+  const bool is_body_forbidden = IsBodyForbiddenForStatus(status_);
+
   impl::OutputHeader(
       header, USERVER_NAMESPACE::http::headers::kTransferEncoding, "chunked");
+
+  // headers end marker
+  header.append(kCrlf);
 
   // send HTTP headers
   size_t sent_bytes = socket.WriteAll(header.data(), header.size(), {});
   header.clear();
   header.shrink_to_fit();  // free memory before time-consuming operation
 
+  if (is_body_forbidden) {
+    return sent_bytes;
+  }
+
   // Transmit HTTP response body
   std::string body_part;
+  // First chunk must be sent without kCrlf
+  // because kCrlf was sent with headers
+  bool first_chunk_processed = false;
   while (body_stream_->Pop(body_part)) {
     if (body_part.empty()) {
       LOG_DEBUG() << "Zero size body_part in http_response.cpp";
       continue;
     }
 
-    auto size = fmt::format("\r\n{:x}\r\n", body_part.size());
+    auto size = first_chunk_processed
+                    ? fmt::format("\r\n{:x}\r\n", body_part.size())
+                    : fmt::format("{:x}\r\n", body_part.size());
     sent_bytes += socket.WriteAll(
         {{size.data(), size.size()}, {body_part.data(), body_part.size()}},
         engine::Deadline{});
+
+    first_chunk_processed = true;
   }
 
-  const constexpr std::string_view terminating_chunk{"\r\n0\r\n\r\n"};
+  const std::string_view terminating_chunk{
+      first_chunk_processed ? "\r\n0\r\n\r\n" : "0\r\n\r\n"};
   sent_bytes +=
       socket.WriteAll(terminating_chunk.data(), terminating_chunk.size(), {});
 

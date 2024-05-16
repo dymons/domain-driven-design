@@ -40,12 +40,12 @@ std::string HttpHandlerJsonBase::HandleRequestThrow(
   response.SetContentType(
       USERVER_NAMESPACE::http::content_type::kApplicationJson);
 
-  const auto& response_json = context.SetData<const formats::json::Value>(
+  const auto& response_json = context.SetData<formats::json::Value>(
       kResponseDataName,
       HandleRequestJsonThrow(request, request_json, context));
 
   const auto scope_time =
-      tracing::Span::CurrentSpan().CreateScopeTime(kSerializeJson);
+      tracing::ScopeTime::CreateOptionalScopeTime(kSerializeJson);
   return formats::json::ToString(response_json);
 }
 
@@ -73,12 +73,12 @@ FormattedErrorData HttpHandlerJsonBase::GetFormattedExternalErrorBody(
 void HttpHandlerJsonBase::ParseRequestData(
     const http::HttpRequest& request, request::RequestContext& context) const {
   if (request.RequestBody().empty()) {
-    context.SetData<const formats::json::Value>(kRequestDataName, kEmptyJson);
+    context.SetData<formats::json::Value>(kRequestDataName, kEmptyJson);
     return;
   }
 
   try {
-    context.SetData<const formats::json::Value>(
+    context.SetData<formats::json::Value>(
         kRequestDataName, formats::json::FromString(request.RequestBody()));
   } catch (const formats::json::Exception& e) {
     throw RequestParseError(

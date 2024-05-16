@@ -78,6 +78,8 @@ components_manager:
       testsuite-redis-timeout-connect: 5s
       testsuite-redis-timeout-single: 1s
       testsuite-redis-timeout-all: 750ms
+      testsuite-increased-timeout: 40s
+      cache-update-execution: concurrent
 # /// [Sample testsuite support component config]
 # /// [Sample http client component config]
 # yaml
@@ -131,10 +133,9 @@ components_manager:
       update-interval: 5s
       update-jitter: 2s
       full-update-interval: 5m
-      first-update-fail-ok: false
+      first-update-fail-ok: true
       config-settings: false
       additional-cleanup-interval: 5m
-      testsuite-force-periodic-update: true
 # /// [Sample dynamic config client updater component config]
 # /// [Sample logging component config]
 # yaml

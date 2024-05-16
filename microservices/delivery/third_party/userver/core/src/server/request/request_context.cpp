@@ -2,7 +2,9 @@
 
 #include <memory>
 #include <stdexcept>
-#include <unordered_map>
+
+#include <server/request/internal_request_context.hpp>
+#include <userver/utils/impl/transparent_hash.hpp>
 
 USERVER_NAMESPACE_BEGIN
 
@@ -16,19 +18,22 @@ class RequestContext::Impl final {
   void EraseUserAnyData();
 
   utils::AnyMovable& SetAnyData(std::string&& name, utils::AnyMovable&& data);
-  utils::AnyMovable& GetAnyData(const std::string& name);
-  utils::AnyMovable* GetAnyDataOptional(const std::string& name);
-  void EraseAnyData(const std::string& name);
+  utils::AnyMovable& GetAnyData(std::string_view name);
+  utils::AnyMovable* GetAnyDataOptional(std::string_view name);
+  void EraseAnyData(std::string_view name);
+
+  impl::InternalRequestContext& GetInternalContext();
 
  private:
   utils::AnyMovable user_data_;
-  std::unordered_map<std::string, utils::AnyMovable> named_datum_;
+  utils::impl::TransparentMap<std::string, utils::AnyMovable> named_datum_;
+  impl::InternalRequestContext internal_context_;
 };
 
 utils::AnyMovable& RequestContext::Impl::SetUserAnyData(
     utils::AnyMovable&& data) {
   if (user_data_.HasValue())
-    throw std::runtime_error("Data is already stored in RequestContext");
+    throw std::runtime_error("UserData is already stored in RequestContext");
   user_data_ = std::move(data);
   return user_data_;
 }
@@ -56,26 +61,28 @@ utils::AnyMovable& RequestContext::Impl::SetAnyData(std::string&& name,
   return res.first->second;
 }
 
-utils::AnyMovable& RequestContext::Impl::GetAnyData(const std::string& name) {
-  auto it = named_datum_.find(name);
-  if (it == named_datum_.end()) {
-    throw std::runtime_error("Data with name '" + name +
+utils::AnyMovable& RequestContext::Impl::GetAnyData(std::string_view name) {
+  auto* ptr = GetAnyDataOptional(name);
+  if (!ptr) {
+    throw std::runtime_error("Data with name '" + std::string{name} +
                              "' is not registered in RequestContext");
   }
-  return it->second;
+  return *ptr;
 }
 
 utils::AnyMovable* RequestContext::Impl::GetAnyDataOptional(
-    const std::string& name) {
-  auto it = named_datum_.find(name);
-  if (it == named_datum_.end()) return nullptr;
-  return &it->second;
+    std::string_view name) {
+  return utils::impl::FindTransparentOrNullptr(named_datum_, name);
 }
 
-void RequestContext::Impl::EraseAnyData(const std::string& name) {
-  auto it = named_datum_.find(name);
+void RequestContext::Impl::EraseAnyData(std::string_view name) {
+  auto it = utils::impl::FindTransparent(named_datum_, name);
   if (it == named_datum_.end()) return;
   named_datum_.erase(it);
+}
+
+impl::InternalRequestContext& RequestContext::Impl::GetInternalContext() {
+  return internal_context_;
 }
 
 RequestContext::RequestContext() = default;
@@ -103,16 +110,20 @@ utils::AnyMovable& RequestContext::SetAnyData(std::string&& name,
   return impl_->SetAnyData(std::move(name), std::move(data));
 }
 
-utils::AnyMovable& RequestContext::GetAnyData(const std::string& name) {
+utils::AnyMovable& RequestContext::GetAnyData(std::string_view name) {
   return impl_->GetAnyData(name);
 }
 
-utils::AnyMovable* RequestContext::GetAnyDataOptional(const std::string& name) {
+utils::AnyMovable* RequestContext::GetAnyDataOptional(std::string_view name) {
   return impl_->GetAnyDataOptional(name);
 }
 
-void RequestContext::EraseAnyData(const std::string& name) {
+void RequestContext::EraseAnyData(std::string_view name) {
   return impl_->EraseAnyData(name);
+}
+
+impl::InternalRequestContext& RequestContext::GetInternalContext() {
+  return impl_->GetInternalContext();
 }
 
 }  // namespace server::request

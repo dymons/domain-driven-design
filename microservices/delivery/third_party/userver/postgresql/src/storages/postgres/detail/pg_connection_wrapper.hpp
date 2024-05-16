@@ -22,6 +22,9 @@ USERVER_NAMESPACE_BEGIN
 
 namespace storages::postgres::detail {
 
+inline constexpr std::string_view kSetConfigQueryResultName{
+    "userver_set_config"};
+
 class PGConnectionWrapper {
  public:
   using Deadline = engine::Deadline;
@@ -92,7 +95,7 @@ class PGConnectionWrapper {
 
   /// @brief Wrapper for PQsendQueryPrepared
   void SendPreparedQuery(const std::string& name, const QueryParameters& params,
-                         tracing::ScopeTime&);
+                         tracing::ScopeTime&, PGresult* description);
 
   /// @brief Wrapper for PQXSendPortalBind
   void SendPortalBind(const std::string& statement_name,
@@ -105,20 +108,24 @@ class PGConnectionWrapper {
 
   /// @brief Wait for query result
   /// Will return result or throw an exception
-  ResultSet WaitResult(Deadline deadline, tracing::ScopeTime&);
+  ResultSet WaitResult(Deadline deadline, tracing::ScopeTime&,
+                       const PGresult* description);
 
   /// @brief Wait for notification
   Notification WaitNotify(Deadline deadline);
 
+  std::vector<ResultSet> GatherPipeline(
+      Deadline deadline, const std::vector<const PGresult*>& descriptions);
+
   /// Consume input from connection
-  void ConsumeInput(Deadline deadline);
+  void ConsumeInput(Deadline deadline, const PGresult* description);
 
   /// Consume all input discarding all result sets
   void DiscardInput(Deadline deadline);
 
   /// Consume input while the connection is busy.
   /// If the connection still busy, return false
-  bool TryConsumeInput(Deadline deadline);
+  bool TryConsumeInput(Deadline deadline, const PGresult* description);
 
   /// @brief Fills current span with connection info
   void FillSpanTags(tracing::Span&, const CommandControl& cc) const;
@@ -137,6 +144,8 @@ class PGConnectionWrapper {
   /// Escape a string for use as an SQL identifier, such as a table, column, or
   /// function name
   std::string EscapeIdentifier(std::string_view);
+
+  void PutPipelineSync();
 
  private:
   PGTransactionStatusType GetTransactionStatus() const;
@@ -157,7 +166,7 @@ class PGConnectionWrapper {
 
   void Flush(Deadline deadline);
 
-  PGresult* ReadResult(Deadline deadline);
+  PGresult* ReadResult(Deadline deadline, const PGresult* description);
 
   ResultSet MakeResult(ResultHandle&& handle);
 

@@ -5,7 +5,6 @@
 #include <deque>
 #include <mutex>
 #include <string>
-#include <thread>
 #include <unordered_map>
 #include <vector>
 
@@ -19,6 +18,8 @@
 #include <userver/logging/level.hpp>
 #include <userver/logging/log.hpp>
 #include <userver/utils/assert.hpp>
+#include <userver/utils/impl/userver_experiments.hpp>
+#include <userver/utils/retry_budget.hpp>
 #include <userver/utils/swappingsmart.hpp>
 
 #include <storages/redis/impl/command.hpp>
@@ -77,17 +78,21 @@ inline bool AreStringsEqualIgnoreCase(const std::string& l,
 inline bool IsUnsubscribeCommand(const CmdArgs::CmdArgsArray& args) {
   static const std::string unsubscribe_command{"UNSUBSCRIBE"};
   static const std::string punsubscribe_command{"PUNSUBSCRIBE"};
+  static const std::string sunsubscribe_command{"SUNSUBSCRIBE"};
 
   return AreStringsEqualIgnoreCase(args[0], unsubscribe_command) ||
-         AreStringsEqualIgnoreCase(args[0], punsubscribe_command);
+         AreStringsEqualIgnoreCase(args[0], punsubscribe_command) ||
+         AreStringsEqualIgnoreCase(args[0], sunsubscribe_command);
 }
 
 inline bool IsSubscribeCommand(const CmdArgs::CmdArgsArray& args) {
   static const std::string subscribe_command{"SUBSCRIBE"};
   static const std::string psubscribe_command{"PSUBSCRIBE"};
+  static const std::string ssubscribe_command{"SSUBSCRIBE"};
 
   return AreStringsEqualIgnoreCase(args[0], subscribe_command) ||
-         AreStringsEqualIgnoreCase(args[0], psubscribe_command);
+         AreStringsEqualIgnoreCase(args[0], psubscribe_command) ||
+         AreStringsEqualIgnoreCase(args[0], ssubscribe_command);
 }
 
 inline bool IsSubscribesCommand(const CmdArgs::CmdArgsArray& args) {
@@ -116,7 +121,8 @@ bool IsUnsubscribeReply(const ReplyPtr& reply) {
   const auto& reply_array = reply->data.GetArray();
   if (reply_array.size() != 3 || !reply_array[0].IsString()) return false;
   return !strcasecmp(reply_array[0].GetString().c_str(), "UNSUBSCRIBE") ||
-         !strcasecmp(reply_array[0].GetString().c_str(), "PUNSUBSCRIBE");
+         !strcasecmp(reply_array[0].GetString().c_str(), "PUNSUBSCRIBE") ||
+         !strcasecmp(reply_array[0].GetString().c_str(), "SUNSUBSCRIBE");
 }
 
 #ifdef USERVER_FEATURE_REDIS_TLS
@@ -155,6 +161,11 @@ class Redis::RedisImpl : public std::enable_shared_from_this<Redis::RedisImpl> {
   size_t GetRunningCommands() const;
   bool IsDestroying() const { return destroying_; }
   bool IsSyncing() const { return is_syncing_; }
+  bool IsAvailable() const {
+    return GetState() == Redis::State::kConnected && !IsDestroying() &&
+           !IsSyncing();
+  }
+  bool CanRetry() const;
   std::chrono::milliseconds GetPingLatency() const {
     return std::chrono::milliseconds(ping_latency_ms_);
   }
@@ -162,6 +173,7 @@ class Redis::RedisImpl : public std::enable_shared_from_this<Redis::RedisImpl> {
       CommandsBufferingSettings commands_buffering_settings);
   void SetReplicationMonitoringSettings(
       const ReplicationMonitoringSettings& replication_monitoring_settings);
+  void SetRetryBudgetSettings(const utils::RetryBudgetSettings& settings);
 
   void ResetRedisObj() { redis_obj_ = nullptr; }
 
@@ -290,32 +302,22 @@ class Redis::RedisImpl : public std::enable_shared_from_this<Redis::RedisImpl> {
   ServerId server_id_;
   bool attached_ = false;
   std::shared_ptr<RedisImpl> self_;
+  utils::RetryBudget retry_budget_;
 };
 
-const std::string& Redis::StateToString(State state) {
-  static const std::string kInit = "init";
-  static const std::string kInitError = "init_error";
-  static const std::string kConnected = "connected";
-  static const std::string kDisconnecting = "disconnecting";
-  static const std::string kDisconnected = "disconnected";
-  static const std::string kDisconnectError = "disconnect_error";
-  static const std::string kUnknown = "unknown";
+std::string_view StateToString(RedisState state) {
+  constexpr utils::TrivialBiMap states_map = [](auto selector) {
+    return selector()
+        .Case(RedisState::kInit, "init")
+        .Case(RedisState::kInitError, "init_error")
+        .Case(RedisState::kConnected, "connected")
+        .Case(RedisState::kDisconnecting, "disconnecting")
+        .Case(RedisState::kDisconnected, "disconnected")
+        .Case(RedisState::kDisconnectError, "disconnect_error");
+  };
 
-  switch (state) {
-    case State::kInit:
-      return kInit;
-    case State::kInitError:
-      return kInitError;
-    case State::kConnected:
-      return kConnected;
-    case State::kDisconnecting:
-      return kDisconnecting;
-    case State::kDisconnected:
-      return kDisconnected;
-    case State::kDisconnectError:
-      return kDisconnectError;
-  }
-  return kUnknown;
+  const auto state_str = states_map.TryFind(state);
+  return state_str ? *state_str : "unknown";
 }
 
 Redis::Redis(const std::shared_ptr<engine::ev::ThreadPool>& thread_pool,
@@ -360,6 +362,10 @@ bool Redis::IsDestroying() const { return impl_->IsDestroying(); }
 
 bool Redis::IsSyncing() const { return impl_->IsSyncing(); }
 
+bool Redis::IsAvailable() const { return impl_->IsAvailable(); }
+
+bool Redis::CanRetry() const { return impl_->CanRetry(); }
+
 std::string Redis::GetServerHost() const { return impl_->GetHost(); }
 
 uint16_t Redis::GetServerPort() const { return impl_->GetPort(); }
@@ -367,6 +373,10 @@ uint16_t Redis::GetServerPort() const { return impl_->GetPort(); }
 void Redis::SetCommandsBufferingSettings(
     CommandsBufferingSettings commands_buffering_settings) {
   impl_->SetCommandsBufferingSettings(commands_buffering_settings);
+}
+
+void Redis::SetRetryBudgetSettings(const utils::RetryBudgetSettings& settings) {
+  impl_->SetRetryBudgetSettings(settings);
 }
 
 void Redis::SetReplicationMonitoringSettings(
@@ -383,7 +393,8 @@ Redis::RedisImpl::RedisImpl(
       thread_pool_(thread_pool),
       send_readonly_(redis_settings.send_readonly),
       connection_security_(redis_settings.connection_security),
-      server_id_(ServerId::Generate()) {
+      server_id_(ServerId::Generate()),
+      retry_budget_(utils::RetryBudgetSettings{100, 0.1, false}) {
   SetCommandsBufferingSettings(CommandsBufferingSettings{});
   LOG_DEBUG() << "RedisImpl() server_id=" << GetServerId().GetId();
 }
@@ -530,6 +541,10 @@ void Redis::RedisImpl::InvokeCommand(const CommandPtr& command,
   reply->server = server_;
   if (reply->status == ReplyStatus::kTimeoutError) {
     reply->log_extra.Extend("timeout_ms", cc.timeout_single.count());
+    retry_budget_.AccountFail();
+  }
+  if (reply->status == ReplyStatus::kOk) {
+    retry_budget_.AccountOk();
   }
 
   reply->server_id = server_id_;
@@ -635,7 +650,6 @@ void Redis::RedisImpl::OnCommandTimeoutImpl(ev_timer* w) {
   auto reply_iterator = reply_privdata_.find(cmd_idx);
   if (reply_iterator != reply_privdata_.end()) {
     SingleCommand& command = *reply_iterator->second;
-    if (!subscriber_) --sent_count_;
     UASSERT(reply_privdata_rev_.count(&command.timer));
     UASSERT(w == &command.timer);
     reply_privdata_rev_.erase(&command.timer);
@@ -1245,6 +1259,8 @@ void Redis::RedisImpl::ProcessCommand(const CommandPtr& command) {
   }
 }
 
+bool Redis::RedisImpl::CanRetry() const { return retry_budget_.CanRetry(); }
+
 void Redis::RedisImpl::SetCommandsBufferingSettings(
     CommandsBufferingSettings commands_buffering_settings) {
   commands_buffering_settings_.Set(
@@ -1256,6 +1272,11 @@ void Redis::RedisImpl::SetReplicationMonitoringSettings(
       replication_monitoring_settings.enable_monitoring;
   forbid_requests_to_syncing_replicas_ =
       replication_monitoring_settings.restrict_requests;
+}
+
+void Redis::RedisImpl::SetRetryBudgetSettings(
+    const utils::RetryBudgetSettings& settings) {
+  retry_budget_.SetSettings(settings);
 }
 
 }  // namespace redis

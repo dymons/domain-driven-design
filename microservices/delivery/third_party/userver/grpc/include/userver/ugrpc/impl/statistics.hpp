@@ -20,9 +20,13 @@ USERVER_NAMESPACE_BEGIN
 
 namespace ugrpc::impl {
 
+enum class StatisticsDomain { kClient, kServer };
+
+std::string_view ToString(StatisticsDomain);
+
 class MethodStatistics final {
  public:
-  MethodStatistics();
+  explicit MethodStatistics(StatisticsDomain domain);
 
   void AccountStarted() noexcept;
 
@@ -48,6 +52,8 @@ class MethodStatistics final {
   friend void DumpMetric(utils::statistics::Writer& writer,
                          const MethodStatistics& stats);
 
+  std::uint64_t GetStarted() const noexcept;
+
  private:
   using Percentile =
       utils::statistics::Percentile<2000, std::uint32_t, 256, 100>;
@@ -57,6 +63,7 @@ class MethodStatistics final {
   static constexpr std::size_t kCodesCount =
       static_cast<std::size_t>(grpc::StatusCode::UNAUTHENTICATED) + 1;
 
+  const StatisticsDomain domain_;
   RateCounter started_{0};
   std::array<RateCounter, kCodesCount> status_codes_{};
   utils::statistics::RecentPeriod<Percentile, Percentile> timings_;
@@ -70,7 +77,8 @@ class MethodStatistics final {
 
 class ServiceStatistics final {
  public:
-  explicit ServiceStatistics(const StaticServiceMetadata& metadata);
+  ServiceStatistics(const StaticServiceMetadata& metadata,
+                    StatisticsDomain domain);
 
   ~ServiceStatistics();
 
@@ -78,6 +86,8 @@ class ServiceStatistics final {
   const MethodStatistics& GetMethodStatistics(std::size_t method_id) const;
 
   const StaticServiceMetadata& GetMetadata() const;
+
+  std::uint64_t GetStartedRequests() const;
 
   friend void DumpMetric(utils::statistics::Writer& writer,
                          const ServiceStatistics& stats);

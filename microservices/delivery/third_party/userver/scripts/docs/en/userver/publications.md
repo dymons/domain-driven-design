@@ -16,6 +16,11 @@
 
 ## Announcements
 
+### Release 2.0
+* 📖 Introducing userver 2.0, overview of safety and freestanding features (ru):
+  [userver 2.0 — большой релиз фреймворка для IO-bound программ](https://habr.com/ru/companies/yandex/articles/813115/)
+
+
 ### Release 1.0.0
 * 📖 Introducing userver 1.0, overview of safety and freestanding features
   [userver 1.0: Releasing a Framework for IO-Bound Programs](https://medium.com/yandex/userver-1-0-releasing-a-framework-for-io-bound-programs-7898c275d226)
@@ -33,6 +38,7 @@
 * 📖 Generic async engine implementation (ru): [Анатомия асинхронных фреймворков в С++ и других языках](https://habr.com/ru/company/yandex/blog/647853/)
 * 🎥 Generic async engine implementation (ru): [Анатомия асинхронных движков](https://youtu.be/MiE22pTvnPs)
 * 🎥 Description of utils::FastPimpl, formats::parse::To and logging implementation (ru): [C++ трюки из Такси](https://youtu.be/_AkF8SpUV3k)
+* 🎥 Description of utils::LazyPrvalue, utils::FixedArray, utils::TrivialBiMap, ODR-detection in PostgreSQL [C++ трюки из userver](https://www.youtube.com/watch?v=FcQC19CX-AY)
 * 🎥 Description of cache::LruSet implementation and optimizations (ru): [Ещё чуть быстрее делаем свой контейнер](https://youtu.be/60XhYzkXu1M)
 * 🎥 Monolyth vs. Microservices architecture and how userver works around their issues (ru):
   [Монолит vs Микросервисы, и Как эффективно работать с последними в C++](https://youtu.be/5QtAFKgS938)

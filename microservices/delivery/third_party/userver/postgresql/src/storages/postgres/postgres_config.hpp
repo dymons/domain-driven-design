@@ -25,6 +25,12 @@ PoolSettings Parse(const formats::json::Value& config,
 PoolSettings Parse(const yaml_config::YamlConfig& config,
                    formats::parse::To<PoolSettings>);
 
+TopologySettings Parse(const formats::json::Value& config,
+                       formats::parse::To<TopologySettings>);
+
+TopologySettings Parse(const yaml_config::YamlConfig& config,
+                       formats::parse::To<TopologySettings>);
+
 StatementMetricsSettings Parse(const formats::json::Value& config,
                                formats::parse::To<StatementMetricsSettings>);
 
@@ -38,6 +44,7 @@ struct Config final {
   CommandControlByHandlerMap handlers_command_control;
   CommandControlByQueryMap queries_command_control;
   dynamic_config::ValueDict<PoolSettings> pool_settings;
+  dynamic_config::ValueDict<TopologySettings> topology_settings;
   dynamic_config::ValueDict<ConnectionSettings> connection_settings;
   dynamic_config::ValueDict<StatementMetricsSettings>
       statement_metrics_settings;
@@ -50,6 +57,9 @@ extern const dynamic_config::Key<PipelineMode> kPipelineModeKey;
 extern const dynamic_config::Key<bool> kConnlimitModeAutoEnabled;
 
 extern const dynamic_config::Key<int> kDeadlinePropagationVersionConfig;
+
+extern const dynamic_config::Key<OmitDescribeInExecuteMode>
+    kOmitDescribeInExecuteModeKey;
 
 }  // namespace storages::postgres
 

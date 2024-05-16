@@ -175,7 +175,7 @@ std::string Span::Impl::GetParentIdForLogging(const Span::Impl* parent) {
       return current->GetSpanId();
     }
     if (current == spans_ptr->begin()) break;
-  };
+  }
 
   return {};
 }
@@ -283,6 +283,13 @@ Span Span::MakeSpan(std::string name, std::string_view trace_id,
   span.SetLink(std::move(link));
   if (!trace_id.empty()) span.pimpl_->SetTraceId(std::string{trace_id});
   span.pimpl_->SetParentId(std::string{parent_span_id});
+  return span;
+}
+
+Span Span::MakeRootSpan(std::string name, logging::Level log_level) {
+  Span span(Tracer::GetTracer(), std::move(name), nullptr,
+            ReferenceType::kChild, log_level);
+  span.SetLink(utils::generators::GenerateUuid());
   return span;
 }
 

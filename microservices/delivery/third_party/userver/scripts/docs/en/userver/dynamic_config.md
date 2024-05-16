@@ -13,8 +13,7 @@ Dynamic config is distributed as a large JSON object where each direct member
 is called a dynamic config variable, or (somewhat confusingly) a dynamic config.
 For example:
 
-```
-json
+```json
 {
   // ...
   "POSTGRES_DEFAULT_COMMAND_CONTROL": {
@@ -37,9 +36,7 @@ proxy setup and so forth.
 See @ref scripts/docs/en/userver/tutorial/production_service.md setup example.
 
 
-### C++ API
-
-#### Adding and using your own dynamic configs
+### Adding and using your own dynamic configs
 
 Dynamic config values are obtained via the dynamic_config::Source client
 that is retrieved from components::DynamicConfig:
@@ -56,7 +53,7 @@ You can also subscribe to dynamic config updates using
 dynamic_config::Source::UpdateAndListen functions, see their docs for details.
 
 @anchor dynamic_config_key
-##### What is needed to define a dynamic config
+#### What is needed to define a dynamic config
 
 A dynamic_config::Key requires 3 main elements:
 
@@ -74,14 +71,14 @@ A dynamic_config::Key requires 3 main elements:
     * If the whole config type is
       a @ref dynamic_config_parsing_trivial "trivial type" , then the default
       value may be provided directly as a C++ literal.
-    * For more complex types (e.g. objects), dynamic_config::DefaultAsJsonValue
+    * For more complex types (e.g. objects), dynamic_config::DefaultAsJsonString
       should be used.
     * @see @ref dynamic_config_defaults "how defaults are used".
 
 
-#### Summary of main dynamic config classes
+### Summary of main dynamic config classes
 
-##### dynamic_config::Snapshot
+#### dynamic_config::Snapshot
 
 A type-safe map that stores a snapshot of all used configs.
 dynamic_config::Snapshot is cheaply copyable (and even more cheaply movable),
@@ -89,12 +86,12 @@ has the semantics of `std::shared_ptr<const Impl>`. An obtained
 dynamic_config::Snapshot instance should be stored while its configs are used
 or referred to.
 
-##### dynamic_config::Source
+#### dynamic_config::Source
 
 A reference to the configs storage, required for obtaining the actual config
 value and subscription to new values.
 
-##### components::DynamicConfig
+#### components::DynamicConfig
 
 The component that stores configs in production and
 @ref dynamic_config_testsuite "testsuite tests".
@@ -104,7 +101,7 @@ For unit tests, dynamic_config::StorageMock is used instead.
 @see @ref dynamic_config_unit_tests
 
 
-#### Recommendations on working with dynamic config
+### Recommendations on working with dynamic config
 
 1. Don't store and pass around `components::DynamicConfig&`. Most code should
    immediately call `GetSource()` on it, then use or store
@@ -134,13 +131,17 @@ For unit tests, dynamic_config::StorageMock is used instead.
 
 @anchor dynamic_config_parsing
 
-#### Parsing dynamic configs
+### Parsing dynamic configs
 
 The following can be applied to parsing formats::json::Value in any context,
 but it frequently comes up in the context of defining configs.
 
+If your dynamic config is any more complex than
+a @ref dynamic_config_parsing_trivial "trivial type", then you need to ensure
+that JSON parsing is defined for it.
+
 @anchor dynamic_config_parsing_trivial
-##### Trivial types
+#### Trivial types
 
 JSON leafs can be parsed out of the box:
 
@@ -155,7 +156,7 @@ If the whole config variable is of such type, then the default value for it can
 be passed to dynamic_config::Key directly
 (without using dynamic_config::DefaultAsJsonString).
 
-##### Durations
+#### Durations
 
 Chrono durations are stored in JSON as integers:
 
@@ -168,7 +169,7 @@ at the JSON, we recommend ending the config name or the object label with one
 of the following suffixes: `_MS`, `_SECONDS`, `_MINUTES`, `_HOURS`
 (in the appropriate capitalization).
 
-##### Enums
+#### Enums
 
 A string that may only be selected a finite range of values should be mapped
 to C++ `enum class`. Parsers for enums currently have to be defined manually.
@@ -176,7 +177,7 @@ Example enum parser:
 
 @snippet engine/task/task_processor_config.cpp  sample enum parser
 
-##### Structs
+#### Structs
 
 Objects are represented as C++ structs. Parsers for structs currently
 have to be defined manually. Example struct config:
@@ -184,7 +185,7 @@ have to be defined manually. Example struct config:
 @snippet dynamic_config/config_test.cpp  struct config hpp
 @snippet dynamic_config/config_test.cpp  struct config cpp
 
-##### Optionals
+#### Optionals
 
 To represent optional (non-required) properties, use `std::optional` or `As`
 with default. For example:
@@ -198,11 +199,11 @@ with default. For example:
   value: `field = json.As<T>(field)`.
 
 To enable support for `std::optional`:
-```
+```cpp
 #include <userver/formats/parse/common_containers.hpp>
 ```
 
-##### Containers
+#### Containers
 
 To represent JSON arrays, use containers, typically:
 
@@ -218,13 +219,13 @@ use map containers, typically:
 
 To enable support for such containers, use the following:
 
-```
+```cpp
 #include <userver/formats/parse/common_containers.hpp>
 ```
 
 If the nested type is your custom type, make sure to define `Parse` for it:
 
-```
+```cpp
 // To parse this type
 std::unordered_map<std::string, std::optional<MyStruct>>
 
@@ -322,7 +323,7 @@ In this case YAML is automatically converted to JSON, then parsed as usual.
 Alternatively, you can pass the path to a JSON file with defaults:
 
 ```
-yaml
+# yaml
     dynamic-config:
         defaults-path: $dynamic-config-defaults
 ```
@@ -349,7 +350,7 @@ Here is a reasonable static config for those:
 
 
 @anchor dynamic_config_fallback
-### Fallback mechanisms for dynamic configs
+### Fallback mechanisms for dynamic configs updates
 
 Suppose that the new revision of the current service released before the newly
 added config was accounted by the config service. In this case it should just
@@ -392,7 +393,11 @@ If the first config update fails, and the config cache file is missing, then
 the service will fail to start, showing a helpful log message. Defaults are not
 used in this case, because they may be significantly outdated, and to avoid
 requiring the developer to always keep defaults up-to-date with production
-requirements.
+requirements. Another reason for such behavior is that the dynamic configs are
+used to fix up incidents, so such check of the dynamic configs service
+at first deployment prevents incident escalation due to unnoticed
+misconfiguration (missing routes to dynamic config service, broken
+authorization, ...).
 
 If you still wish to boot the service using just dynamic config defaults, you
 can create a config cache file with contents `{}`, or bake a config cache file
@@ -452,8 +457,7 @@ dynamic config (as shown above) in each of those directories in different ways.
 If the service has config updates enabled, then you can change dynamic config
 per-test as follows:
 
-```
-python
+```python
 @pytest.mark.config(MY_CONFIG_NAME=42, MY_OTHER_CONFIG_NAME=True)
 async def test_whatever(service_client, ...):
 ```
@@ -463,9 +467,8 @@ Dynamic config can also be modified mid-test using @ref dynamic_config fixture.
 Such dynamic config changes are applied (sent to the service) at the first
 `service_client` request in the test, or manually:
 
-```
-python
-await service_client.update_server_state()`
+```python
+await service_client.update_server_state()
 ```
 
 

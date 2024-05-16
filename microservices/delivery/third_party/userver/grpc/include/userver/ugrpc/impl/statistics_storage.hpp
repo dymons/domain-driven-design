@@ -17,7 +17,7 @@ namespace ugrpc::impl {
 class StatisticsStorage final {
  public:
   explicit StatisticsStorage(utils::statistics::Storage& statistics_storage,
-                             std::string_view domain);
+                             StatisticsDomain domain);
 
   StatisticsStorage(const StatisticsStorage&) = delete;
   StatisticsStorage& operator=(const StatisticsStorage&) = delete;
@@ -26,6 +26,11 @@ class StatisticsStorage final {
 
   ugrpc::impl::ServiceStatistics& GetServiceStatistics(
       const ugrpc::impl::StaticServiceMetadata& metadata);
+
+  // Can only be called on StatisticsStorage for gRPC services (not clients).
+  // Can only be called strictly after all the components are loaded.
+  // gRPC services must not be [un]registered during GetStartedRequests().
+  std::uint64_t GetStartedRequests() const;
 
  private:
   // Pointer to service name from its metadata is used as a unique service ID
@@ -39,6 +44,8 @@ class StatisticsStorage final {
   struct ServiceIdComparer final {
     bool operator()(ServiceId lhs, ServiceId rhs) const { return lhs == rhs; }
   };
+
+  const StatisticsDomain domain_;
 
   std::unordered_map<ServiceId, ugrpc::impl::ServiceStatistics,
                      std::hash<ServiceId>, ServiceIdComparer>

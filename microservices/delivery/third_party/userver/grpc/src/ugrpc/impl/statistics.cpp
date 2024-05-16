@@ -13,6 +13,21 @@ namespace ugrpc::impl {
 
 namespace {
 
+// See https://opentelemetry.io/docs/specs/semconv/rpc/grpc/
+// Except that we don't mark DEADLINE_EXCEEDED as a server error.
+bool IsServerError(grpc::StatusCode status) {
+  switch (status) {
+    case grpc::StatusCode::UNKNOWN:
+    case grpc::StatusCode::UNIMPLEMENTED:
+    case grpc::StatusCode::INTERNAL:
+    case grpc::StatusCode::UNAVAILABLE:
+    case grpc::StatusCode::DATA_LOSS:
+      return true;
+    default:
+      return false;
+  }
+}
+
 // For now, we need to dump metrics in legacy format - without 'rate'
 // support - in order not to break existing dashboards
 struct AsRateAndGauge final {
@@ -32,7 +47,7 @@ void DumpMetric(utils::statistics::Writer& writer,
 
 }  // namespace
 
-MethodStatistics::MethodStatistics() = default;
+MethodStatistics::MethodStatistics(StatisticsDomain domain) : domain_(domain) {}
 
 void MethodStatistics::AccountStarted() noexcept { ++started_; }
 
@@ -65,6 +80,16 @@ void MethodStatistics::AccountCancelled() noexcept { ++cancelled_; }
 
 void DumpMetric(utils::statistics::Writer& writer,
                 const MethodStatistics& stats) {
+  if (stats.domain_ == StatisticsDomain::kClient && !stats.started_.Load()) {
+    // Don't write client metrics for methods, for which the current service has
+    // not performed any requests since the start.
+    //
+    // gRPC service clients may have tens of methods, of which only a few are
+    // actually used by the current service. Not writing extra metrics saves
+    // metrics quota and mirrors the behavior for HTTP destinations.
+    return;
+  }
+
   writer["timings"] = stats.timings_;
 
   utils::statistics::Rate total_requests{0};
@@ -76,38 +101,46 @@ void DumpMetric(utils::statistics::Writer& writer,
       const auto code = static_cast<grpc::StatusCode>(idx);
       const auto count = counter.Load();
       total_requests += count;
-      if (code != grpc::StatusCode::OK) error_requests += count;
+      if (IsServerError(code)) error_requests += count;
       status.ValueWithLabels(AsRateAndGauge{count},
                              {"grpc_code", ugrpc::ToString(code)});
     }
   }
 
   const auto network_errors_value = stats.network_errors_.Load();
+  // 'abandoned_errors' need not be accounted in eps or rps, because such
+  // requests also separately report the error that occurred during the
+  // automatic request termination.
   const auto abandoned_errors_value = stats.internal_errors_.Load();
   const auto deadline_cancelled_value = stats.deadline_cancelled_.Load();
   const auto cancelled_value = stats.cancelled_.Load();
 
   // 'total_requests' and 'error_requests' originally only count RPCs that
-  // finished with a status code. 'network_errors' are RPCs that finished
-  // abruptly and didn't produce a status code. But these RPCs still need to
-  // be included in the totals.
+  // finished with a status code. 'network_errors', 'deadline_cancelled' and
+  // 'cancelled' are RPCs that finished abruptly and didn't produce a status
+  // code. But these RPCs still need to be included in the totals.
+
+  // Network errors are not considered to be server errors, because either the
+  // client is responsible for the server dropping the request (`TryCancel`,
+  // deadline), or it is truly a network error, in which case it's typically
+  // helpful for troubleshooting to say that there are issues not with the
+  // uservice process itself, but with the infrastructure.
   total_requests += network_errors_value;
-  error_requests += network_errors_value;
 
-  // Same for deadline propagation cancellation
+  // Deadline propagation is considered a client-side error: the client likely
+  // caused the error by giving the server an insufficient deadline.
   total_requests += deadline_cancelled_value;
-  error_requests += deadline_cancelled_value;
 
-  // Same for cancelled tasks
+  // Cancellation is triggered by deadline propagation or by the client
+  // dropping the RPC, it is not a server-side error.
   total_requests += cancelled_value;
-  error_requests += cancelled_value;
 
   // "active" is not a rate metric. Also, beware of overflow
   writer["active"] = static_cast<std::int64_t>(stats.started_.Load().value) -
                      static_cast<std::int64_t>(total_requests.value);
 
   writer["rps"] = AsRateAndGauge{total_requests};
-  writer["eps"] = AsRateAndGauge{error_requests};
+  writer["eps"] = error_requests;
 
   writer["network-error"] = AsRateAndGauge{network_errors_value};
   writer["abandoned-error"] = AsRateAndGauge{abandoned_errors_value};
@@ -119,11 +152,16 @@ void DumpMetric(utils::statistics::Writer& writer,
       AsRateAndGauge{deadline_cancelled_value};
 }
 
+std::uint64_t MethodStatistics::GetStarted() const noexcept {
+  return started_.Load().value;
+}
+
 ServiceStatistics::~ServiceStatistics() = default;
 
-ServiceStatistics::ServiceStatistics(const StaticServiceMetadata& metadata)
+ServiceStatistics::ServiceStatistics(const StaticServiceMetadata& metadata,
+                                     StatisticsDomain domain)
     : metadata_(metadata),
-      method_statistics_(metadata.method_full_names.size()) {}
+      method_statistics_(metadata.method_full_names.size(), domain) {}
 
 MethodStatistics& ServiceStatistics::GetMethodStatistics(
     std::size_t method_id) {
@@ -133,6 +171,14 @@ MethodStatistics& ServiceStatistics::GetMethodStatistics(
 const MethodStatistics& ServiceStatistics::GetMethodStatistics(
     std::size_t method_id) const {
   return method_statistics_[method_id];
+}
+
+std::uint64_t ServiceStatistics::GetStartedRequests() const {
+  std::uint64_t result{0};
+  for (const auto& stats : method_statistics_) {
+    result += stats.GetStarted();
+  }
+  return result;
 }
 
 const StaticServiceMetadata& ServiceStatistics::GetMetadata() const {

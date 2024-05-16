@@ -49,21 +49,33 @@ formats::json::Value Control::Perform(
 
   const auto invalidate_caches = request_body["invalidate_caches"];
   if (!invalidate_caches.IsMissing()) {
-    const auto update_type =
-        cache::Parse(invalidate_caches["update_type"],
-                     formats::parse::To<cache::UpdateType>());
-
-    if (invalidate_caches.HasMember("names")) {
-      testsuite_support_.GetCacheControl().InvalidateCaches(
-          update_type,
-          invalidate_caches["names"].As<std::unordered_set<std::string>>());
-    } else {
-      testsuite_support_.GetCacheControl().InvalidateAllCaches(update_type);
-      testsuite_support_.GetComponentControl().InvalidateComponents();
-    }
+    InvalidateCaches(invalidate_caches);
   }
 
   return {};
+}
+
+void Control::InvalidateCaches(
+    const formats::json::Value& invalidate_caches) const {
+  const auto update_type =
+      cache::Parse(invalidate_caches["update_type"],
+                   formats::parse::To<cache::UpdateType>());
+  const auto force_incremental_names =
+      invalidate_caches["force_incremental_names"]
+          .As<std::unordered_set<std::string>>({});
+
+  if (invalidate_caches.HasMember("names")) {
+    testsuite_support_.GetCacheControl().ResetCaches(
+        update_type,
+        invalidate_caches["names"].As<std::unordered_set<std::string>>(),
+        force_incremental_names);
+  } else {
+    const auto exclude_names =
+        invalidate_caches["exclude_names"].As<std::unordered_set<std::string>>(
+            {});
+    testsuite_support_.GetCacheControl().ResetAllCaches(
+        update_type, force_incremental_names, exclude_names);
+  }
 }
 
 }  // namespace testsuite::impl::actions

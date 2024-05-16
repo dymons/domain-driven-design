@@ -33,6 +33,10 @@ namespace components {
 ///
 /// @brief Component that does a periodic update of runtime configs.
 ///
+/// Note that the service with dynamic config update component and without
+/// configs cache requires successful update to start. See
+/// @ref dynamic_config_fallback for details and explanation.
+///
 /// ## Optional update event deduplication
 ///
 /// Config update types to deduplicate. If enabled, JSON of the whole config is
@@ -93,8 +97,15 @@ class DynamicConfigClientUpdater final
               const std::chrono::system_clock::time_point& now,
               cache::UpdateStatisticsScope&) override;
 
+  void UpdateFull(const std::vector<std::string>& docs_map_keys,
+                  cache::UpdateStatisticsScope&);
+
+  void UpdateIncremental(const std::vector<std::string>& docs_map_keys,
+                         cache::UpdateStatisticsScope&);
+
   dynamic_config::DocsMap MergeDocsMap(const dynamic_config::DocsMap& current,
-                                       dynamic_config::DocsMap&& update);
+                                       dynamic_config::DocsMap&& update,
+                                       const std::vector<std::string>& removed);
   void StoreIfEnabled();
 
   using DocsMapKeys = utils::impl::TransparentSet<std::string>;
@@ -115,6 +126,7 @@ class DynamicConfigClientUpdater final
   const std::optional<cache::AllowedUpdateTypes> deduplicate_update_types_;
   dynamic_config::Client& config_client_;
 
+  bool is_empty_{true};
   dynamic_config::Client::Timestamp server_timestamp_;
   // for atomic updates of cached data
   engine::Mutex update_config_mutex_;

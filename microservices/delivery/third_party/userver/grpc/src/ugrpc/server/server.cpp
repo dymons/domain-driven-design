@@ -20,6 +20,7 @@
 #include <ugrpc/impl/logging.hpp>
 #include <ugrpc/impl/to_string.hpp>
 #include <ugrpc/server/impl/parse_config.hpp>
+#include <userver/ugrpc/impl/deadline_timepoint.hpp>
 #include <userver/ugrpc/impl/statistics_storage.hpp>
 #include <userver/ugrpc/server/impl/queue_holder.hpp>
 #include <userver/ugrpc/server/impl/service_worker.hpp>
@@ -29,6 +30,9 @@ USERVER_NAMESPACE_BEGIN
 namespace ugrpc::server {
 
 namespace {
+
+constexpr std::size_t kMaxSocketPathLength = 107;
+constexpr std::chrono::seconds kShutdownGracePeriod{1};
 
 std::optional<int> ToOptionalInt(const std::string& str) {
   char* str_end{};
@@ -86,18 +90,23 @@ class Server::Impl final {
 
   int GetPort() const noexcept;
 
+  void StopServing() noexcept;
+
   void Stop() noexcept;
 
-  void StopDebug() noexcept;
+  std::uint64_t GetTotalRequests() const;
 
  private:
   enum class State {
     kConfiguration,
     kActive,
+    kServingStopped,
     kStopped,
   };
 
   void AddListeningPort(int port);
+
+  void AddListeningUnixSocket(std::string_view path);
 
   void DoStart();
 
@@ -117,7 +126,8 @@ class Server::Impl final {
 Server::Impl::Impl(ServerConfig&& config,
                    utils::statistics::Storage& statistics_storage,
                    dynamic_config::Source config_source)
-    : statistics_storage_(statistics_storage, "server"),
+    : statistics_storage_(statistics_storage,
+                          ugrpc::impl::StatisticsDomain::kServer),
       config_source_(config_source),
       access_tskv_logger_(std::move(config.access_tskv_logger)) {
   LOG_INFO() << "Configuring the gRPC server";
@@ -134,6 +144,8 @@ Server::Impl::Impl(ServerConfig&& config,
   ApplyChannelArgs(*server_builder_, config);
   queue_.emplace(static_cast<std::size_t>(config.completion_queue_num),
                  std::ref(*server_builder_));
+
+  if (config.unix_socket_path) AddListeningUnixSocket(*config.unix_socket_path);
 
   if (config.port) AddListeningPort(*config.port);
 }
@@ -159,6 +171,22 @@ void Server::Impl::AddListeningPort(int port) {
   const auto uri = fmt::format("[::]:{}", port);
   server_builder_->AddListeningPort(ugrpc::impl::ToGrpcString(uri),
                                     grpc::InsecureServerCredentials(), &*port_);
+}
+
+void Server::Impl::AddListeningUnixSocket(std::string_view path) {
+  std::lock_guard lock(configuration_mutex_);
+  UASSERT(state_ == State::kConfiguration);
+
+  UASSERT_MSG(!path.empty(), "Empty unix socket path is not allowed");
+  UASSERT_MSG(path[0] == '/', "Unix socket path must be absolute");
+  UINVARIANT(
+      path.size() <= kMaxSocketPathLength,
+      fmt::format("Unix socket path cannot contain more than {} characters",
+                  kMaxSocketPathLength));
+
+  const auto uri = fmt::format("unix:{}", path);
+  server_builder_->AddListeningPort(ugrpc::impl::ToGrpcString(uri),
+                                    grpc::InsecureServerCredentials());
 }
 
 void Server::Impl::AddService(ServiceBase& service, ServiceConfig&& config) {
@@ -216,6 +244,7 @@ void Server::Impl::Start() {
 
 int Server::Impl::GetPort() const noexcept {
   UASSERT(state_ == State::kActive);
+
   UASSERT_MSG(port_, "No port has been registered using AddListeningPort");
   return *port_;
 }
@@ -230,7 +259,7 @@ void Server::Impl::Stop() noexcept {
   // else
   if (server_) {
     LOG_INFO() << "Stopping the gRPC server";
-    server_->Shutdown();
+    server_->Shutdown(engine::Deadline::FromDuration(kShutdownGracePeriod));
   }
   service_workers_.clear();
   queue_.reset();
@@ -239,10 +268,19 @@ void Server::Impl::Stop() noexcept {
   state_ = State::kStopped;
 }
 
-void Server::Impl::StopDebug() noexcept {
-  UINVARIANT(server_, "The gRPC server is not running");
-  server_->Shutdown();
+void Server::Impl::StopServing() noexcept {
+  UASSERT(state_ != State::kStopped);
+  if (server_) {
+    LOG_INFO() << "Stopping serving on the gRPC server";
+    server_->Shutdown(engine::Deadline::FromDuration(kShutdownGracePeriod));
+  }
   service_workers_.clear();
+
+  state_ = State::kServingStopped;
+}
+
+std::uint64_t Server::Impl::GetTotalRequests() const {
+  return statistics_storage_.GetStartedRequests();
 }
 
 void Server::Impl::DoStart() {
@@ -300,7 +338,11 @@ int Server::GetPort() const noexcept { return impl_->GetPort(); }
 
 void Server::Stop() noexcept { return impl_->Stop(); }
 
-void Server::StopDebug() noexcept { return impl_->StopDebug(); }
+void Server::StopServing() noexcept { return impl_->StopServing(); }
+
+std::uint64_t Server::GetTotalRequests() const {
+  return impl_->GetTotalRequests();
+}
 
 }  // namespace ugrpc::server
 

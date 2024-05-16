@@ -59,7 +59,7 @@ namespace components {
 /// update-interval | (*required*) interval between Update invocations | --
 /// update-jitter | max. amount of time by which update-interval may be adjusted for requests dispersal | update_interval / 10
 /// full-update-interval | interval between full updates | --
-/// full-update-jitter | max. amount of time by which full-update-interval may be adjusted for requests dispersal | 0
+/// full-update-jitter | max. amount of time by which full-update-interval may be adjusted for requests dispersal | full-update-interval / 10
 /// updates-enabled | if false, cache updates are disabled (except for the first one if !first-update-fail-ok) | true
 /// first-update-fail-ok | whether first update failure is non-fatal | false
 /// task-processor | the name of the TaskProcessor for running DoWork | main-task-processor
@@ -152,12 +152,21 @@ class CachingComponentBase : public LoggableComponentBase,
   static yaml_config::Schema GetStaticConfigSchema();
 
  protected:
+  /// Sets the new value of cache. As a result the Get() member function starts
+  /// returning the value passed into this function after the Update() finishes.
+  ///
+  /// @warning Do not forget to update cache::UpdateStatisticsScope, otherwise
+  /// the behavior is undefined.
   void Set(std::unique_ptr<const T> value_ptr);
+
+  /// @overload
   void Set(T&& value);
 
+  /// @overload Set()
   template <typename... Args>
   void Emplace(Args&&... args);
 
+  /// Clears the content of the cache by string a default constructed T.
   void Clear();
 
   /// Whether Get() is expected to return nullptr.
@@ -172,6 +181,12 @@ class CachingComponentBase : public LoggableComponentBase,
   virtual std::unique_ptr<const T> ReadContents(dump::Reader& reader) const;
   /// @}
 
+  /// @brief If the option has-pre-assign-check is set true in static config,
+  /// this function is called before assigning the new value to the cache
+  /// @note old_value_ptr and new_value_ptr can be nullptr.
+  virtual void PreAssignCheck(const T* old_value_ptr,
+                              const T* new_value_ptr) const;
+
  private:
   void OnAllComponentsLoaded() final;
 
@@ -181,12 +196,6 @@ class CachingComponentBase : public LoggableComponentBase,
 
   void GetAndWrite(dump::Writer& writer) const final;
   void ReadAndSet(dump::Reader& reader) final;
-
-  /// @brief If the option has-pre-assign-check is set true in static config,
-  /// this function is called before assigning the new value to the cache
-  /// @note old_value_ptr and new_value_ptr can be nullptr.
-  virtual void PreAssignCheck(const T* old_value_ptr,
-                              const T* new_value_ptr) const;
 
   rcu::Variable<std::shared_ptr<const T>> cache_;
   concurrent::AsyncEventChannel<const std::shared_ptr<const T>&> event_channel_;
@@ -305,7 +314,13 @@ void CachingComponentBase<T>::GetAndWrite(dump::Writer& writer) const {
 
 template <typename T>
 void CachingComponentBase<T>::ReadAndSet(dump::Reader& reader) {
-  Set(ReadContents(reader));
+  auto data = ReadContents(reader);
+  if constexpr (meta::kIsSizable<T>) {
+    if (data) {
+      SetDataSizeStatistic(std::size(*data));
+    }
+  }
+  Set(std::move(data));
 }
 
 template <typename T>

@@ -14,6 +14,7 @@
 #include <userver/engine/task/task_processor_fwd.hpp>
 #include <userver/logging/level.hpp>
 #include <userver/logging/null_logger.hpp>
+#include <userver/server/congestion_control/sensor.hpp>
 #include <userver/utils/function_ref.hpp>
 #include <userver/utils/statistics/fwd.hpp>
 #include <userver/yaml_config/fwd.hpp>
@@ -32,6 +33,10 @@ struct ServerConfig final {
   /// If none, the ports have to be configured programmatically using
   /// Server::WithServerBuilder.
   std::optional<int> port{0};
+
+  /// Absolute path to the unix socket to listen to.
+  /// A server can listen to both port and unix socket simultaneously.
+  std::optional<std::string> unix_socket_path{std::nullopt};
 
   /// Number of completion queues to create. Should be ~2 times less than number
   /// of worker threads for best RPS.
@@ -56,7 +61,8 @@ struct ServerConfig final {
 ///
 /// All methods are thread-safe.
 /// Usually retrieved from ugrpc::server::ServerComponent.
-class Server final {
+class Server final
+    : public USERVER_NAMESPACE::server::congestion_control::RequestsSource {
  public:
   using SetupHook = utils::function_ref<void(grpc::ServerBuilder&)>;
 
@@ -67,7 +73,7 @@ class Server final {
 
   Server(Server&&) = delete;
   Server& operator=(Server&&) = delete;
-  ~Server();
+  ~Server() override;
 
   /// @brief Register a service implementation in the server. The user or the
   /// component is responsible for keeping `service` and `middlewares` alive at
@@ -100,13 +106,13 @@ class Server final {
   /// @note Should be called at least once before the services are destroyed
   void Stop() noexcept;
 
-  /// @cond
   /// Same as Stop, but:
   /// - does not destroy server statistics
   /// - does not close the associated CompletionQueue
-  /// Stop must still be called. StopDebug is useful for testing.
-  void StopDebug() noexcept;
-  /// @endcond
+  /// Stop must still be called. StopServing is also useful for testing.
+  void StopServing() noexcept;
+
+  std::uint64_t GetTotalRequests() const override;
 
  private:
   class Impl;

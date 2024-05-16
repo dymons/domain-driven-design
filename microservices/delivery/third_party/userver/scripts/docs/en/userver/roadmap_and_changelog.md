@@ -16,14 +16,356 @@ Changelog news also go to the
 
 ## Roadmap
 
-* Add YDB driver.
-* Add PostgreSQL connection pools control via Congestion Control.
-* Add retry budget or retry circuit breaker for clients.
+* 👨‍💻 Codegen parsers and serializers by JSON schema
+* 👨‍💻 Improve Kafka driver.
+* 👨‍💻 Add retry budget or retry circuit breaker for clients.
+* Improve OpenTelemetry Protocol (OTLP) support.
 * Add web interface to the [uservice-dynconf](https://github.com/userver-framework/uservice-dynconf)
-* Add basic Kafka driver.
 
 
 ## Changelog
+
+
+### Release v2.0
+
+Big new features since the v1.0.0:
+
+* Simplified dynamic configs and embedded defaults into the code.
+* Added PostgreSQL connection pools auto-configuration.
+* Added YDB driver and basic Kafka driver.
+* LISTEN/NOTIFY support for PostgreSQL
+* New landing page for the website
+* Significantly reduced network data transmission for PostgreSQL
+* Supported `install` in CMake and CPack packaging.
+* Implemented middlewares for HTTP server, most of the HTTP server functionality
+  was moved to middlewares.
+* Improved documentation, added more samples and descriptions.
+* Numerous optimizations and build improvements.
+
+Detailed descriptions could be found below.
+
+Binary Ubuntu 22.04 amd64 package could be found at
+[userver Releases](https://github.com/userver-framework/userver/releases).
+
+
+### May 2024 (v2.0-rc)
+
+* Kafka driver is now documented, compiles and works. Thanks to
+  [Fedor](https://github.com/fdr896) for the work!
+* Added utils::numeric_cast for safe casting of integers of different width.
+* The userver framework is now
+  [available at Yandex Cloud Marketplace](https://yandex.cloud/en/marketplace/products/yc/userver).
+* YDB driver now can be built on modern Clang compilers in C++20 and above
+  modes.
+* Redis now allows to subscribe to master instances.
+* Improved logging of failures in testsuite.
+
+* Optimizations:
+  * rcu::Variable was optimized to use asymmetric fences and
+    concurrent::StripedCounter. x1000 performance improvement for some edge
+    cases, x3 improvement for the generic use case.
+  * Internal `TaskCounter` now uses concurrent::StripedCounter to reduce
+    contention on atomics on each async task construction and destruction.
+  * Adjusted the default spinning count in scheduler to better fit modern
+    hardware and typical loads.
+  * ~5% faster tasks queue overload detection logic. Many thanks to
+    [Egor Bocharov](https://github.com/egor-bystepdev) for the PR!
+
+* Docs, tests and build
+  * Fixed build of utils/rand.hpp related source files. Thanks to
+    [Nikita](https://github.com/root-kidik) for the PR!
+  * Improved logic of Telegram support chats URL selection. Many thanks to
+    [Mingaripov Niyaz](https://github.com/mnink275) for the PR!
+  * Fixed multiple `@snippet` links in docs. Many thanks to
+    [Mingaripov Niyaz](https://github.com/mnink275) for the PR!
+  * Fixed flaky `ThreadLocal.SafeThreadLocalWorks` test. Many thanks to
+    [Egor Bocharov](https://github.com/egor-bystepdev) for the PR!
+
+
+### April 2024
+
+* Initial CPack support. Now `userver-all.deb` packages could be build via:
+  ```
+  git clone --depth 1 https://github.com/userver-framework/userver.git
+  docker run --rm -it --network ip6net -v $(pwd):/home/user -w /home/user/userver \
+     --entrypoint bash ghcr.io/userver-framework/ubuntu-22.04-userver-base:latest ./scripts/docker/run_as_user.sh \
+     ./scripts/build_and_install_all.sh
+  ```
+  We'll start publishing the packages soon.
+
+* New Docker images based on Ubuntu-22.04 with weekly builds and publishing:
+  * ghcr.io/userver-framework/ubuntu-22.04-userver-pg:latest - image with
+    preinstalled userver deb package and PostgreSQL database. All the
+    service templates now use it for tests
+  * ghcr.io/userver-framework/ubuntu-22.04-userver:latest - image with
+    preinstalled userver deb package. Good starting container for
+    developing servers that do not use POstgreSQL.
+  * ghcr.io/userver-framework/ubuntu-22.04-userver-base:latest - an image
+    with only the build dependencies to build userver. Good for development of
+    userver itself.
+  More info at @ref scripts/docs/en/userver/tutorial/build.md
+
+* All the service templates were moved to a new components naming with `::`
+  (for example `userver::core`) and
+  now attempt to find an installed userver. Now in CMake component names with
+  `::` work regardless of the framework installation (CPM, `add_subdirectory`,
+  or `find_package`).
+
+* Added userver/utils/hedged_request.hpp with a bunch of helper classes to
+  perform hedged requests.
+* Improved testsuite logging for
+  @ref scripts/docs/en/userver/functional_testing.md "functional tests".
+* Consumers of concurrent queues now have a Reset() method. Thanks to
+  [akhoroshev](https://github.com/akhoroshev) for the PR!
+* Fixed gRPC builds and runs with ASAN. Thanks to
+  [Nikita](https://github.com/root-kidik) for the PR!
+* Published early work on Kafka driver. API is not stable, build scripts,
+  improvements and samples to come. Thanks to [Fedor](https://github.com/fdr896)
+  for the work!
+* Published early work on RocksDB driver. API is not stable, build scripts,
+  improvements and samples to come. Thanks to
+  [Kirill](https://github.com/Shuba-Buba) for the work!
+
+* Optimizations:
+  * WriteAll for TLS became up to 7 times faster if multiple small chunks of
+    data are written. Thanks to [Илья Оплачкин](https://github.com/IoplachkinI)
+    and [VScdr](https://github.com/VS-CDR) for the PR! 
+  * Binary sizes were reduced if building without LTO. All the binaries linked
+    with userver became about 1MB smaller.
+  * Implemented asymmetric thread fences. This opens the door for optimizations
+    of rcu::Variable and internals of the scheduler.
+  * Caches in testsuite are now invalidated concurrently, leading to tens of
+    seconds speedup for services with multiple caches and tests.
+  * concurrent::StripedCounter became 8 times more memory efficient.
+
+* Build and docs:
+  * Updated PostgreSQL CMake scripts for Manjaro. Thanks to
+    [Ivan Gabrusevich](https://github.com/sddwbbs) for the PR!
+  * Disabled LTO for Conan builds. Thanks to
+    [Pavel Talashchenko](https://github.com/pavelbezpravel) for the PR!
+  * Fixed typo in 'Manjaro'. Thank to
+    [Igor Martynov](https://github.com/snailbaron) for the PR!
+
+
+### March 2024
+
+* Installation via `cmake --install` was implemented. See @ref userver_install
+  for more info.
+* Implemented @ref scripts/docs/en/userver/http_server_middlewares.md
+* @ref USERVER_LOG_DYNAMIC_DEBUG now provides fine granted runtime control over
+  logging.
+* Now all the modern versions of `libmongoc` are supported in `userver-mongo`.
+* @ref POSTGRES_CONNLIMIT_MODE_AUTO_ENABLED is now `on` by default.
+* A secret value for the digest nonce generating now could be provided in
+  `http_server_digest_auth_secret` key via components::Secdist. Many thanks to
+  [Mingaripov Niyaz](https://github.com/mnink275) for the PR!
+* ugrpc::server::ServerComponent now has a `unix-socket-path` static option to
+  listen on unix domain socket path instead of an inet socket.
+* All the `formats::*::ValueBuilder` now support std::string_view. Thanks to
+  Андрей Будиловский for the bug report!
+* clients::http::Form is now movable and slightly more efficient. Thanks to
+  [Alexandr Kondratev](https://github.com/theg4sh) for the PR!
+* Redis now supports `SSUBSCRIBE` and removes dead nodes.
+* engine::WaitAny() now can wait for an engine::io::Socket/engine::io::TlsWrapper
+  to become readable or writable. For example:
+  `engine::WaitAny(socket.GetReadableBase(), task1, tls_socket.GetWritableBase(), future1);`
+* New tracing::Span::MakeRootSpan() helper function.
+
+* Optimizations:
+  * Switched from unmaintained `http_parser` to a 156% faster `llhttp`.
+  * Implemented a concurrent::StripedCounter that allows to have a per-cpu data
+    in user space with kernel-provided transactional guarantees. Works
+    at least x2 faster than std::atomic on a single thread and scales
+    linearly (unlike std::atomic). As a result gives more than x10 performance
+    improvement under heavy contention.
+  * An explicit control over cache invalidations in testsuite. As a result,
+    less caches are invalidated between tests and the overall time to run tests
+    goes down significantly.
+  * Components start was optimized to copy less containers during component
+    dependencies detection.
+  * Per each incoming HTTP request:
+    * one less `std::chrono::steady_clock::now()` call
+    * one less `StrCaseHash` construction (2 calls into `std::uniform_int_distribution<std::uint64_t>` over `std::mt19937`)
+    * one less `dynamic_config::Snapshot` construction (at least one atomic CAS)
+  * HTTP Client now copies less `std::shared_ptr` variables in implementation.
+  * Optimized up to an order of magnitude the user types query in PostgreSQL
+    driver.
+  * pytest_userver.client.Client.capture_logs() now accepts `log_level` to
+    filter out messages with lower log level in the service itself and minimize
+    CPU and memory consumption during tests.
+  * Up to two times faster utils::statistics::RecentPeriod statistics in
+    PostgreSQL driver due to switching to a utils::datetime::SteadyCoarseClock.
+
+* Build:
+  * Workarounds for the Protobuf >= 5.26.0
+  * Removed redundant semicolon, thanks to Oleksii Demchenko for the
+    [PR](https://github.com/userver-framework/userver/commit/b3abb84d6bb1da693).
+  * utils::FastScopeGuard now uses proper traits. Thanks to
+    [Илья Оплачкин](https://github.com/IoplachkinI) for the PR and to
+    [Artyom Kolpakov](https://github.com/ddvamp) for the report!
+  * Added missing dependency for Arch based distros. Thanks to
+    [VScdr](https://github.com/VS-CDR) for the PR!
+
+
+### February 2024
+
+* PostgreSQL driver now keeps processing the current queries and transactions
+  after encountering a "prepared statement already exists" event.
+* Implemented a new landing page to make userver even more nice&shiny! The whole
+  project was done by 👨🏻‍💻 frontend developer [Fedor Alekseev](https://github.com/atlz253);
+  🧑🏼‍🎨 designers [hellenisaeva](https://github.com/hellenisaeva)
+  and [MariaGrinchenko](https://github.com/MariaGrinchenko);
+  👨🏻‍💼 manager [Oleg Komarov](https://github.com/0GE1). Many thanks for the
+  awesome work!
+* HTTP components::Server now has a static configuration option `address` to
+  select network interface to listen to.
+* gRPC futures now can be used efficiently with engine::WaitAny().
+* Flush headers before starting to produce the body parts in HTTP streaming
+  handlers, so a client can react to the request earlier. Thanks to
+  [akhoroshev](https://github.com/akhoroshev) for the PR!
+* Added tracing::TagScope for comfortable work with local scope tracing tags.
+  Many thanks to [nfrmtk](https://github.com/nfrmtk) for the PR!
+* `INCLUDE_DIRECTORIES` is now used in `userver_add_grpc_library`. Thanks to
+  [Nikita](https://github.com/root-kidik) for the PR!
+* New storages::postgres::QueryQueue class, mostly for executing multiple
+  `SELECT` statements and retrieving the results in one roundtrip.
+* @ref POSTGRES_TOPOLOGY_SETTINGS to control maximum allowed replication lag.
+
+* Optimizations:
+  * PostgreSQL driver now caches the low-level database (D)escribe responses,
+    workarounds the libpq implementation and does not request query describe
+    information on each request. This results in about ~2 times less data
+    transmitted for select statements that return multiple columns, less CPU
+    consumption for the database server and for the application itself.
+  * On Boost 1.74 and newer the engine::SingleConsumerEvent::IsReady() now uses
+    atomic load instead of a much less efficient atomic DWCAS.
+  * gRPC deadline propagation now uses less `now()` calls and measures time
+    more precisely.
+  * About 16% faster HttpResponse::SetHeader due to using a vectorization
+    friendly algorithm.
+  * Improved Redis driver start-up time.
+  * dynamic_config::DocsMap::Parse() and dynamic configs retrieval copies
+    less strings.
+
+* Build:
+  * New Docker container for developing userver based projects
+    `ghcr.io/userver-framework/ubuntu-22.04-userver-base:latest`. It
+    contains all the build dependencies preinstalled and
+    a proper setup of PPAs with databases, compilers and tools.
+  * Switched to a modern python `venv` instead of the older `virtualenv`.
+  * Use system provided Boost.Stacktrace if it is available.
+
+* Documentation and Diagnostics:
+  * Added fix hints for storages::postgres::InvalidParserCategory.
+  * Clarify @ref scripts/docs/en/userver/pg_user_types.md
+  * More references and info for the metrics documentation.
+  * More documentation for dynamic_config::ValueDict `__default__` behavior,
+    and for dynamic configs.
+
+
+### January 2024
+
+* `full-update-jitter` default value is now `full-update-interval / 10`. This
+  leads to more responsive databases on full update on multiple instances of
+  the service.
+* server::handlers::ServerMonitor now has a `format` static config option,
+  simplifying userver based services setup with unified agent.
+* Allow creating custom implicit options. Thanks to
+  [trenin17](https://github.com/trenin17) for the PR!
+* Limit JSON parsing depth to some sane value. Thanks to
+  [Kirill Morozov](https://github.com/moki) for the PR!
+* Implemented JSON parsing to `google.protobuf.Value` in
+  userver/ugrpc/proto_json.hpp.
+* Support histogram metrics in testsuite via pytest_userver.metrics.Histogram
+* utils::generators::GenerateUuidV7() was added.
+* Redis retry budget now could be controlled via
+  @ref REDIS_RETRY_BUDGET_SETTINGS
+* drivers::WaitForSubscribableFuture and drivers::TryWaitForSubscribableFuture
+  for simplifying asynchronous driver writing for third-party code that
+  provides futures with `Subscribe` methods (for example - YDB).
+
+* Optimizations:
+  * Up to two times faster dynamic config parsing in updates.
+  * Optimized dynamic config updates in testsuite. Thanks to
+    [Victor Makarov](https://github.com/vitek) for the PRs!
+  * Optimized JSON parsing of std::variant leading to an order of magnitude
+    faster parsing.
+  * Minor optimizations: do less work in server::handlers::HttpHandlerBase for
+    higher logging level, do less copies in server::handlers::HttpHandlerJsonBase.
+  * Optimized statistics collection for Redis.
+
+* Build:
+  * Namespace of userver is now versioned by default to avoid binary symbols
+    clashing.
+  * `lld` used by default if it is available and the compiler is clang
+  * `bash` is not required any more by the build scripts.
+
+* Documentation and Diagnostics:
+  * storages::postgres::InvalidParserCategory now provides fix hints for some
+    of the PostgreSQL misuse cases.
+  * Document that compiler::ThreadLocal should be used instead of `thread_local`.
+  * Documented dynamic_config::ValueDict and related dynamic configs.
+  * Improved documentation for metrics by adding more references to
+    utils::statistics::MetricTag, utils::statistics::Storage and
+    @ref TESTSUITE_METRICS_TESTING "testsuite metrics testing".
+  * Cleaner docs for the utils::statistics::Percentile.
+
+### December 2023
+
+* LISTEN/NOTIFY support for PostgreSQL. See
+  storages::postgres::Cluster::Listen() and storages::postgres::NotifyScope
+  for more information.
+* components::Server now has `tls.ca` option for client-side certificates check.
+* Caches now have a `full-update-jitter` option to avoid simultaneous full
+  updates in different servers.
+* Fault injection into transactions. See pytest_userver.sql.RegisteredTrx for
+  sample usage.
+* Improved diagnostics for improper Secdist usage.
+* Added storages::postgres::ResultSet::AsOptionalSingleRow. Thanks to
+  [Jiawei He](https://github.com/waker-umich) for the PR!
+
+* Build:
+  * Big rewrite of CMake logic. Now `userver_setup_environment()` function is
+    used to setup the environment:
+    - before:
+      ```cmake
+      include(third_party/userver/cmake/SetupEnvironment.cmake)
+      add_subdirectory(third_party/userver)
+      ```
+    - after:
+      ```cmake
+      add_subdirectory(third_party/userver)
+      userver_setup_environment()
+      ```
+    Requirements are not code generated any more and the default requirements
+    used on `userver_testsuite_add_simple()` CMake function call.
+    `add_grpc_library()` renamed to `userver_add_grpc_library()`.
+  * `USERVER_PIP_USE_SYSTEM_PACKAGES` and `USERVER_PIP_OPTIONS` CMake options
+    now allow building the userver without internet connection. Thanks to
+    [Nikita](https://github.com/root-kidik) for the PR!
+  * Curl library now downloaded automatically if no suitable version found.
+  * Added missing check for Mongo in Conan. Thanks to
+    [Pavel Talashchenko](https://github.com/pavelbezpravel) for the PR!
+  * Fixed sanitizers error message in CMake. Thanks to
+    [Kirill Pavlov](https://github.com/pavkir) for the PR!
+  * Updated MacOS dependencies. Thanks to
+    [Kirill Morozov](https://github.com/moki) for the PRs!
+  * Added PostgreSQL 16 detection. Thanks to
+    [linuxnyasha](https://github.com/linuxnyasha) for the PR!
+
+* Optimizations:
+  * Optimized Http::Cookie::ToString(). Thanks to
+    [Илья Оплачкин](https://github.com/IoplachkinI) for the PR!
+
+* Documentation:
+  * Documented Secdist formats and added notes on possible environment variables
+    usage instead of secdist.
+  * Layout of reference pages changes. Now descriptions are at the top of the
+    page rather than being after the list of methods and members.
+  * Documented Mongo pool metrics at
+    @ref scripts/docs/en/userver/service_monitor.md.
+  * New @ref scripts/docs/en/userver/tutorial/grpc_middleware_service.md sample.
+  * Switched to Doxygen 1.10 with our search patches upstreamed
 
 
 ### November 2023
@@ -518,7 +860,7 @@ Detailed descriptions could be found below.
     implementation of the sink does not rely on spdlog implementation.
   * Configuration step was made much faster.
   * Makefile was simplified and only up-to-date targets were left.
-  * Added a script to prepare docker build, see @ref scripts/docs/en/userver/docker.md for
+  * Added a script to prepare docker build, see @ref scripts/docker/Readme.md for
     more info.
   * Scripts for generating CMakeLists were simplified and cleared from internal
     stuff.

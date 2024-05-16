@@ -1,12 +1,14 @@
 #pragma once
 
 #include <array>
-#include <atomic>
-#include <chrono>
 #include <cstddef>
-#include <cstdint>
+
+#include <boost/range/adaptor/transformed.hpp>
 
 #include <concurrent/impl/interference_shield.hpp>
+#include <userver/concurrent/impl/asymmetric_fence.hpp>
+#include <userver/concurrent/impl/striped_read_indicator.hpp>
+#include <userver/concurrent/striped_counter.hpp>
 #include <userver/utils/fixed_array.hpp>
 #include <userver/utils/statistics/rate_counter.hpp>
 
@@ -25,11 +27,23 @@ class TaskCounter final {
 
   ~TaskCounter();
 
-  void WaitForExhaustion() const noexcept;
+  void WaitForExhaustionBlocking() const noexcept;
 
   // May return 'true' when there are no tasks alive (due to races).
   // Never returns 'false' when there are tasks alive.
   bool MayHaveTasksAlive() const noexcept;
+
+  // May return 'true' when there are no tasks alive (due to races).
+  // Never returns 'false' when there are tasks alive.
+  template <typename TaskCounterRange>
+  static bool AnyMayHaveTasksAlive(TaskCounterRange&& counters) {
+    concurrent::impl::AsymmetricThreadFenceHeavy();
+    return !concurrent::impl::StripedReadIndicator::AreAllFree(
+        counters |
+        boost::adaptors::transformed([](const TaskCounter& counter) -> auto& {
+          return counter.tasks_alive_;
+        }));
+  }
 
   Rate GetCreatedTasks() const noexcept;
 
@@ -74,25 +88,20 @@ class TaskCounter final {
  private:
   // Counters that may be mutated from outside the bound TaskProcessor.
   enum class GlobalCounterId : std::size_t {
-    kCreated,
-    kDestroyed,
+    kCancelOverload,
+    kOverload,
 
     kCountersSize,
   };
 
   // Counters that are only mutated from the bound TaskProcessor.
   enum class LocalCounterId : std::size_t {
-    kCreated = static_cast<std::size_t>(GlobalCounterId::kCreated),
-    kDestroyed = static_cast<std::size_t>(GlobalCounterId::kDestroyed),
-
     kStarted,
     kStopped,
     kCancelled,
     kSwitchFast,
     kSwitchSlow,
     kSpuriousWakeups,
-    kCancelOverload,
-    kOverload,
     kOverloadSensor,
     kNoOverloadSensor,
 
@@ -110,8 +119,7 @@ class TaskCounter final {
       std::array<Counter, kLocalCountersSize>>;
 
   using GlobalCounterPack =
-      std::array<concurrent::impl::InterferenceShield<Counter>,
-                 kGlobalCountersSize>;
+      std::array<concurrent::StripedCounter, kGlobalCountersSize>;
 
   Rate GetApproximate(LocalCounterId) const noexcept;
 
@@ -123,6 +131,7 @@ class TaskCounter final {
 
   GlobalCounterPack global_counters_;
   utils::FixedArray<LocalCounterPack> local_counters_;
+  concurrent::impl::StripedReadIndicator tasks_alive_;
 };
 
 class TaskCounter::Token final {
@@ -130,13 +139,12 @@ class TaskCounter::Token final {
   explicit Token(TaskCounter& counter) noexcept;
 
   Token(const Token&) = delete;
-  Token(Token&&) = delete;
   Token& operator=(const Token&) = delete;
-  Token& operator=(Token&&) = delete;
-  ~Token();
+  Token(Token&&) noexcept = default;
+  Token& operator=(Token&&) noexcept = default;
 
  private:
-  TaskCounter& counter_;
+  concurrent::impl::StripedReadIndicatorLock lock_;
 };
 
 class TaskCounter::CoroToken final {

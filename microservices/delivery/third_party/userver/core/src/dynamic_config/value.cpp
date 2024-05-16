@@ -36,15 +36,23 @@ void DocsMap::Set(std::string name, formats::json::Value obj) {
                                          std::move(obj));
 }
 
-void DocsMap::Parse(const std::string& json_string, bool empty_ok) {
-  const auto json = formats::json::FromString(json_string);
+void DocsMap::Remove(const std::string& name) { docs_.erase(name); }
+
+void DocsMap::Parse(std::string_view json_string, bool empty_ok) {
+  Parse(formats::json::FromString(json_string), empty_ok);
+}
+
+void DocsMap::Parse(formats::json::Value json, bool empty_ok) {
   json.CheckObject();
-
-  if (!empty_ok && json.GetSize() == 0)
+  if (!empty_ok && json.GetSize() == 0) {
     throw std::runtime_error("DocsMap::Parse failed: json is empty");
+  }
 
-  for (const auto& [name, value] : Items(json)) {
-    Set(name, value);
+  // Erase the origin of 'json' from error messages of configs parsing.
+  json.DropRootPath();
+
+  for (auto [name, value] : Items(std::move(json))) {
+    Set(std::move(name), value);
   }
 }
 
@@ -83,18 +91,6 @@ const utils::impl::TransparentSet<std::string>&
 DocsMap::GetConfigsExpectedToBeUsed(utils::InternalTag) const {
   return configs_to_be_used_;
 }
-
-const std::string kValueDictDefaultName = "__default__";
-
-namespace impl {
-
-[[noreturn]] void ThrowNoValueException(std::string_view dict_name,
-                                        std::string_view key) {
-  throw std::runtime_error(
-      fmt::format("no value for '{}' in dict '{}'", key, dict_name));
-}
-
-}  // namespace impl
 
 }  // namespace dynamic_config
 

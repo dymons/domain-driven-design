@@ -1,5 +1,6 @@
 #include "json_tree.hpp"
 
+#include <algorithm>
 #include <cstddef>
 #include <limits>
 
@@ -62,11 +63,7 @@ std::string MakePath(const Value* root, const Value* node, int node_depth) {
   TreeStack stack;
   const Value* value = root;
 
-  if (value == node) return formats::common::kPathRoot;
-  UASSERT(value != nullptr);
-  if (value == nullptr)
-    throw formats::json::Exception(
-        "Calling MakePath with node == nullptr is pointless");
+  if (value == node || value == nullptr) return formats::common::kPathRoot;
 
   stack.reserve(node_depth + 1);
   stack.emplace_back();  // fake "top" frame to avoid extra checks for an empty
@@ -102,7 +99,7 @@ std::string ExtractPath(const TreeStack& stack) {
   std::string path;
   for (size_t depth = 1; depth < stack.size(); depth++) {
     const auto& frame = stack[depth];
-    // because index in stack had already been Advance'd
+    // because index in stack has already been Advance'd
     const auto idx = frame.CurrentIndex() - 1;
     if (frame.container()->IsObject()) {
       const Value& name = frame.container()->MemberBegin()[idx].name;

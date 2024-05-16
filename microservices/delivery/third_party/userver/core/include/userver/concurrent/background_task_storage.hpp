@@ -31,6 +31,10 @@ class BackgroundTaskStorageCore final {
   /// after this call returns. Should be called no more than once.
   void CancelAndWait() noexcept;
 
+  /// Explicitly wait for execution tasks in the store.
+  /// Should be called no more than once.
+  void CloseAndWaitDebug() noexcept;
+
   /// @brief Detaches task, allowing it to continue execution out of scope. It
   /// will be cancelled and waited for on BTS destruction.
   /// @note After detach, Task becomes invalid
@@ -136,6 +140,10 @@ class BackgroundTaskStorage final {
   /// after this call returns. Should be called no more than once.
   void CancelAndWait() noexcept;
 
+  /// Explicitly stop accepting new tasks and wait for execution tasks in the
+  /// store. Should be called no more than once.
+  void CloseAndWaitDebug() noexcept;
+
   /// @brief Launch a task that will be cancelled and waited for in the BTS
   /// destructor.
   ///
@@ -147,6 +155,20 @@ class BackgroundTaskStorage final {
   void AsyncDetach(std::string name, Args&&... args) {
     core_.Detach(utils::AsyncBackground(std::move(name), task_processor_,
                                         std::forward<Args>(args)...));
+  }
+
+  /// @brief Launch a task that will be cancelled and waited for in the BTS
+  /// destructor.
+  ///
+  /// Execution of function is guaranteed to start regardless
+  /// of engine::TaskProcessor load limits.
+  /// engine::TaskInheritedVariable instances are not
+  /// inherited from the caller except baggage::Baggage. See
+  /// utils::CriticalAsyncBackground for details.
+  template <typename... Args>
+  void CriticalAsyncDetach(std::string name, Args&&... args) {
+    core_.Detach(utils::CriticalAsyncBackground(
+        std::move(name), task_processor_, std::forward<Args>(args)...));
   }
 
   /// Approximate number of currently active tasks

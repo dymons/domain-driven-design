@@ -96,9 +96,6 @@ void UserverExperimentsScope::EnableOnly(
   }
 }
 
-UserverExperiment kRedisClusterAutoTopologyExperiment{
-    "redis-cluster-autotopology"};
-
 }  // namespace utils::impl
 
 USERVER_NAMESPACE_END

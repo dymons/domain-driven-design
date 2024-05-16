@@ -2,7 +2,6 @@
 
 #include <limits>
 #include <memory>
-#include <optional>
 #include <vector>
 
 #include <userver/utils/assert.hpp>
@@ -86,6 +85,7 @@ bool ClusterShard::AsyncCommand(CommandPtr command) const {
   const auto& available_servers = GetAvailableServers(command->control);
   const auto servers_count = available_servers.size();
   const auto is_nearest_ping_server = IsNearestServerPing(cc);
+  const auto is_retry = command->counter != 0;
 
   const auto masters_count = 1;
   const auto max_attempts = replicas_.size() + masters_count + 1;
@@ -96,7 +96,7 @@ bool ClusterShard::AsyncCommand(CommandPtr command) const {
 
     size_t idx = SentinelImpl::kDefaultPrevInstanceIdx;
     const auto instance =
-        GetInstance(available_servers, start_idx, attempt,
+        GetInstance(available_servers, is_retry, start_idx, attempt,
                     is_nearest_ping_server, cc.best_dc_count, &idx);
     if (!instance) {
       continue;
@@ -112,19 +112,19 @@ bool ClusterShard::AsyncCommand(CommandPtr command) const {
   return false;
 }
 
-ShardStatistics ClusterShard::GetStatistics(
-    bool master, const MetricsSettings& settings) const {
-  ShardStatistics stats(settings);
+void ClusterShard::GetStatistics(bool master, const MetricsSettings& settings,
+                                 ShardStatistics& stats) const {
   auto add_to_stats = [&settings, &stats](const auto& instance) {
     if (!instance) {
       return;
     }
-    auto inst_stats =
-        redis::InstanceStatistics(settings, instance->GetStatistics());
-    stats.shard_total.Add(inst_stats);
     auto master_host_port = instance->GetServerHost() + ":" +
                             std::to_string(instance->GetServerPort());
-    stats.instances.emplace(std::move(master_host_port), std::move(inst_stats));
+    auto it = stats.instances.emplace(std::move(master_host_port),
+                                      redis::InstanceStatistics(settings));
+    auto& inst_stats = it.first->second;
+    inst_stats.Fill(instance->GetStatistics());
+    stats.shard_total.Add(inst_stats);
   };
 
   if (master) {
@@ -140,7 +140,6 @@ ShardStatistics ClusterShard::GetStatistics(
   }
 
   stats.is_ready = IsReady(WaitConnectedMode::kMasterAndSlave);
-  return stats;
 }
 
 /// Prioritize first command_control.best_dc_count nearest by ping instances.
@@ -165,6 +164,9 @@ void ClusterShard::GetNearestServersPing(
 ClusterShard::RedisPtr ClusterShard::GetAvailableServer(
     const CommandControl& command_control, bool read_only) const {
   if (!read_only) {
+    if (!master_) {
+      return {};
+    }
     return master_->Get();
   }
 
@@ -173,12 +175,17 @@ ClusterShard::RedisPtr ClusterShard::GetAvailableServer(
     return {};
   }
 
-  auto master = master_->Get();
-  if (master->GetServerId() == cc.force_server_id) {
-    return master;
+  if (master_) {
+    auto master = master_->Get();
+    if (master->GetServerId() == cc.force_server_id) {
+      return master;
+    }
   }
 
   for (const auto& replica_connection : replicas_) {
+    if (!replica_connection) {
+      continue;
+    }
     auto replica = replica_connection->Get();
     if (replica->GetServerId() == cc.force_server_id) {
       return replica;
@@ -214,9 +221,9 @@ std::vector<ClusterShard::RedisConnectionPtr> ClusterShard::GetAvailableServers(
 }
 
 ClusterShard::RedisPtr ClusterShard::GetInstance(
-    const std::vector<RedisConnectionPtr>& instances, size_t start_idx,
-    size_t attempt, bool is_nearest_ping_server, size_t best_dc_count,
-    size_t* pinstance_idx) {
+    const std::vector<RedisConnectionPtr>& instances, bool retry,
+    size_t start_idx, size_t attempt, bool is_nearest_ping_server,
+    size_t best_dc_count, size_t* pinstance_idx) {
   RedisPtr ret;
   const auto end = (is_nearest_ping_server && attempt == 0 && best_dc_count)
                        ? std::min(instances.size(), best_dc_count)
@@ -229,9 +236,8 @@ ClusterShard::RedisPtr ClusterShard::GetInstance(
     }
     const auto& cur_inst = cur->Get();
 
-    if (cur_inst && !cur_inst->IsDestroying() &&
-        (cur_inst->GetState() == Redis::State::kConnected) &&
-        !cur_inst->IsSyncing() &&
+    if (cur_inst && cur_inst->IsAvailable() &&
+        (!retry || cur_inst->CanRetry()) &&
         (!ret || ret->IsDestroying() ||
          cur_inst->GetRunningCommands() < ret->GetRunningCommands())) {
       if (pinstance_idx) *pinstance_idx = idx;
@@ -309,8 +315,7 @@ ClusterShard::RedisPtr GetRedisIfAvailable(
 
   auto ret = connection->Get();
 
-  if (!ret || ret->GetState() != Redis::State::kConnected ||
-      ret->IsDestroying() ||
+  if (!ret || !ret->IsAvailable() ||
       (!command_control.force_server_id.IsAny() &&
        ret->GetServerId() != command_control.force_server_id)) {
     return {};

@@ -44,8 +44,8 @@ class ClusterShard {
   ClusterShard& operator=(ClusterShard&& other) noexcept;
   bool IsReady(WaitConnectedMode mode) const;
   bool AsyncCommand(CommandPtr command) const;
-  ShardStatistics GetStatistics(bool master,
-                                const MetricsSettings& settings) const;
+  void GetStatistics(bool master, const MetricsSettings& settings,
+                     ShardStatistics& stats) const;
 
   ServersWeighted GetAvailableServersWeighted(
       bool with_master, const CommandControl& command_control) const;
@@ -61,7 +61,7 @@ class ClusterShard {
   std::vector<RedisConnectionPtr> GetAvailableServers(
       const CommandControl& command_control) const;
   static RedisPtr GetInstance(const std::vector<RedisConnectionPtr>& instances,
-                              size_t start_idx, size_t attempt,
+                              bool is_retry, size_t start_idx, size_t attempt,
                               bool is_nearest_ping_server, size_t best_dc_count,
                               size_t* pinstance_idx);
   std::vector<RedisConnectionPtr> MakeReadonlyWithMasters() const;

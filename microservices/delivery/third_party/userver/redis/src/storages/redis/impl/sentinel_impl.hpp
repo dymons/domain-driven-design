@@ -18,6 +18,7 @@
 #include <userver/dynamic_config/source.hpp>
 #include <userver/engine/deadline.hpp>
 #include <userver/engine/impl/condition_variable_any.hpp>
+#include <userver/utils/retry_budget.hpp>
 #include <userver/utils/swappingsmart.hpp>
 
 #include <storages/redis/impl/redis_stats.hpp>
@@ -88,7 +89,8 @@ class SentinelImplBase {
       CommandsBufferingSettings commands_buffering_settings) = 0;
   virtual void SetReplicationMonitoringSettings(
       const ReplicationMonitoringSettings& replication_monitoring_settings) = 0;
-  virtual void SetClusterAutoTopology(bool /*auto_topology*/) {}
+  virtual void SetRetryBudgetSettings(
+      const utils::RetryBudgetSettings& retry_budget_settings) = 0;
 
   virtual PublishSettings GetPublishSettings() = 0;
 };
@@ -144,6 +146,8 @@ class SentinelImpl : public SentinelImplBase {
   void SetReplicationMonitoringSettings(
       const ReplicationMonitoringSettings& replication_monitoring_settings)
       override;
+  void SetRetryBudgetSettings(
+      const utils::RetryBudgetSettings& retry_budget_settings) override;
   PublishSettings GetPublishSettings() override;
 
  private:

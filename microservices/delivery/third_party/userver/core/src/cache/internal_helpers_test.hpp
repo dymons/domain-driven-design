@@ -23,9 +23,8 @@ namespace cache {
 
 struct MockEnvironment final {
   MockEnvironment() = default;
-  explicit MockEnvironment(
-      testsuite::CacheControl::PeriodicUpdatesMode update_mode)
-      : cache_control(update_mode) {}
+  explicit MockEnvironment(testsuite::impl::PeriodicUpdatesMode update_mode)
+      : cache_control(update_mode, testsuite::CacheControl::UnitTests{}) {}
 
   dynamic_config::StorageMock config_storage{{dump::kConfigSet, {}},
                                              {cache::kCacheConfigSet, {}}};
@@ -33,7 +32,8 @@ struct MockEnvironment final {
   alerts::Storage alerts_storage;
   fs::blocking::TempDirectory dump_root = fs::blocking::TempDirectory::Create();
   testsuite::CacheControl cache_control{
-      testsuite::CacheControl::PeriodicUpdatesMode::kDisabled};
+      testsuite::impl::PeriodicUpdatesMode::kDisabled,
+      testsuite::CacheControl::UnitTests{}};
   testsuite::DumpControl dump_control{
       testsuite::DumpControl::PeriodicsMode::kDisabled};
 };

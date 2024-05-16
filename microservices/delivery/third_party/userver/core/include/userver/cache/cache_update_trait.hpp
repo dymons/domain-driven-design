@@ -81,8 +81,12 @@ class CacheUpdateTrait {
   // For internal use only
   rcu::ReadablePtr<Config> GetConfig() const;
 
-  /// Checks for the presence of the flag for pre-assign check
+  // Checks for the presence of the flag for pre-assign check.
+  // For internal use only.
   bool HasPreAssignCheck() const;
+
+  // For internal use only.
+  void SetDataSizeStatistic(std::size_t size) noexcept;
 
   // For internal use only
   // TODO remove after TAXICOMMON-3959
@@ -115,6 +119,9 @@ class CacheUpdateTrait {
   /// @param now current time point
   ///
   /// @throws std::exception on update failure
+  ///
+  /// @warning If `Update` returns without throwing an exception and without
+  /// calling one of the `Finish*` methods, the behavior is undefined.
   ///
   /// @see @ref scripts/docs/en/userver/caches.md
   virtual void Update(UpdateType type,

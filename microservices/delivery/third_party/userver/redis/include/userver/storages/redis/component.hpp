@@ -44,13 +44,15 @@ namespace components {
 /// Provides access to a redis cluster.
 ///
 /// ## Dynamic options:
+/// * @ref REDIS_COMMANDS_BUFFERING_SETTINGS
 /// * @ref REDIS_DEFAULT_COMMAND_CONTROL
+/// * @ref REDIS_METRICS_SETTINGS
+/// * @ref REDIS_PUBSUB_METRICS_SETTINGS
+/// * @ref REDIS_RETRY_BUDGET_SETTINGS
+/// * @ref REDIS_REPLICA_MONITORING_SETTINGS
 /// * @ref REDIS_SUBSCRIBER_DEFAULT_COMMAND_CONTROL
 /// * @ref REDIS_SUBSCRIPTIONS_REBALANCE_MIN_INTERVAL_SECONDS
 /// * @ref REDIS_WAIT_CONNECTED
-/// * @ref REDIS_COMMANDS_BUFFERING_SETTINGS
-/// * @ref REDIS_METRICS_SETTINGS
-/// * @ref REDIS_PUBSUB_METRICS_SETTINGS
 ///
 /// ## Static options:
 /// Name | Description | Default value
@@ -70,6 +72,7 @@ namespace components {
 /// ## Static configuration example:
 ///
 /// ```
+///    # yaml
 ///    redis:
 ///        groups:
 ///          - config_name: taxi-tmp
@@ -84,6 +87,27 @@ namespace components {
 ///            redis_thread_pool_size: 8
 ///            sentinel_thread_pool_size: 1
 /// ```
+///
+/// ## Secdist format
+///
+/// If a `config_name` option is provided, for example
+/// `groups.some.config_name: some_name_of_your_database`, then the Secdist
+/// entry for that alias should look like following:
+/// @code{.json}
+/// {
+///   "redis_settings": {
+///     "some_name_of_your_database": {
+///       "password": "the_password_of_your_database",
+///       "sentinels": [
+///         {"host": "the_host1_of_your_database", "port": 11564}
+///       ],
+///       "shards": [
+///         {"name": "test_master0"}
+///       ]
+///     }
+///   }
+/// }
+/// @endcode
 
 // clang-format on
 class Redis : public LoggableComponentBase {

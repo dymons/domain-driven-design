@@ -24,6 +24,15 @@ UTEST(BackgroundTaskStorage, TaskStart) {
   EXPECT_TRUE(event.WaitForEvent());
 }
 
+UTEST(BackgroundTaskStorage, CriticalTaskStart) {
+  concurrent::BackgroundTaskStorage bts;
+
+  engine::SingleConsumerEvent event;
+  bts.CriticalAsyncDetach("test", [&event] { event.Send(); });
+
+  EXPECT_TRUE(event.WaitForEvent());
+}
+
 UTEST(BackgroundTaskStorage, CancelAndWaitInDtr) {
   std::atomic<bool> started{false};
   std::atomic<bool> cancelled{false};
@@ -149,6 +158,19 @@ UTEST(BackgroundTaskStorage, CancelAndWait) {
   engine::Yield();
 
   bts.CancelAndWait();
+  EXPECT_TRUE(finished);
+}
+
+UTEST(BackgroundTaskStorage, CloseAndWaitDebug) {
+  std::atomic<bool> finished{false};
+  concurrent::BackgroundTaskStorage bts;
+  bts.AsyncDetach("", [&] {
+    engine::InterruptibleSleepFor(std::chrono::milliseconds(50));
+    EXPECT_FALSE(engine::current_task::IsCancelRequested());
+    finished = true;
+  });
+
+  bts.CloseAndWaitDebug();
   EXPECT_TRUE(finished);
 }
 

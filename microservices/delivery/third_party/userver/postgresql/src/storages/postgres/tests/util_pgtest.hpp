@@ -24,7 +24,7 @@ inline constexpr std::uint32_t kConnectionId = 0;
 
 inline constexpr storages::postgres::CommandControl kTestCmdCtl{
     // TODO: lower execute timeout after TAXICOMMON-1313
-    std::chrono::seconds{1}, std::chrono::milliseconds{500}};
+    std::chrono::seconds{2}, std::chrono::milliseconds{500}};
 
 storages::postgres::DefaultCommandControls GetTestCmdCtls();
 
@@ -54,6 +54,15 @@ inline const storages::postgres::ConnectionSettings kPipelineEnabled{
     storages::postgres::kDefaultMaxPreparedCacheSize,
     storages::postgres::PipelineMode::kEnabled,
 };
+inline const storages::postgres::ConnectionSettings
+    kOmitDescribeAndPipelineEnabled{
+        storages::postgres::ConnectionSettings::kCachePreparedStatements,
+        storages::postgres::ConnectionSettings::kUserTypesEnabled,
+        storages::postgres::ConnectionSettings::kCheckUnused,
+        storages::postgres::kDefaultMaxPreparedCacheSize,
+        storages::postgres::PipelineMode::kEnabled,
+        storages::postgres::OmitDescribeInExecuteMode::kEnabled,
+    };
 
 engine::Deadline MakeDeadline();
 

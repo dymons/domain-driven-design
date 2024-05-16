@@ -15,7 +15,6 @@ USERVER_NAMESPACE_BEGIN
 namespace {
 
 /// [struct config hpp]
-// hpp
 struct SampleStructConfig final {
   bool is_foo_enabled;
   std::chrono::milliseconds bar_period;
@@ -25,7 +24,6 @@ extern const dynamic_config::Key<SampleStructConfig> kSampleStructConfig;
 /// [struct config hpp]
 
 /// [struct config cpp]
-// cpp
 // Parser for a type must be defined in the same namespace as the type itself.
 // In this example, JSON parser is only needed for dynamic config, so declaring
 // it in hpp is not strictly necessary.
@@ -173,6 +171,35 @@ UTEST(DynamicConfig, Snippet) {
   UEXPECT_THROW(client.DoStuff(), std::runtime_error);
 }
 /// [Sample StorageMock usage]
+
+/// [Sample StorageMock defaults]
+// Some production code
+void MyHelper(const dynamic_config::Snapshot&);
+
+class MyClient final {
+ public:
+  explicit MyClient(dynamic_config::Source);
+  // ...
+};
+
+// Tests
+UTEST(Stuff, DefaultConfig) {
+  MyHelper(dynamic_config::GetDefaultSnapshot());
+  MyClient client{dynamic_config::GetDefaultSource()};
+}
+
+UTEST(Stuff, CustomConfig) {
+  const auto config_storage = dynamic_config::MakeDefaultStorage({
+      {kDummyConfig, {42, "what"}},
+      {kIntConfig, 5},
+  });
+  MyHelper(config_storage.GetSnapshot());
+  MyClient client{config_storage.GetSource()};
+}
+/// [Sample StorageMock defaults]
+
+void MyHelper(const dynamic_config::Snapshot&) {}
+MyClient::MyClient(dynamic_config::Source) {}
 
 UTEST(DynamicConfig, Extend) {
   const std::vector<dynamic_config::KeyValue> vars1{

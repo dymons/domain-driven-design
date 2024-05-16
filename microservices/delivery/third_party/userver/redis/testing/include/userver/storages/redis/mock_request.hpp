@@ -6,8 +6,8 @@
 #include <memory>
 #include <string>
 
+#include <userver/storages/redis/exception.hpp>
 #include <userver/storages/redis/impl/base.hpp>
-#include <userver/storages/redis/impl/exception.hpp>
 #include <userver/storages/redis/impl/request.hpp>
 #include <userver/storages/redis/reply_types.hpp>
 #include <userver/storages/redis/request.hpp>
@@ -36,6 +36,11 @@ class MockRequestData final : public RequestDataBase<ReplyType> {
     return nullptr;
   }
 
+  engine::impl::ContextAccessor* TryGetContextAccessor() noexcept override {
+    UASSERT_MSG(false, "not supported in mocked request");
+    return nullptr;
+  }
+
  private:
   ReplyType reply_;
 };
@@ -50,6 +55,11 @@ class MockRequestData<Result, void> final : public RequestDataBase<void> {
   void Get(const std::string& /*request_description*/) override {}
 
   ReplyPtr GetRaw() override {
+    UASSERT_MSG(false, "not supported in mocked request");
+    return nullptr;
+  }
+
+  engine::impl::ContextAccessor* TryGetContextAccessor() noexcept override {
     UASSERT_MSG(false, "not supported in mocked request");
     return nullptr;
   }
@@ -69,6 +79,11 @@ class MockRequestDataTimeout final : public RequestDataBase<ReplyType> {
   }
 
   ReplyPtr GetRaw() override {
+    UASSERT_MSG(false, "not supported in mocked request");
+    return nullptr;
+  }
+
+  engine::impl::ContextAccessor* TryGetContextAccessor() noexcept override {
     UASSERT_MSG(false, "not supported in mocked request");
     return nullptr;
   }

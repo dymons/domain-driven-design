@@ -40,3 +40,5 @@ target_link_libraries(CryptoPP INTERFACE cryptopp)
 get_filename_component(cryptopp_parent_directory "${cryptopp_SOURCE_DIR}" DIRECTORY)
 target_include_directories(CryptoPP INTERFACE "${cryptopp_parent_directory}")
 target_compile_options(cryptopp PRIVATE "-Wno-implicit-fallthrough")
+
+_userver_install_targets(COMPONENT universal TARGETS CryptoPP)

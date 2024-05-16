@@ -71,6 +71,7 @@ class Value final {
       Iterator<IterTraits, common::IteratorDirection::kReverse>;
   using Exception = formats::json::Exception;
   using ParseException = formats::json::ParseException;
+  using ExceptionWithPath = formats::json::ExceptionWithPath;
   using Builder = ValueBuilder;
 
   /// @brief Constructs a Value that holds a null.
@@ -162,7 +163,8 @@ class Value final {
 
   // clang-format off
 
-  /// @brief Returns value of *this converted to T.
+  /// @brief Returns value of *this converted to the result type of
+  ///        Parse(const Value&, parse::To<T>). Almost always it is T.
   /// @throw Anything derived from std::exception.
   ///
   /// ## Example usage:
@@ -174,19 +176,19 @@ class Value final {
   // clang-format on
 
   template <typename T>
-  T As() const;
+  auto As() const;
 
   /// @brief Returns value of *this converted to T or T(args) if
   /// this->IsMissing().
   /// @throw Anything derived from std::exception.
   template <typename T, typename First, typename... Rest>
-  T As(First&& default_arg, Rest&&... more_default_args) const;
+  auto As(First&& default_arg, Rest&&... more_default_args) const;
 
   /// @brief Returns value of *this converted to T or T() if this->IsMissing().
   /// @throw Anything derived from std::exception.
   /// @note Use as `value.As<T>({})`
   template <typename T>
-  T As(DefaultConstructed) const;
+  auto As(DefaultConstructed) const;
 
   /// @brief Extracts the specified type with relaxed type checks.
   /// For example, `true` may be converted to 1.0.
@@ -205,10 +207,14 @@ class Value final {
   /// @brief Returns full path to this value.
   std::string GetPath() const;
 
-  /// @brief Returns new value that is an exact copy if the existing one
+  /// @cond
+  void DropRootPath();
+  /// @endcond
+
+  /// @brief Returns new value that is an exact copy of the existing one
   /// but references different memory (a deep copy of a *this). The returned
   /// value is a root value with path '/'.
-  /// @throws MemberMissingException id `this->IsMissing()`.
+  /// @throws MemberMissingException if `this->IsMissing()`.
   Value Clone() const;
 
   /// @throw MemberMissingException if `this->IsMissing()`.
@@ -240,19 +246,24 @@ class Value final {
   }
 
  private:
-  class EmplaceEnabler {};
+  struct EmplaceEnabler {
+    explicit EmplaceEnabler() = default;
+  };
+
   class LazyDetachedPath;
 
  public:
   /// @cond
   Value(EmplaceEnabler, const impl::VersionedValuePtr& root,
-        const impl::Value& value, int depth);
+        const impl::Value* root_ptr_for_path, const impl::Value* value_ptr,
+        int depth);
+
+  Value(EmplaceEnabler, const impl::VersionedValuePtr& root,
+        impl::Value* root_ptr_for_path, LazyDetachedPath&& lazy_detached_path);
   /// @endcond
 
  private:
   explicit Value(impl::VersionedValuePtr root) noexcept;
-  Value(impl::VersionedValuePtr root, const impl::Value* value_ptr, int depth);
-  Value(impl::VersionedValuePtr root, LazyDetachedPath&& lazy_detached_path);
 
   bool IsUniqueReference() const;
   void EnsureNotMissing() const;
@@ -261,7 +272,8 @@ class Value final {
   void SetNative(impl::Value&);  // does not copy
   int GetExtendedType() const;
 
-  impl::VersionedValuePtr root_{};
+  impl::VersionedValuePtr holder_{};
+  impl::Value* root_ptr_for_path_{nullptr};
   impl::Value* value_ptr_{nullptr};
   /// Depth of the node to ease recursive traversal in GetPath()
   int depth_{0};
@@ -304,6 +316,12 @@ class Value final {
   friend class parser::JsonValueParser;
   friend class impl::StringBuffer;
 
+  friend bool Parse(const Value& value, parse::To<bool>);
+  friend std::int64_t Parse(const Value& value, parse::To<std::int64_t>);
+  friend std::uint64_t Parse(const Value& value, parse::To<std::uint64_t>);
+  friend double Parse(const Value& value, parse::To<double>);
+  friend std::string Parse(const Value& value, parse::To<std::string>);
+
   friend formats::json::Value FromString(std::string_view);
   friend formats::json::Value FromStream(std::istream&);
   friend void Serialize(const formats::json::Value&, std::ostream&);
@@ -318,7 +336,7 @@ class Value final {
 };
 
 template <typename T>
-T Value::As() const {
+auto Value::As() const {
   static_assert(formats::common::impl::kHasParse<Value, T>,
                 "There is no `Parse(const Value&, formats::parse::To<T>)` "
                 "in namespace of `T` or `formats::parse`. "
@@ -329,20 +347,15 @@ T Value::As() const {
   return Parse(*this, formats::parse::To<T>{});
 }
 
-template <>
-bool Value::As<bool>() const;
+bool Parse(const Value& value, parse::To<bool>);
 
-template <>
-int64_t Value::As<int64_t>() const;
+std::int64_t Parse(const Value& value, parse::To<std::int64_t>);
 
-template <>
-uint64_t Value::As<uint64_t>() const;
+std::uint64_t Parse(const Value& value, parse::To<std::uint64_t>);
 
-template <>
-double Value::As<double>() const;
+double Parse(const Value& value, parse::To<double>);
 
-template <>
-std::string Value::As<std::string>() const;
+std::string Parse(const Value& value, parse::To<std::string>);
 
 template <>
 bool Value::ConvertTo<bool>() const;
@@ -360,19 +373,19 @@ template <>
 std::string Value::ConvertTo<std::string>() const;
 
 template <typename T, typename First, typename... Rest>
-T Value::As(First&& default_arg, Rest&&... more_default_args) const {
+auto Value::As(First&& default_arg, Rest&&... more_default_args) const {
   if (IsMissing() || IsNull()) {
     // intended raw ctor call, sometimes casts
     // NOLINTNEXTLINE(google-readability-casting)
-    return T(std::forward<First>(default_arg),
-             std::forward<Rest>(more_default_args)...);
+    return decltype(As<T>())(std::forward<First>(default_arg),
+                             std::forward<Rest>(more_default_args)...);
   }
   return As<T>();
 }
 
 template <typename T>
-T Value::As(Value::DefaultConstructed) const {
-  return (IsMissing() || IsNull()) ? T() : As<T>();
+auto Value::As(Value::DefaultConstructed) const {
+  return (IsMissing() || IsNull()) ? decltype(As<T>())() : As<T>();
 }
 
 template <typename T>
@@ -402,6 +415,9 @@ T Value::ConvertTo(First&& default_arg, Rest&&... more_default_args) const {
 }
 
 inline Value Parse(const Value& value, parse::To<Value>) { return value; }
+
+std::chrono::microseconds Parse(const Value& value,
+                                parse::To<std::chrono::microseconds>);
 
 std::chrono::milliseconds Parse(const Value& value,
                                 parse::To<std::chrono::milliseconds>);

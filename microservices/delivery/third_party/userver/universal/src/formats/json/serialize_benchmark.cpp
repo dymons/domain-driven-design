@@ -1,4 +1,5 @@
 #include <string_view>
+#include <variant>
 
 #include <benchmark/benchmark.h>
 #include <rapidjson/document.h>
@@ -6,6 +7,11 @@
 #include <userver/formats/json/impl/types.hpp>
 #include <userver/formats/json/serialize.hpp>
 #include <userver/formats/json/value.hpp>
+#include <userver/formats/json/value_builder.hpp>
+#include <userver/formats/parse/common_containers.hpp>
+#include <userver/formats/parse/variant.hpp>
+#include <userver/formats/serialize/common_containers.hpp>
+#include <userver/formats/serialize/variant.hpp>
 
 USERVER_NAMESPACE_BEGIN
 
@@ -157,7 +163,7 @@ constexpr std::string_view str_width_json =
 }
 })";
 
-constexpr std::size_t kDepth = 500;
+constexpr std::size_t kDepth = 127;
 
 const std::string str_deep_json = MakeStringOfDeepObject(kDepth);
 
@@ -1178,6 +1184,80 @@ BENCHMARK(WidthJson);
 BENCHMARK(DeepJson);
 
 BENCHMARK(DeepWidthJson);
+
+namespace {
+
+struct InnerObject final {
+  std::variant<int, bool, std::vector<std::string>, std::string> value;
+};
+
+formats::json::Value Serialize(const InnerObject& value,
+                               formats::serialize::To<formats::json::Value>) {
+  formats::json::ValueBuilder builder{};
+  builder["value"] = value.value;
+  return builder.ExtractValue();
+}
+
+InnerObject Parse(const formats::json::Value& value,
+                  formats::parse::To<InnerObject>) {
+  return {value["value"].As<decltype(InnerObject::value)>()};
+}
+
+struct OuterObject final {
+  InnerObject obj;
+};
+
+formats::json::Value Serialize(const OuterObject& value,
+                               formats::serialize::To<formats::json::Value>) {
+  formats::json::ValueBuilder builder{};
+  builder["obj"] = value.obj;
+  return builder.ExtractValue();
+}
+
+OuterObject Parse(const formats::json::Value& value,
+                  formats::parse::To<OuterObject>) {
+  return {value["obj"].As<InnerObject>()};
+}
+
+struct PairOfArrays final {
+  using Array = std::vector<OuterObject>;
+
+  Array first;
+  Array second;
+};
+
+formats::json::Value Serialize(const PairOfArrays& value,
+                               formats::serialize::To<formats::json::Value>) {
+  formats::json::ValueBuilder builder{};
+  builder["first"] = value.first;
+  builder["second"] = value.second;
+  return builder.ExtractValue();
+}
+
+PairOfArrays Parse(const formats::json::Value& value,
+                   formats::parse::To<PairOfArrays>) {
+  return {value["first"].As<PairOfArrays::Array>(),
+          value["second"].As<PairOfArrays::Array>()};
+}
+
+}  // namespace
+
+void JsonArrayToVariantParseBenchmark(benchmark::State& state) {
+  const std::size_t data_size = state.range(0);
+
+  PairOfArrays::Array array{};
+  array.reserve(data_size);
+  for (std::size_t i = 0; i < data_size; ++i) {
+    array.push_back(OuterObject{InnerObject{"some_string"}});
+  }
+  const PairOfArrays data{array, array};
+  const auto json_data = formats::json::ValueBuilder{data}.ExtractValue();
+
+  for ([[maybe_unused]] auto _ : state) {
+    benchmark::DoNotOptimize(json_data.As<PairOfArrays>());
+  }
+}
+BENCHMARK(JsonArrayToVariantParseBenchmark)->Range(16, 4096);
 
 }  // namespace
 

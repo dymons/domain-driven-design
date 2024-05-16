@@ -4,6 +4,7 @@
 #include <vector>
 
 #include <userver/engine/async.hpp>
+#include <userver/engine/future_status.hpp>
 #include <userver/engine/single_consumer_event.hpp>
 #include <userver/engine/task/cancel.hpp>
 #include <userver/engine/task/task_with_result.hpp>
@@ -75,7 +76,7 @@ void ExpectCancelledStats(const utils::statistics::Snapshot& stats) {
   // However, if it is set, then it is 1.
   EXPECT_LE(stats.SingleMetric("cancelled.v2").AsRate(), 1);
 
-  EXPECT_EQ(stats.SingleMetric("eps.v2").AsRate(), 1);
+  EXPECT_EQ(stats.SingleMetric("eps").AsRate(), 0);
   EXPECT_EQ(stats.SingleMetric("rps.v2").AsRate(), 1);
   EXPECT_EQ(stats.SingleMetric("network-error.v2").AsRate(), 0);
   EXPECT_EQ(stats.SingleMetric("abandoned-error.v2").AsRate(), 0);
@@ -96,6 +97,27 @@ UTEST_F(GrpcClientCancel, UnaryCall) {
 
     sample::ugrpc::GreetingResponse in;
     UEXPECT_THROW(in = call.Finish(), ugrpc::client::RpcCancelledError);
+  }
+
+  const auto stats = GetStatistics(
+      "grpc.client.by-destination",
+      {{"grpc_destination", "sample.ugrpc.UnitTestService/SayHello"}});
+  ExpectCancelledStats(stats);
+}
+
+UTEST_F(GrpcClientCancel, AsyncUnaryRPC) {
+  auto client = MakeClient<sample::ugrpc::UnitTestServiceClient>();
+  {
+    engine::current_task::GetCancellationToken().RequestCancel();
+
+    sample::ugrpc::GreetingRequest out;
+    out.set_name("userver");
+    auto call = client.SayHello(out, PrepareClientContext());
+
+    sample::ugrpc::GreetingResponse in;
+    auto future = call.FinishAsync(in);
+    EXPECT_EQ(future.Get(engine::Deadline::FromDuration(60s)),
+              engine::FutureStatus::kCancelled);
   }
 
   const auto stats = GetStatistics(

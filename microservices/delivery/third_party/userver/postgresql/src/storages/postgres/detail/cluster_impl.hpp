@@ -14,12 +14,13 @@
 #include <storages/postgres/connlimit_watchdog.hpp>
 #include <storages/postgres/detail/pg_impl_types.hpp>
 #include <storages/postgres/detail/pool.hpp>
-#include <storages/postgres/detail/statement_timings_storage.hpp>
+#include <storages/postgres/detail/statement_stats_storage.hpp>
 #include <storages/postgres/detail/topology/base.hpp>
 #include <userver/storages/postgres/cluster_types.hpp>
 #include <userver/storages/postgres/detail/non_transaction.hpp>
 #include <userver/storages/postgres/notify.hpp>
 #include <userver/storages/postgres/options.hpp>
+#include <userver/storages/postgres/query_queue.hpp>
 #include <userver/storages/postgres/statistics.hpp>
 #include <userver/storages/postgres/transaction.hpp>
 
@@ -49,6 +50,9 @@ class ClusterImpl {
 
   NotifyScope Listen(std::string_view channel, OptionalCommandControl);
 
+  QueryQueue CreateQueryQueue(ClusterHostTypeFlags flags,
+                              TimeoutDuration acquire_timeout);
+
   void SetDefaultCommandControl(CommandControl, DefaultCommandControlSource);
   CommandControl GetDefaultCommandControl() const;
 
@@ -61,6 +65,8 @@ class ClusterImpl {
   void SetConnectionSettings(const ConnectionSettings& settings);
 
   void SetPoolSettings(const PoolSettings& settings);
+
+  void SetTopologySettings(const TopologySettings& settings);
 
   void SetStatementMetricsSettings(const StatementMetricsSettings& settings);
 

@@ -1,5 +1,6 @@
 ccache
 cmake
+cyrus-sasl
 git
 google-benchmark
 boost
@@ -10,7 +11,6 @@ fmt
 grpc
 googletest
 hiredis
-http-parser
 jemalloc
 krb5
 nghttp2
@@ -18,10 +18,10 @@ ninja
 protobuf
 openssl
 yaml-cpp
+librdkafka-dev
 postgresql@14
 redis
 zlib
 amqp-cpp
 c-ares
-virtualenv
 coreutils

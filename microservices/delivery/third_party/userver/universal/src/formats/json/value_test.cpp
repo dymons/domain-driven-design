@@ -205,4 +205,46 @@ TEST(FormatsJson, UserDefinedLiterals) {
     )json"_json);
 }
 
+TEST(FormatsJson, DropRootPath) {
+  static constexpr std::string_view kJson = R"({
+    "foo": {
+      "bar": "baz"
+    }
+  })";
+  formats::json::Value child;
+
+  {
+    const auto root = formats::json::FromString(kJson);
+    EXPECT_EQ(root.GetPath(), "/");
+
+    auto foo = root["foo"];
+    EXPECT_EQ(foo.GetPath(), "foo");
+    foo.DropRootPath();
+    EXPECT_EQ(foo.GetPath(), "/");
+
+    for (auto [_, value] : Items(foo)) {
+      EXPECT_EQ(value.GetPath(), "bar");
+      child = value;
+    }
+  }
+
+  EXPECT_EQ(child.GetPath(), "bar");
+}
+
+TEST(FormatsJson, ExceptionMessages) {
+  formats::json::Value json = formats::json::FromString(R"({
+    "foo": {
+      "bar": "baz"
+    }
+  })");
+
+  try {
+    auto _ [[maybe_unused]] = json["foo"]["bar"].As<int64_t>();
+  } catch (const formats::json::TypeMismatchException& ex) {
+    EXPECT_EQ(ex.GetPath(), "foo.bar");
+    EXPECT_EQ(ex.GetMessageWithoutPath(),
+              "Wrong type. Expected: intValue, actual: stringValue");
+  }
+}
+
 USERVER_NAMESPACE_END

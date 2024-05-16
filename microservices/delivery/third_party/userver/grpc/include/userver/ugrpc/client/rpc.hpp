@@ -11,6 +11,8 @@
 #include <grpcpp/impl/codegen/proto_utils.h>
 
 #include <userver/dynamic_config/snapshot.hpp>
+#include <userver/engine/deadline.hpp>
+#include <userver/engine/future_status.hpp>
 #include <userver/utils/assert.hpp>
 #include <userver/utils/function_ref.hpp>
 
@@ -36,6 +38,8 @@ class [[nodiscard]] UnaryFuture {
 
   UnaryFuture(UnaryFuture&&) noexcept = default;
   UnaryFuture& operator=(UnaryFuture&&) noexcept;
+  UnaryFuture(const UnaryFuture&) = delete;
+  UnaryFuture& operator=(const UnaryFuture&) = delete;
 
   ~UnaryFuture() noexcept;
 
@@ -50,11 +54,26 @@ class [[nodiscard]] UnaryFuture {
   /// @throws ugrpc::client::RpcCancelledError on task cancellation
   void Get();
 
+  /// @brief Await response until specified timepoint
+  ///
+  /// Once `kReady` is returned, result is available in `response` when
+  /// initiating the asynchronous operation, e.g. FinishAsync.
+  ///
+  /// In case of 'kReady/kCancelled' answer or exception `Get` should not
+  /// be called anymore.
+  ///
+  /// @throws ugrpc::client::RpcError on an RPC error
+  [[nodiscard]] engine::FutureStatus Get(engine::Deadline deadline);
+
   /// @brief Checks if the asynchronous call has completed
   ///        Note, that once user gets result, IsReady should not be called
   /// @return true if result ready
   [[nodiscard]] bool IsReady() const noexcept;
 
+  /// @cond
+  // For internal use only.
+  engine::impl::ContextAccessor* TryGetContextAccessor() noexcept;
+  /// @endcond
  private:
   impl::FutureImpl impl_;
 };
@@ -288,11 +307,13 @@ class [[nodiscard]] OutputStream final : public CallAnyBase {
 
 /// @brief Controls a request stream -> response stream RPC
 ///
-/// This class allows the following concurrent calls:
-///   - `GetContext`
-///   - Concurrent call of one of (`Read`, `ReadAsync`) with one of (`Write`,
-///     `WritesDone`)
-/// `WriteAndCheck` is not thread-safe
+/// It is safe to call the following methods from different coroutines:
+///
+///   - `GetContext`;
+///   - one of (`Read`, `ReadAsync`);
+///   - one of (`Write`, `WritesDone`).
+///
+/// `WriteAndCheck` is NOT thread-safe.
 ///
 /// The RPC is cancelled on destruction unless the stream is closed (`Read` has
 /// returned `false`). In that case the connection is not closed (it will be
@@ -315,6 +336,10 @@ class [[nodiscard]] OutputStream final : public CallAnyBase {
 /// Instead the user SHOULD call `Read` method until the end of input. If
 /// `Write` or `WritesDone` finishes with negative result, finally `Read`
 /// will throw an exception.
+/// ## Usage example:
+///
+/// @snippet grpc/tests/src/stream_test.cpp concurrent bidirectional stream
+///
 template <typename Request, typename Response>
 class [[nodiscard]] BidirectionalStream final : public CallAnyBase {
  public:

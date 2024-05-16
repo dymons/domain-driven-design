@@ -17,14 +17,14 @@
 /// ----------
 ///
 /// @htmlonly <div class="bottom-nav"> @endhtmlonly
-/// ⇦ @ref userver_clients | @ref scripts/docs/en/userver/synchronization.md ⇨
+/// ⇦ @ref userver_middlewares | @ref scripts/docs/en/userver/synchronization.md ⇨
 /// @htmlonly </div> @endhtmlonly
 
 
 /// @defgroup userver_clients Clients
 ///
 /// @brief Clients are classes that provide interfaces for requesting and
-/// retrieving data usually from remove server.
+/// retrieving data usually from remote server.
 ///
 /// All the clients are asynchronous. In other words, a request suspends the
 /// current engine::Task and other coroutines are processed on the task
@@ -74,7 +74,7 @@
 /// ----------
 ///
 /// @htmlonly <div class="bottom-nav"> @endhtmlonly
-/// ⇦ @ref userver_clients | @ref userver_components ⇨
+/// ⇦ @ref userver_clients | @ref userver_middlewares ⇨
 /// @htmlonly </div> @endhtmlonly
 
 
@@ -138,5 +138,16 @@
 /// @defgroup userver_component_names Component Default Names
 /// @ingroup userver_components
 /// @brief Default names of components that are used in static config files
+
+/// @defgroup userver_middlewares Http server middlewares
+/// @ingroup userver_components
+/// @brief Base classes for implementing and configuring http server middlewares
+/// @see @ref scripts/docs/en/userver/http_server_middlewares.md
+///
+/// ----------
+///
+/// @htmlonly <div class="bottom-nav"> @endhtmlonly
+/// ⇦ @ref userver_http_handlers | @ref userver_components ⇨
+/// @htmlonly </div> @endhtmlonly
 
 // clang-format on

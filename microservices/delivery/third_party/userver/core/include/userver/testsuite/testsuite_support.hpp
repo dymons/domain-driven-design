@@ -3,9 +3,8 @@
 /// @file userver/testsuite/testsuite_support.hpp
 /// @brief @copybrief components::TestsuiteSupport
 
-#include <userver/components/component_fwd.hpp>
+#include <userver/components/impl/component_base.hpp>
 #include <userver/testsuite/cache_control.hpp>
-#include <userver/testsuite/component_control.hpp>
 #include <userver/testsuite/dump_control.hpp>
 #include <userver/testsuite/grpc_control.hpp>
 #include <userver/testsuite/http_allowed_urls_extra.hpp>
@@ -42,6 +41,8 @@ namespace components {
 /// testsuite-redis-timeout-single | minimum single shard timeout for redis | -
 /// testsuite-redis-timeout-all | minimum command timeout for redis | -
 /// testsuite-tasks-enabled | enable testsuite tasks facility | false
+/// testsuite-increased-timeout | increase timeouts for connections, statement executions, RPC timeouts to avoid timeouts happening in testing environments, where the hardware differs from production. Overrides postgres, redis and grpc timeouts if these are missing | 0ms
+/// cache-update-execution |  If 'sequential' the caches are updated by testsuite sequentially in the order for cache component registration, which makes sense if service has components that push value into a cache component. If 'concurrent' the caches are updated concurrently with respect to the cache component dependencies. | concurrent
 ///
 /// ## Static configuration example:
 ///
@@ -60,7 +61,6 @@ class TestsuiteSupport final : public components::impl::ComponentBase {
   ~TestsuiteSupport() override;
 
   testsuite::CacheControl& GetCacheControl();
-  testsuite::ComponentControl& GetComponentControl();
   testsuite::DumpControl& GetDumpControl();
   testsuite::PeriodicTaskControl& GetPeriodicTaskControl();
   testsuite::TestpointControl& GetTestpointControl();
@@ -69,14 +69,18 @@ class TestsuiteSupport final : public components::impl::ComponentBase {
   testsuite::TestsuiteTasks& GetTestsuiteTasks();
   testsuite::HttpAllowedUrlsExtra& GetHttpAllowedUrlsExtra();
   testsuite::GrpcControl& GetGrpcControl();
+  /// @returns 0 if timeout was not increased via
+  /// `testsuite-increased-timeout` static option,
+  /// `testsuite-increased-timeout` value otherwise
+  std::chrono::milliseconds GetIncreasedTimeout() const noexcept;
 
   static yaml_config::Schema GetStaticConfigSchema();
 
  private:
   void OnAllComponentsAreStopping() override;
 
+  const std::chrono::milliseconds increased_timeout_;
   testsuite::CacheControl cache_control_;
-  testsuite::ComponentControl component_control_;
   testsuite::DumpControl dump_control_;
   testsuite::PeriodicTaskControl periodic_task_control_;
   testsuite::TestpointControl testpoint_control_;

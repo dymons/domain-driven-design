@@ -15,6 +15,7 @@
 #include <userver/storages/secdist/exceptions.hpp>
 #include <userver/storages/secdist/secdist.hpp>
 #include <userver/testsuite/testsuite_support.hpp>
+#include <userver/utils/retry_budget.hpp>
 #include <userver/utils/statistics/writer.hpp>
 #include <userver/utils/trivial_map.hpp>
 #include <userver/yaml_config/merge_schemas.hpp>
@@ -30,6 +31,7 @@
 #include "client_impl.hpp"
 #include "redis_secdist.hpp"
 #include "subscribe_client_impl.hpp"
+#include "userver/storages/redis/impl/base.hpp"
 
 #include <boost/range/adaptor/map.hpp>
 
@@ -88,6 +90,7 @@ struct SubscribeRedisGroup {
   std::string db;
   std::string config_name;
   std::string sharding_strategy;
+  bool allow_reads_from_master{false};
 };
 
 SubscribeRedisGroup Parse(const yaml_config::YamlConfig& value,
@@ -96,6 +99,8 @@ SubscribeRedisGroup Parse(const yaml_config::YamlConfig& value,
   config.db = value["db"].As<std::string>();
   config.config_name = value["config_name"].As<std::string>();
   config.sharding_strategy = value["sharding_strategy"].As<std::string>("");
+  config.allow_reads_from_master =
+      value["allow_reads_from_master"].As<bool>(false);
   return config;
 }
 
@@ -244,10 +249,12 @@ void Redis::Connect(const ComponentConfig& config,
 
     bool is_cluster_mode = USERVER_NAMESPACE::redis::IsClusterStrategy(
         redis_group.sharding_strategy);
+    redis::CommandControl cc{};
+    cc.allow_reads_from_master = redis_group.allow_reads_from_master;
 
     auto sentinel = redis::SubscribeSentinel::Create(
         thread_pools_, settings, redis_group.config_name, config_source,
-        redis_group.db, is_cluster_mode, testsuite_redis_control);
+        redis_group.db, is_cluster_mode, cc, testsuite_redis_control);
     if (sentinel)
       subscribe_clients_.emplace(
           redis_group.db,
@@ -300,7 +307,6 @@ void Redis::OnConfigUpdate(const dynamic_config::Snapshot& cfg) {
 
   auto cc = std::make_shared<redis::CommandControl>(
       redis_config.default_command_control);
-  const auto auto_topology = redis_config.redis_cluster_autotopology_enabled;
   for (auto& it : sentinels_) {
     const auto& name = it.first;
     auto& client = it.second;
@@ -310,7 +316,9 @@ void Redis::OnConfigUpdate(const dynamic_config::Snapshot& cfg) {
     client->SetReplicationMonitoringSettings(
         redis_config.replication_monitoring_settings.GetOptional(name).value_or(
             redis::ReplicationMonitoringSettings{}));
-    client->SetClusterAutoTopology(auto_topology);
+    client->SetRetryBudgetSettings(
+        redis_config.retry_budget_settings.GetOptional(name).value_or(
+            utils::RetryBudgetSettings{}));
   }
 
   auto subscriber_cc = std::make_shared<redis::CommandControl>(
@@ -320,7 +328,6 @@ void Redis::OnConfigUpdate(const dynamic_config::Snapshot& cfg) {
     subscribe_client.SetConfigDefaultCommandControl(subscriber_cc);
     subscribe_client.SetRebalanceMinInterval(
         redis_config.subscriptions_rebalance_min_interval);
-    subscribe_client.SetClusterAutoTopology(auto_topology);
   }
 
   auto metrics_settings = metrics_settings_.Read();
@@ -408,6 +415,10 @@ properties:
                     enum:
                       - RedisCluster
                       - KeyShardTaximeterCrc32
+                allow_reads_from_master:
+                    type: boolean
+                    description: allows subscriptions to master instance to distribute load
+                    defaultDescription: false
 )");
 }
 

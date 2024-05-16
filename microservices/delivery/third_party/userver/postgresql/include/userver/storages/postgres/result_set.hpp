@@ -214,6 +214,7 @@ class RowDescription {
   /// Check that all fields can be read in binary format
   /// @throw NoBinaryParser if any of the fields doesn't have a binary parser
   void CheckBinaryFormat(const UserTypes& types) const;
+
   // TODO interface for iterating field descriptions
  private:
   detail::ResultWrapperPtr res_;
@@ -276,9 +277,9 @@ class FieldView final {
     try {
       io::ReadBuffer(buffer, std::forward<T>(val), GetTypeBufferCategories());
     } catch (ResultSetError& ex) {
-      ex.AddMsgSuffix(fmt::format(
-          " (field #{} name `{}` C++ type `{}`. Postgres ResultSet error)",
-          field_index_, Name(), compiler::GetTypeName<T>()));
+      ex.AddMsgSuffix(
+          fmt::format(" (ResultSet error while reading field #{} name `{}`)",
+                      field_index_, Name()));
       throw;
     }
   }
@@ -350,6 +351,8 @@ class Field {
  protected:
   friend class Row;
 
+  Field() = default;
+
   Field(detail::ResultWrapperPtr res, size_type row, size_type col)
       : res_{std::move(res)}, row_index_{row}, field_index_{col} {}
 
@@ -363,14 +366,18 @@ class Field {
 
  private:
   detail::ResultWrapperPtr res_;
-  size_type row_index_;
-  size_type field_index_;
+  size_type row_index_{0};
+  size_type field_index_{0};
 };
 
 /// @brief Iterator over fields in a result set's row
 class ConstFieldIterator
     : public detail::ConstDataIterator<ConstFieldIterator, Field,
                                        detail::IteratorDirection::kForward> {
+ public:
+  ConstFieldIterator() = default;
+
+ private:
   friend class Row;
 
   ConstFieldIterator(detail::ResultWrapperPtr res, size_type row, size_type col)
@@ -381,6 +388,10 @@ class ConstFieldIterator
 class ReverseConstFieldIterator
     : public detail::ConstDataIterator<ReverseConstFieldIterator, Field,
                                        detail::IteratorDirection::kReverse> {
+ public:
+  ReverseConstFieldIterator() = default;
+
+ private:
   friend class Row;
 
   ReverseConstFieldIterator(detail::ResultWrapperPtr res, size_type row,
@@ -469,8 +480,6 @@ class Row {
   /// Function to disambiguate reading the first column to a user's composite
   /// type (PostgreSQL composite type in the row initializes user's type).
   /// The same as calling To(T&& val) for a T mapped to a PostgreSQL type.
-  ///
-  /// See @ref pg_composite_types
   template <typename T>
   void To(T&& val, FieldTag) const;
 
@@ -493,8 +502,6 @@ class Row {
 
   /// @brief Returns T initialized with values of the row.
   /// @snippet storages/postgres/tests/typed_rows_pgtest.cpp RowTagSippet
-  ///
-  /// @see @ref pg_composite_types
   template <typename T>
   T As(RowTag) const {
     T val{};
@@ -504,8 +511,6 @@ class Row {
 
   /// @brief Returns T initialized with a single column value of the row.
   /// @snippet storages/postgres/tests/composite_types_pgtest.cpp FieldTagSippet
-  ///
-  /// @see @ref pg_composite_types
   template <typename T>
   T As(FieldTag) const {
     T val{};
@@ -534,6 +539,8 @@ class Row {
  protected:
   friend class ResultSet;
 
+  Row() = default;
+
   Row(detail::ResultWrapperPtr res, size_type row)
       : res_{std::move(res)}, row_index_{row} {}
 
@@ -546,13 +553,17 @@ class Row {
   //@}
  private:
   detail::ResultWrapperPtr res_;
-  size_type row_index_;
+  size_type row_index_{0};
 };
 
 /// @name Iterator over rows in a result set
 class ConstRowIterator
     : public detail::ConstDataIterator<ConstRowIterator, Row,
                                        detail::IteratorDirection::kForward> {
+ public:
+  ConstRowIterator() = default;
+
+ private:
   friend class ResultSet;
 
   ConstRowIterator(detail::ResultWrapperPtr res, size_type row)
@@ -563,6 +574,10 @@ class ConstRowIterator
 class ReverseConstRowIterator
     : public detail::ConstDataIterator<ReverseConstRowIterator, Row,
                                        detail::IteratorDirection::kReverse> {
+ public:
+  ReverseConstRowIterator() = default;
+
+ private:
   friend class ResultSet;
 
   ReverseConstRowIterator(detail::ResultWrapperPtr res, size_type row)
@@ -812,6 +827,22 @@ struct TupleDataExtractor<std::tuple<T...>>
     : RowDataExtractorBase<std::index_sequence_for<T...>, T...> {};
 //@}
 
+template <typename RowType>
+constexpr void AssertRowTypeIsMappedToPgOrIsCompositeType() {
+  // composite types can be parsed without an explicit mapping
+  static_assert(
+      io::traits::kIsMappedToPg<RowType> ||
+          io::traits::kIsCompositeType<RowType>,
+      "Row type must be mapped to pg type(CppToUserPg) or one of the "
+      "following: "
+      "1. primitive type. "
+      "2. std::tuple. "
+      "3. Aggregation type. See std::aggregation. "
+      "4. Has a Introspect method that makes the std::tuple from your "
+      "class/struct. "
+      "For more info see `uPg: Typed PostgreSQL results` chapter in docs.");
+}
+
 }  // namespace detail
 
 template <typename T>
@@ -824,8 +855,7 @@ void Row::To(T&& val, RowTag) const {
   detail::AssertSaneTypeToDeserialize<T>();
   // Convert the val into a writable tuple and extract the data
   using ValueType = std::decay_t<T>;
-  static_assert(io::traits::kIsRowType<ValueType>,
-                "This type cannot be used as a row type");
+  io::traits::AssertIsValidRowType<ValueType>();
   using RowType = io::RowType<ValueType>;
   using TupleType = typename RowType::TupleType;
   constexpr auto tuple_size = RowType::size;
@@ -846,10 +876,7 @@ template <typename T>
 void Row::To(T&& val, FieldTag) const {
   detail::AssertSaneTypeToDeserialize<T>();
   using ValueType = std::decay_t<T>;
-  // composite types can be parsed without an explicit mapping
-  static_assert(io::traits::kIsMappedToPg<ValueType> ||
-                    io::traits::kIsCompositeType<ValueType>,
-                "This type is not mapped to a PostgreSQL type");
+  detail::AssertRowTypeIsMappedToPgOrIsCompositeType<ValueType>();
   // Read the first field into the type
   if (Size() < 1) {
     throw InvalidTupleSizeRequested{Size(), 1};
@@ -933,8 +960,7 @@ template <typename T>
 auto ResultSet::AsSetOf(RowTag) const {
   detail::AssertSaneTypeToDeserialize<T>();
   using ValueType = std::decay_t<T>;
-  static_assert(io::traits::kIsRowType<ValueType>,
-                "This type cannot be used as a row type");
+  io::traits::AssertIsValidRowType<ValueType>();
   return TypedResultSet<T, RowTag>{*this};
 }
 
@@ -942,10 +968,7 @@ template <typename T>
 auto ResultSet::AsSetOf(FieldTag) const {
   detail::AssertSaneTypeToDeserialize<T>();
   using ValueType = std::decay_t<T>;
-  // composite types can be parsed without an explicit mapping
-  static_assert(io::traits::kIsMappedToPg<ValueType> ||
-                    io::traits::kIsCompositeType<ValueType>,
-                "This type is not mapped to a PostgreSQL type");
+  detail::AssertRowTypeIsMappedToPgOrIsCompositeType<ValueType>();
   if (FieldCount() > 1) {
     throw NonSingleColumnResultSet{FieldCount(), compiler::GetTypeName<T>(),
                                    "AsSetOf"};

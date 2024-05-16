@@ -37,6 +37,9 @@ add_dependencies(${PROJECT_NAME} ${PROJECT_NAME}-json2yaml)
 add_subdirectory(hello_service)
 add_dependencies(${PROJECT_NAME} ${PROJECT_NAME}-hello_service)
 
+add_subdirectory(http_middleware_service)
+add_dependencies(${PROJECT_NAME} ${PROJECT_NAME}-http_middleware_service)
+
 add_subdirectory(multipart_service)
 add_dependencies(${PROJECT_NAME} ${PROJECT_NAME}-multipart_service)
 
@@ -101,4 +104,9 @@ endif()
 if (USERVER_FEATURE_MYSQL)
   add_subdirectory(mysql_service)
   add_dependencies(${PROJECT_NAME} ${PROJECT_NAME}-mysql_service)
+endif()
+
+if (USERVER_FEATURE_YDB AND USERVER_FEATURE_MONGODB)
+  add_subdirectory(ydb_service)
+  add_dependencies(${PROJECT_NAME} ${PROJECT_NAME}-ydb_service)
 endif()
