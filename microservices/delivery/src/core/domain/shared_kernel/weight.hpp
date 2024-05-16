@@ -1,5 +1,7 @@
 #pragma once
 
+#include <utility>
+
 namespace delivery::core::domain::shared_kernel {
 
 class Weight {
