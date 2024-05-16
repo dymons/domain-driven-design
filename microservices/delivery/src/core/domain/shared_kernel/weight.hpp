@@ -41,10 +41,7 @@ class Weight {
     \brief
         Get the weight
   */
-  template <typename Self>
-  [[nodiscard]] constexpr decltype(auto) GetWeight(this Self&& self) {
-    return std::forward<Self>(self).weight_;
-  }
+  [[nodiscard]] auto GetWeight() const noexcept -> int { return weight_; }
 
   /*!
     \brief
