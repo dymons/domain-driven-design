@@ -13,6 +13,8 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-enum-constexpr-conversion")
 add_subdirectory(third_party/userver)
 userver_setup_environment()
 
+# Use C++23
+set(CMAKE_CXX_STANDARD 23)
 
 # Common sources
 add_library(${PROJECT_NAME}_objs OBJECT
