@@ -32,11 +32,6 @@ class Weight {
 
     \ingroup
         SharedKernel
-
-    \code
-        auto const weight = Weight::Create(10);
-        do_some_stuff(weight.GetWeight());
-    \endcode
   */
   [[nodiscard]] static auto Create(int weight) -> Weight;
 
