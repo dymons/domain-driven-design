@@ -75,4 +75,40 @@ UTEST(LocationShould, CanCompareMoreLess) {
   EXPECT_FALSE(result);
 }
 
+UTEST(LocationShould, CanCalculateDistanceToOtherLocation) {
+  // Arrange
+  auto const first = Location::Create(10, 10);
+  auto const second = Location::Create(5, 5);
+
+  // Act
+  auto const distance = first.DistanceTo(second);
+
+  // Assert
+  EXPECT_EQ(distance, 10);
+}
+
+UTEST(LocationShould, HaveZeroDistanceWhenLocationIsEqual) {
+  // Arrange
+  auto const location = Location::Create(10, 10);
+
+  // Act
+  auto const distance = location.DistanceTo(location);
+
+  // Assert
+  EXPECT_EQ(distance, 0);
+}
+
+UTEST(LocationShould, DistanceToNotDependOrderArguments) {
+  // Arrange
+  auto const first = Location::Create(10, 10);
+  auto const second = Location::Create(5, 5);
+
+  // Act
+  auto const distance1 = first.DistanceTo(second);
+  auto const distance2 = second.DistanceTo(first);
+
+  // Assert
+  EXPECT_EQ(distance1, distance2);
+}
+
 }  // namespace delivery::core::domain::shared_kernel
