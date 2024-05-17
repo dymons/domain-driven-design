@@ -50,6 +50,14 @@ class Location {
 
   /*!
     \brief
+        Calculate distance between locations. The distance between Location
+        is the cumulative number of X and Y steps that the courier needs
+        to take to reach the point
+  */
+  [[nodiscard]] auto DistanceTo(Location const&) const noexcept -> int;
+
+  /*!
+    \brief
         Comparing two Location objects
   */
   constexpr auto operator<=>(Location const&) const = default;

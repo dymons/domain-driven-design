@@ -15,7 +15,7 @@ UTEST(WeightShould, BeCorrectWhenParamsIsCorrectOnCreated) {
   EXPECT_EQ(weight.GetWeight(), 10);
 }
 
-UTEST(WeightShould, ReturnErrorWhenParamsIsInCorrectOnCreated) {
+UTEST(WeightShould, ThrowExceptionWhenParamsIsInCorrectOnCreated) {
   // Arrange
 
   // Act & Assert
