@@ -51,4 +51,28 @@ UTEST(LocationShould, BeEqualWhenAllPropertiesIsEqual) {
   EXPECT_TRUE(result);
 }
 
+UTEST(LocationShould, CanCompareMoreThen) {
+  // Arrange
+  auto const first = Location::Create(10, 10);
+  auto const second = Location::Create(5, 5);
+
+  // Act
+  auto const result = first > second;
+
+  // Assert
+  EXPECT_TRUE(result);
+}
+
+UTEST(LocationShould, CanCompareMoreLess) {
+  // Arrange
+  auto const first = Location::Create(10, 10);
+  auto const second = Location::Create(5, 5);
+
+  // Act
+  auto const result = first < second;
+
+  // Assert
+  EXPECT_FALSE(result);
+}
+
 }  // namespace delivery::core::domain::shared_kernel
