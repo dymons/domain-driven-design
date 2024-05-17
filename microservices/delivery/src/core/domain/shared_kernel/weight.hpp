@@ -1,6 +1,6 @@
 #pragma once
 
-#include <utility>
+#include <compare>
 
 namespace delivery::core::domain::shared_kernel {
 
@@ -12,14 +12,14 @@ class Weight {
 
   /*!
     \brief
-        User constructor, constructs a Weight with predefined weight.
+        User constructor, constructs Weight with predefined weight
   */
   explicit Weight(int weight) : weight_(weight) {}
 
  public:
   /*!
     \brief
-        Named constructor, constructs a Weight with predefined weight
+        Factory method, constructs Weight with predefined weight
 
     \param weight
         The weight in kilograms

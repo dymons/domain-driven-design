@@ -22,6 +22,8 @@ add_library(${PROJECT_NAME}_objs OBJECT
     src/hello.cpp
     src/core/domain/shared_kernel/weight.hpp
     src/core/domain/shared_kernel/weight.cpp
+    src/core/domain/shared_kernel/location.hpp
+    src/core/domain/shared_kernel/location.cpp
     src/core/domain/shared_kernel/exceptions.hpp
     src/core/domain/shared_kernel/exceptions.cpp
 )
