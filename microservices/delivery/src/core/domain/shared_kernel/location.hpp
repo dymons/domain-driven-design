@@ -10,11 +10,6 @@ using X = userver::utils::StrongTypedef<struct XTag, int>;
 using Y = userver::utils::StrongTypedef<struct YTag, int>;
 
 class Location {
-  /*
-   * Note: Cant use StrongTypedef at member class, operator<=> is required
-   * to have operator<=> at the StrongTypedef class, but we do not have
-   * this
-   * */
   int x_;
   int y_;
 
