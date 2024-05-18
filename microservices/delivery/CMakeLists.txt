@@ -20,6 +20,12 @@ set(CMAKE_CXX_STANDARD 23)
 add_library(${PROJECT_NAME}_objs OBJECT
     src/hello.hpp
     src/hello.cpp
+    src/core/domain/shared_kernel/weight.hpp
+    src/core/domain/shared_kernel/weight.cpp
+    src/core/domain/shared_kernel/location.hpp
+    src/core/domain/shared_kernel/location.cpp
+    src/core/domain/shared_kernel/exceptions.hpp
+    src/core/domain/shared_kernel/exceptions.cpp
 )
 target_link_libraries(${PROJECT_NAME}_objs PUBLIC userver-core)
 
@@ -32,6 +38,8 @@ target_link_libraries(${PROJECT_NAME} PRIVATE ${PROJECT_NAME}_objs)
 # Unit Tests
 add_executable(${PROJECT_NAME}_unittest
     src/hello_test.cpp
+    src/core/domain/shared_kernel/weight_test.cpp
+    src/core/domain/shared_kernel/location_test.cpp
 )
 target_link_libraries(${PROJECT_NAME}_unittest PRIVATE ${PROJECT_NAME}_objs userver-utest)
 add_google_tests(${PROJECT_NAME}_unittest)
