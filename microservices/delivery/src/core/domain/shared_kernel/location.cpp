@@ -16,14 +16,15 @@ void ValidateCoordinate(int const coord) {
 
 }  // namespace
 
-auto Location::Create(int const x, int const y) -> Location {
-  ValidateCoordinate(x);
-  ValidateCoordinate(y);
+auto Location::Create(X const x, Y const y) -> Location {
+  ValidateCoordinate(x.GetUnderlying());
+  ValidateCoordinate(y.GetUnderlying());
   return Location{x, y};
 }
 
 auto Location::DistanceTo(Location const& other) const noexcept -> int {
-  return std::abs(GetX() - other.GetX()) + std::abs(GetY() - other.GetY());
+  return std::abs(GetX().GetUnderlying() - other.GetX().GetUnderlying()) +
+         std::abs(GetY().GetUnderlying() - other.GetY().GetUnderlying());
 }
 
 }  // namespace delivery::core::domain::shared_kernel

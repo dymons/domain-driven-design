@@ -13,11 +13,11 @@ UTEST(LocationShould, BeCorrectWhenParamsIsCorrectOnCreated) {
   for (int x = 1; x <= 10; ++x) {
     for (int y = 1; y <= 10; ++y) {
       // Act
-      auto const location = Location::Create(x, y);
+      auto const location = Location::Create(X{x}, Y{y});
 
       // Assert
-      EXPECT_EQ(location.GetX(), x);
-      EXPECT_EQ(location.GetY(), y);
+      EXPECT_EQ(location.GetX(), X{x});
+      EXPECT_EQ(location.GetY(), Y{y});
     }
   }
 }
@@ -34,15 +34,15 @@ UTEST(LocationShould, ThrowExceptionWhenParamsIsInCorrectOnCreated) {
   // Act & Assert
   for (auto const location : kUnexpectedLocations) {
     EXPECT_THROW(
-        auto const _ = Location::Create(location.first, location.second),
+        auto const _ = Location::Create(X{location.first}, Y{location.second}),
         ArgumentException);
   }
 }
 
 UTEST(LocationShould, BeEqualWhenAllPropertiesIsEqual) {
   // Arrange
-  auto const first = Location::Create(10, 10);
-  auto const second = Location::Create(10, 10);
+  auto const first = Location::Create(X{10}, Y{10});
+  auto const second = Location::Create(X{10}, Y{10});
 
   // Act
   auto const result = first == second;
@@ -53,8 +53,8 @@ UTEST(LocationShould, BeEqualWhenAllPropertiesIsEqual) {
 
 UTEST(LocationShould, CanCompareMoreThen) {
   // Arrange
-  auto const first = Location::Create(10, 10);
-  auto const second = Location::Create(5, 5);
+  auto const first = Location::Create(X{10}, Y{10});
+  auto const second = Location::Create(X{5}, Y{5});
 
   // Act
   auto const result = first > second;
@@ -65,8 +65,8 @@ UTEST(LocationShould, CanCompareMoreThen) {
 
 UTEST(LocationShould, CanCompareMoreLess) {
   // Arrange
-  auto const first = Location::Create(10, 10);
-  auto const second = Location::Create(5, 5);
+  auto const first = Location::Create(X{10}, Y{10});
+  auto const second = Location::Create(X{5}, Y{5});
 
   // Act
   auto const result = first < second;
@@ -77,8 +77,8 @@ UTEST(LocationShould, CanCompareMoreLess) {
 
 UTEST(LocationShould, CanCalculateDistanceToOtherLocation) {
   // Arrange
-  auto const first = Location::Create(10, 10);
-  auto const second = Location::Create(5, 5);
+  auto const first = Location::Create(X{10}, Y{10});
+  auto const second = Location::Create(X{5}, Y{5});
 
   // Act
   auto const distance = first.DistanceTo(second);
@@ -89,7 +89,7 @@ UTEST(LocationShould, CanCalculateDistanceToOtherLocation) {
 
 UTEST(LocationShould, HaveZeroDistanceWhenLocationIsEqual) {
   // Arrange
-  auto const location = Location::Create(10, 10);
+  auto const location = Location::Create(X{10}, Y{10});
 
   // Act
   auto const distance = location.DistanceTo(location);
@@ -100,8 +100,8 @@ UTEST(LocationShould, HaveZeroDistanceWhenLocationIsEqual) {
 
 UTEST(LocationShould, DistanceToNotDependOrderArguments) {
   // Arrange
-  auto const first = Location::Create(10, 10);
-  auto const second = Location::Create(5, 5);
+  auto const first = Location::Create(X{10}, Y{10});
+  auto const second = Location::Create(X{5}, Y{5});
 
   // Act
   auto const distance1 = first.DistanceTo(second);

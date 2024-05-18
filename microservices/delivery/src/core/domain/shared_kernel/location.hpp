@@ -2,9 +2,19 @@
 
 #include <compare>
 
+#include <userver/utils/strong_typedef.hpp>
+
 namespace delivery::core::domain::shared_kernel {
 
+using X = userver::utils::StrongTypedef<struct XTag, int>;
+using Y = userver::utils::StrongTypedef<struct YTag, int>;
+
 class Location {
+  /*
+   * Note: Cant use StrongTypedef at member class, operator<=> is required
+   * to have operator<=> at the StrongTypedef class, but we do not have
+   * this
+   * */
   int x_;
   int y_;
 
@@ -14,7 +24,7 @@ class Location {
     \brief
         User constructor, constructs Location with predefined x and y
   */
-  Location(int x, int y) : x_(x), y_(y) {}
+  Location(X x, Y y) : x_(x.GetUnderlying()), y_(y.GetUnderlying()) {}
 
  public:
   /*!
@@ -37,7 +47,7 @@ class Location {
     \ingroup
           SharedKernel
   */
-  [[nodiscard]] static auto Create(int x, int y) -> Location;
+  [[nodiscard]] static auto Create(X x, Y y) -> Location;
 
   // Observers
 
@@ -45,8 +55,8 @@ class Location {
     \brief
         Get coordinates
   */
-  [[nodiscard]] auto GetX() const noexcept -> int { return x_; }
-  [[nodiscard]] auto GetY() const noexcept -> int { return y_; }
+  [[nodiscard]] auto GetX() const noexcept -> X { return X{x_}; }
+  [[nodiscard]] auto GetY() const noexcept -> Y { return Y{y_}; }
 
   /*!
     \brief
@@ -63,4 +73,4 @@ class Location {
   constexpr auto operator<=>(Location const&) const = default;
 };
 
-} // namespace delivery::core::domain::shared_kernel
+}  // namespace delivery::core::domain::shared_kernel
