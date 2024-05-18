@@ -8,6 +8,7 @@ namespace delivery::core::domain::shared_kernel {
 
 using X = userver::utils::StrongTypedef<struct XTag, int>;
 using Y = userver::utils::StrongTypedef<struct YTag, int>;
+using Distance = userver::utils::StrongTypedef<struct DistanceTag, int>;
 
 class Location {
   int x_;
@@ -59,13 +60,13 @@ class Location {
         is the cumulative number of X and Y steps that the courier needs
         to take to reach the point
   */
-  [[nodiscard]] auto DistanceTo(Location const&) const noexcept -> int;
+  [[nodiscard]] auto DistanceTo(Location const&) const noexcept -> Distance;
 
   /*!
     \brief
         Comparing two Location objects
   */
-  constexpr auto operator<=>(Location const&) const = default;
+  auto operator<=>(Location const&) const -> std::strong_ordering = default;
 };
 
 }  // namespace delivery::core::domain::shared_kernel

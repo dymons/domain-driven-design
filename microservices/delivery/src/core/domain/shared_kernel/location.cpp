@@ -22,9 +22,10 @@ auto Location::Create(X const x, Y const y) -> Location {
   return Location{x, y};
 }
 
-auto Location::DistanceTo(Location const& other) const noexcept -> int {
-  return std::abs(GetX().GetUnderlying() - other.GetX().GetUnderlying()) +
-         std::abs(GetY().GetUnderlying() - other.GetY().GetUnderlying());
+auto Location::DistanceTo(Location const& other) const noexcept -> Distance {
+  return Distance{
+      std::abs(GetX().GetUnderlying() - other.GetX().GetUnderlying()) +
+      std::abs(GetY().GetUnderlying() - other.GetY().GetUnderlying())};
 }
 
 }  // namespace delivery::core::domain::shared_kernel

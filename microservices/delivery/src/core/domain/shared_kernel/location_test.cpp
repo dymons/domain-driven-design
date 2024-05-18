@@ -84,7 +84,7 @@ UTEST(LocationShould, CanCalculateDistanceToOtherLocation) {
   auto const distance = first.DistanceTo(second);
 
   // Assert
-  EXPECT_EQ(distance, 10);
+  EXPECT_EQ(distance, Distance{10});
 }
 
 UTEST(LocationShould, HaveZeroDistanceWhenLocationIsEqual) {
@@ -95,7 +95,7 @@ UTEST(LocationShould, HaveZeroDistanceWhenLocationIsEqual) {
   auto const distance = location.DistanceTo(location);
 
   // Assert
-  EXPECT_EQ(distance, 0);
+  EXPECT_EQ(distance, Distance{0});
 }
 
 UTEST(LocationShould, DistanceToNotDependOrderArguments) {
