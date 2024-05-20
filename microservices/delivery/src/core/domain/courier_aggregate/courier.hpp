@@ -23,7 +23,8 @@ class Courier {
         status_(status) {}
 
  public:
-  static Courier Create(CourierName courier_name, Transport transport);
+  [[nodiscard]] static Courier Create(CourierName courier_name,
+                                      Transport transport);
 };
 
 }  // namespace delivery::core::domain::courier_aggregate
