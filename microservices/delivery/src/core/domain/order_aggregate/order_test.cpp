@@ -2,6 +2,7 @@
 
 #include <userver/utils/uuid7.hpp>
 
+#include "exceptions.hpp"
 #include "order.hpp"
 
 namespace delivery::core::domain::order_aggregate {
@@ -22,6 +23,11 @@ auto MockWeight() -> shared_kernel::Weight {
   return shared_kernel::Weight::Create(10);
 }
 
+auto MockCourierId() -> CourierId {
+  static const auto kCourierId = userver::utils::generators::GenerateUuidV7();
+  return CourierId{kCourierId};
+}
+
 }  // namespace
 
 UTEST(OrderShould, BeConstructibleWithRequiredProperties) {
@@ -36,6 +42,51 @@ UTEST(OrderShould, BeConstructibleWithRequiredProperties) {
   EXPECT_EQ(order.GetCourierId(), std::nullopt);
   EXPECT_EQ(order.GetLocation(), MockLocation());
   EXPECT_EQ(order.GetWeight(), MockWeight());
+}
+
+UTEST(OrderShould, AssignCourier) {
+  // Arrange
+  auto order = Order::Create(MockBasketId(), MockLocation(), MockWeight());
+
+  // Act
+  order.AssignCourier(MockCourierId());
+
+  // Assert
+  EXPECT_EQ(order.GetOrderStatus(), OrderStatus::Assigned);
+  EXPECT_EQ(order.GetCourierId(), MockCourierId());
+}
+
+UTEST(OrderShould, CompleteOrderWhenOrderIsAssigned) {
+  // Arrange
+  auto order = Order::Create(MockBasketId(), MockLocation(), MockWeight());
+  order.AssignCourier(MockCourierId());
+
+  // Act
+  order.Complete();
+
+  // Assert
+  EXPECT_EQ(order.GetOrderStatus(), OrderStatus::Completed);
+  EXPECT_EQ(order.GetCourierId(), MockCourierId());
+}
+
+UTEST(OrderShould, ThrowWhenCompleteOrderWithStatusCreated) {
+  // Arrange
+  auto order = Order::Create(MockBasketId(), MockLocation(), MockWeight());
+
+  // Act & Assert
+  EXPECT_EQ(order.GetOrderStatus(), OrderStatus::Created);
+  EXPECT_THROW(order.Complete(), IllegalStateException);
+}
+
+UTEST(OrderShould, ThrowWhenCompleteOrderWithStatusCompleted) {
+  // Arrange
+  auto order = Order::Create(MockBasketId(), MockLocation(), MockWeight());
+  order.AssignCourier(MockCourierId());
+  order.Complete();
+
+  // Act & Assert
+  EXPECT_EQ(order.GetOrderStatus(), OrderStatus::Completed);
+  EXPECT_THROW(order.Complete(), IllegalStateException);
 }
 
 }  // namespace delivery::core::domain::order_aggregate
