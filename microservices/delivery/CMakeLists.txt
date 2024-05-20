@@ -26,6 +26,12 @@ add_library(${PROJECT_NAME}_objs OBJECT
     src/core/domain/shared_kernel/location.cpp
     src/core/domain/shared_kernel/exceptions.hpp
     src/core/domain/shared_kernel/exceptions.cpp
+    src/core/domain/courier_aggregate/courier.hpp
+    src/core/domain/courier_aggregate/courier.cpp
+    src/core/domain/courier_aggregate/transport.hpp
+    src/core/domain/courier_aggregate/transport.cpp
+    src/core/domain/order_aggregate/order.hpp
+    src/core/domain/order_aggregate/order.cpp
 )
 target_link_libraries(${PROJECT_NAME}_objs PUBLIC userver-core)
 
