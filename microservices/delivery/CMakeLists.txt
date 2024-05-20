@@ -34,7 +34,7 @@ add_library(${PROJECT_NAME}_objs OBJECT
     src/core/domain/order_aggregate/order.cpp
 )
 target_link_libraries(${PROJECT_NAME}_objs PUBLIC userver-core)
-
+target_include_directories(${PROJECT_NAME}_objs PUBLIC src)
 
 # The Service
 add_executable(${PROJECT_NAME} src/main.cpp)
@@ -45,6 +45,7 @@ target_link_libraries(${PROJECT_NAME} PRIVATE ${PROJECT_NAME}_objs)
 add_executable(${PROJECT_NAME}_unittest
     src/core/domain/shared_kernel/weight_test.cpp
     src/core/domain/shared_kernel/location_test.cpp
+    src/core/domain/order_aggregate/order_test.cpp
 )
 target_link_libraries(${PROJECT_NAME}_unittest PRIVATE ${PROJECT_NAME}_objs userver-utest)
 add_google_tests(${PROJECT_NAME}_unittest)
