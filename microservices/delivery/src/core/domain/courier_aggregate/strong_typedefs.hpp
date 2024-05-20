@@ -3,4 +3,8 @@
 #include <userver/utils/strong_typedef.hpp>
 
 namespace delivery::core::domain::courier_aggregate {
+
+using CourierId =
+    userver::utils::StrongTypedef<struct CourierIdTag, std::string>;
+
 }  // namespace delivery::core::domain::courier_aggregate

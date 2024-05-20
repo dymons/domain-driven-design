@@ -15,7 +15,8 @@ auto Order::GetOrderId() const noexcept -> OrderId { return order_id_; }
 
 auto Order::GetOrderStatus() const noexcept -> OrderStatus { return status_; }
 
-auto Order::GetCourierId() const noexcept -> std::optional<CourierId> {
+auto Order::GetCourierId() const noexcept
+    -> std::optional<courier_aggregate::CourierId> {
   return courier_id_;
 }
 
@@ -31,7 +32,7 @@ auto Order::IsCourierAssigned() const noexcept -> bool {
   return courier_id_.has_value();
 }
 
-auto Order::AssignCourier(CourierId courier_id) -> void {
+auto Order::AssignCourier(courier_aggregate::CourierId courier_id) -> void {
   status_ = OrderStatus::Assigned;
   courier_id_ = std::move(courier_id);
 }

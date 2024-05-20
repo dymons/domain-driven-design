@@ -23,9 +23,9 @@ auto MockWeight() -> shared_kernel::Weight {
   return shared_kernel::Weight::Create(10);
 }
 
-auto MockCourierId() -> CourierId {
+auto MockCourierId() -> courier_aggregate::CourierId {
   static const auto kCourierId = userver::utils::generators::GenerateUuidV7();
-  return CourierId{kCourierId};
+  return courier_aggregate::CourierId{kCourierId};
 }
 
 }  // namespace
@@ -34,7 +34,7 @@ UTEST(OrderShould, BeConstructibleWithRequiredProperties) {
   // Arrange
 
   // Act
-  auto order =
+  auto const order =
       Order::Create(MockBasketId(), MockDeliveryLocation(), MockWeight());
 
   // Assert

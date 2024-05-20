@@ -2,6 +2,7 @@
 
 #include <optional>
 
+#include <core/domain/courier_aggregate/strong_typedefs.hpp>
 #include <core/domain/shared_kernel/location.hpp>
 #include <core/domain/shared_kernel/weight.hpp>
 #include "order_status.hpp"
@@ -12,12 +13,12 @@ namespace delivery::core::domain::order_aggregate {
 class Order {
   OrderId order_id_;
   OrderStatus status_;
-  std::optional<CourierId> courier_id_;
+  std::optional<courier_aggregate::CourierId> courier_id_;
   shared_kernel::Location delivery_location_;
   shared_kernel::Weight weight_;
 
   Order(OrderId order_id, OrderStatus status,
-        std::optional<CourierId> courier_id,
+        std::optional<courier_aggregate::CourierId> courier_id,
         shared_kernel::Location delivery_location, shared_kernel::Weight weight)
       : order_id_(std::move(order_id)),
         status_(status),
@@ -32,13 +33,14 @@ class Order {
 
   [[nodiscard]] auto GetOrderId() const noexcept -> OrderId;
   [[nodiscard]] auto GetOrderStatus() const noexcept -> OrderStatus;
-  [[nodiscard]] auto GetCourierId() const noexcept -> std::optional<CourierId>;
+  [[nodiscard]] auto GetCourierId() const noexcept
+      -> std::optional<courier_aggregate::CourierId>;
   [[nodiscard]] auto GetDeliveryLocation() const noexcept
       -> shared_kernel::Location;
   [[nodiscard]] auto GetWeight() const noexcept -> shared_kernel::Weight;
   [[nodiscard]] auto IsCourierAssigned() const noexcept -> bool;
 
-  auto AssignCourier(CourierId courier_id) -> void;
+  auto AssignCourier(courier_aggregate::CourierId courier_id) -> void;
 
   auto Complete() -> void;
 };
