@@ -4,10 +4,11 @@
 
 namespace delivery::core::domain::order_aggregate {
 
-auto Order::Create(BasketId basket_id, shared_kernel::Location location,
+auto Order::Create(BasketId basket_id,
+                   shared_kernel::Location delivery_location,
                    shared_kernel::Weight weight) -> Order {
   return {OrderId{basket_id.GetUnderlying()}, OrderStatus::Created,
-          std::nullopt, location, weight};
+          std::nullopt, delivery_location, weight};
 }
 
 auto Order::GetOrderId() const noexcept -> OrderId { return order_id_; }
@@ -18,8 +19,8 @@ auto Order::GetCourierId() const noexcept -> std::optional<CourierId> {
   return courier_id_;
 }
 
-auto Order::GetLocation() const noexcept -> shared_kernel::Location {
-  return location_;
+auto Order::GetDeliveryLocation() const noexcept -> shared_kernel::Location {
+  return delivery_location_;
 }
 
 auto Order::GetWeight() const noexcept -> shared_kernel::Weight {

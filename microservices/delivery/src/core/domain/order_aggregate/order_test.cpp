@@ -14,7 +14,7 @@ auto MockBasketId() -> BasketId {
   return BasketId{kBasketId};
 }
 
-auto MockLocation() -> shared_kernel::Location {
+auto MockDeliveryLocation() -> shared_kernel::Location {
   return shared_kernel::Location::Create(shared_kernel::X{5},
                                          shared_kernel::Y{5});
 }
@@ -34,19 +34,21 @@ UTEST(OrderShould, BeConstructibleWithRequiredProperties) {
   // Arrange
 
   // Act
-  auto order = Order::Create(MockBasketId(), MockLocation(), MockWeight());
+  auto order =
+      Order::Create(MockBasketId(), MockDeliveryLocation(), MockWeight());
 
   // Assert
   EXPECT_EQ(order.GetOrderId(), OrderId{MockBasketId().GetUnderlying()});
   EXPECT_EQ(order.GetOrderStatus(), OrderStatus::Created);
   EXPECT_EQ(order.GetCourierId(), std::nullopt);
-  EXPECT_EQ(order.GetLocation(), MockLocation());
+  EXPECT_EQ(order.GetDeliveryLocation(), MockDeliveryLocation());
   EXPECT_EQ(order.GetWeight(), MockWeight());
 }
 
 UTEST(OrderShould, AssignCourier) {
   // Arrange
-  auto order = Order::Create(MockBasketId(), MockLocation(), MockWeight());
+  auto order =
+      Order::Create(MockBasketId(), MockDeliveryLocation(), MockWeight());
 
   // Act
   order.AssignCourier(MockCourierId());
@@ -59,7 +61,8 @@ UTEST(OrderShould, AssignCourier) {
 
 UTEST(OrderShould, CompleteOrderWhenOrderIsAssigned) {
   // Arrange
-  auto order = Order::Create(MockBasketId(), MockLocation(), MockWeight());
+  auto order =
+      Order::Create(MockBasketId(), MockDeliveryLocation(), MockWeight());
   order.AssignCourier(MockCourierId());
 
   // Act
@@ -72,7 +75,8 @@ UTEST(OrderShould, CompleteOrderWhenOrderIsAssigned) {
 
 UTEST(OrderShould, ThrowWhenCompleteOrderWithStatusCreated) {
   // Arrange
-  auto order = Order::Create(MockBasketId(), MockLocation(), MockWeight());
+  auto order =
+      Order::Create(MockBasketId(), MockDeliveryLocation(), MockWeight());
 
   // Act & Assert
   EXPECT_EQ(order.GetOrderStatus(), OrderStatus::Created);
@@ -81,7 +85,8 @@ UTEST(OrderShould, ThrowWhenCompleteOrderWithStatusCreated) {
 
 UTEST(OrderShould, ThrowWhenCompleteOrderWithStatusCompleted) {
   // Arrange
-  auto order = Order::Create(MockBasketId(), MockLocation(), MockWeight());
+  auto order =
+      Order::Create(MockBasketId(), MockDeliveryLocation(), MockWeight());
   order.AssignCourier(MockCourierId());
   order.Complete();
 
