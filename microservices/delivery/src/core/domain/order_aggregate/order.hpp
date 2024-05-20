@@ -35,6 +35,7 @@ class Order {
   [[nodiscard]] auto GetCourierId() const noexcept -> std::optional<CourierId>;
   [[nodiscard]] auto GetLocation() const noexcept -> shared_kernel::Location;
   [[nodiscard]] auto GetWeight() const noexcept -> shared_kernel::Weight;
+  [[nodiscard]] auto IsCourierAssigned() const noexcept -> bool;
 
   auto AssignCourier(CourierId courier_id) -> void;
 

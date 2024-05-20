@@ -26,6 +26,10 @@ auto Order::GetWeight() const noexcept -> shared_kernel::Weight {
   return weight_;
 }
 
+auto Order::IsCourierAssigned() const noexcept -> bool {
+  return courier_id_.has_value();
+}
+
 auto Order::AssignCourier(CourierId courier_id) -> void {
   status_ = OrderStatus::Assigned;
   courier_id_ = std::move(courier_id);

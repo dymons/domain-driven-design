@@ -52,6 +52,7 @@ UTEST(OrderShould, AssignCourier) {
   order.AssignCourier(MockCourierId());
 
   // Assert
+  EXPECT_TRUE(order.IsCourierAssigned());
   EXPECT_EQ(order.GetOrderStatus(), OrderStatus::Assigned);
   EXPECT_EQ(order.GetCourierId(), MockCourierId());
 }
