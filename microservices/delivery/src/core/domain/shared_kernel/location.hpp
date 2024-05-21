@@ -23,6 +23,9 @@ class Location {
   Location(X x, Y y) : x_(x.GetUnderlying()), y_(y.GetUnderlying()) {}
 
  public:
+  static const Location kMinLocation;
+  static const Location kMaxLocation;
+
   /*!
     \brief
         Factory method, constructs Location with predefined x and y
