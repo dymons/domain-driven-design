@@ -11,7 +11,7 @@ auto Order::Create(BasketId basket_id,
           std::nullopt, delivery_location, weight};
 }
 
-auto Order::GetOrderId() const noexcept -> OrderId { return order_id_; }
+auto Order::GetId() const noexcept -> OrderId { return id_; }
 
 auto Order::GetOrderStatus() const noexcept -> OrderStatus { return status_; }
 

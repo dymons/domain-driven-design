@@ -38,7 +38,7 @@ UTEST(OrderShould, BeConstructibleWithRequiredProperties) {
       Order::Create(MockBasketId(), MockDeliveryLocation(), MockWeight());
 
   // Assert
-  EXPECT_EQ(order.GetOrderId(), OrderId{MockBasketId().GetUnderlying()});
+  EXPECT_EQ(order.GetId(), OrderId{MockBasketId().GetUnderlying()});
   EXPECT_EQ(order.GetOrderStatus(), OrderStatus::Created);
   EXPECT_EQ(order.GetCourierId(), std::nullopt);
   EXPECT_EQ(order.GetDeliveryLocation(), MockDeliveryLocation());

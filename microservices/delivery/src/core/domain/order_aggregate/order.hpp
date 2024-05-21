@@ -11,16 +11,16 @@
 namespace delivery::core::domain::order_aggregate {
 
 class Order {
-  OrderId order_id_;
+  OrderId id_;
   OrderStatus status_;
   std::optional<courier_aggregate::CourierId> courier_id_;
   shared_kernel::Location delivery_location_;
   shared_kernel::Weight weight_;
 
-  Order(OrderId order_id, OrderStatus status,
+  Order(OrderId id, OrderStatus status,
         std::optional<courier_aggregate::CourierId> courier_id,
         shared_kernel::Location delivery_location, shared_kernel::Weight weight)
-      : order_id_(std::move(order_id)),
+      : id_(std::move(id)),
         status_(status),
         courier_id_(std::move(courier_id)),
         delivery_location_(delivery_location),
@@ -31,7 +31,7 @@ class Order {
                                    shared_kernel::Location delivery_location,
                                    shared_kernel::Weight weight) -> Order;
 
-  [[nodiscard]] auto GetOrderId() const noexcept -> OrderId;
+  [[nodiscard]] auto GetId() const noexcept -> OrderId;
   [[nodiscard]] auto GetOrderStatus() const noexcept -> OrderStatus;
   [[nodiscard]] auto GetCourierId() const noexcept
       -> std::optional<courier_aggregate::CourierId>;

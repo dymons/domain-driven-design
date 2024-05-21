@@ -4,10 +4,10 @@
 
 namespace delivery::core::domain::courier_aggregate {
 
-Courier Courier::Create(CourierName courier_name, Transport transport) {
+Courier Courier::Create(CourierName name, Transport transport) {
   return {
-      CourierId{userver::utils::generators::GenerateUuidV7()},
-      std::move(courier_name), transport,
+      CourierId{userver::utils::generators::GenerateUuidV7()}, std::move(name),
+      transport,
       shared_kernel::Location::Create(shared_kernel::X{1}, shared_kernel::Y{1}),
       CourierStatus::NotAvailable};
 }
