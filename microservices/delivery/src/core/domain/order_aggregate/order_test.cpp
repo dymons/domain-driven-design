@@ -39,7 +39,7 @@ UTEST(OrderShould, BeConstructibleWithRequiredProperties) {
 
   // Assert
   EXPECT_EQ(order.GetId(), OrderId{MockBasketId().GetUnderlying()});
-  EXPECT_EQ(order.GetOrderStatus(), OrderStatus::Created);
+  EXPECT_EQ(order.GetStatus(), OrderStatus::Created);
   EXPECT_EQ(order.GetCourierId(), std::nullopt);
   EXPECT_EQ(order.GetDeliveryLocation(), MockDeliveryLocation());
   EXPECT_EQ(order.GetWeight(), MockWeight());
@@ -55,7 +55,7 @@ UTEST(OrderShould, AssignCourier) {
 
   // Assert
   EXPECT_TRUE(order.IsCourierAssigned());
-  EXPECT_EQ(order.GetOrderStatus(), OrderStatus::Assigned);
+  EXPECT_EQ(order.GetStatus(), OrderStatus::Assigned);
   EXPECT_EQ(order.GetCourierId(), MockCourierId());
 }
 
@@ -69,7 +69,7 @@ UTEST(OrderShould, CompleteOrderWhenOrderIsAssigned) {
   order.Complete();
 
   // Assert
-  EXPECT_EQ(order.GetOrderStatus(), OrderStatus::Completed);
+  EXPECT_EQ(order.GetStatus(), OrderStatus::Completed);
   EXPECT_EQ(order.GetCourierId(), MockCourierId());
 }
 
@@ -79,7 +79,7 @@ UTEST(OrderShould, ThrowWhenCompleteOrderWithStatusCreated) {
       Order::Create(MockBasketId(), MockDeliveryLocation(), MockWeight());
 
   // Act & Assert
-  EXPECT_EQ(order.GetOrderStatus(), OrderStatus::Created);
+  EXPECT_EQ(order.GetStatus(), OrderStatus::Created);
   EXPECT_THROW(order.Complete(), IllegalStateException);
 }
 
@@ -91,7 +91,7 @@ UTEST(OrderShould, ThrowWhenCompleteOrderWithStatusCompleted) {
   order.Complete();
 
   // Act & Assert
-  EXPECT_EQ(order.GetOrderStatus(), OrderStatus::Completed);
+  EXPECT_EQ(order.GetStatus(), OrderStatus::Completed);
   EXPECT_THROW(order.Complete(), IllegalStateException);
 }
 

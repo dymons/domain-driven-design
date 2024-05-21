@@ -32,7 +32,7 @@ class Order {
                                    shared_kernel::Weight weight) -> Order;
 
   [[nodiscard]] auto GetId() const noexcept -> OrderId;
-  [[nodiscard]] auto GetOrderStatus() const noexcept -> OrderStatus;
+  [[nodiscard]] auto GetStatus() const noexcept -> OrderStatus;
   [[nodiscard]] auto GetCourierId() const noexcept
       -> std::optional<courier_aggregate::CourierId>;
   [[nodiscard]] auto GetDeliveryLocation() const noexcept

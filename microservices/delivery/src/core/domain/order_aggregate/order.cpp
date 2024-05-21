@@ -13,7 +13,7 @@ auto Order::Create(BasketId basket_id,
 
 auto Order::GetId() const noexcept -> OrderId { return id_; }
 
-auto Order::GetOrderStatus() const noexcept -> OrderStatus { return status_; }
+auto Order::GetStatus() const noexcept -> OrderStatus { return status_; }
 
 auto Order::GetCourierId() const noexcept
     -> std::optional<courier_aggregate::CourierId> {

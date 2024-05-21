@@ -4,7 +4,7 @@
 
 namespace delivery::core::domain::courier_aggregate {
 
-Courier Courier::Create(CourierName name, Transport transport) {
+auto Courier::Create(CourierName name, Transport transport) -> Courier {
   return {
       CourierId{userver::utils::generators::GenerateUuidV7()}, std::move(name),
       transport,
@@ -22,8 +22,6 @@ auto Courier::GetCurrentLocation() const noexcept -> shared_kernel::Location {
   return current_location_;
 }
 
-auto Courier::GetCourierStatus() const noexcept -> CourierStatus {
-  return status_;
-}
+auto Courier::GetStatus() const noexcept -> CourierStatus { return status_; }
 
 }  // namespace delivery::core::domain::courier_aggregate
