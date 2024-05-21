@@ -24,6 +24,13 @@ class Courier {
 
  public:
   [[nodiscard]] static Courier Create(CourierName name, Transport transport);
+
+  [[nodiscard]] auto GetId() const noexcept -> CourierId;
+  [[nodiscard]] auto GetName() const noexcept -> CourierName;
+  [[nodiscard]] auto GetTransport() const noexcept -> Transport;
+  [[nodiscard]] auto GetCurrentLocation() const noexcept
+      -> shared_kernel::Location;
+  [[nodiscard]] auto GetCourierStatus() const noexcept -> CourierStatus;
 };
 
 }  // namespace delivery::core::domain::courier_aggregate

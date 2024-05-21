@@ -12,4 +12,18 @@ Courier Courier::Create(CourierName name, Transport transport) {
       CourierStatus::NotAvailable};
 }
 
+auto Courier::GetId() const noexcept -> CourierId { return id_; }
+
+auto Courier::GetName() const noexcept -> CourierName { return name_; }
+
+auto Courier::GetTransport() const noexcept -> Transport { return transport_; }
+
+auto Courier::GetCurrentLocation() const noexcept -> shared_kernel::Location {
+  return current_location_;
+}
+
+auto Courier::GetCourierStatus() const noexcept -> CourierStatus {
+  return status_;
+}
+
 }  // namespace delivery::core::domain::courier_aggregate
