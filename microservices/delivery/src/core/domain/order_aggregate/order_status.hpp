@@ -10,7 +10,7 @@ enum class OrderStatus {
   Completed,
 };
 
-auto ToString(OrderStatus status) -> std::string;
-auto FromString(std::string_view status) -> OrderStatus;
+[[nodiscard]] auto ToString(OrderStatus status) -> std::string;
+[[nodiscard]] auto FromString(std::string_view status) -> OrderStatus;
 
 }  // namespace delivery::core::domain::order_aggregate

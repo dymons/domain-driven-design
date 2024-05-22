@@ -1,5 +1,6 @@
 #include "order.hpp"
 
+#include <core/domain/courier_aggregate/courier.hpp>
 #include "exceptions.hpp"
 
 namespace delivery::core::domain::order_aggregate {
@@ -7,34 +8,32 @@ namespace delivery::core::domain::order_aggregate {
 auto Order::Create(BasketId basket_id,
                    shared_kernel::Location delivery_location,
                    shared_kernel::Weight weight) -> Order {
-  return {OrderId{basket_id.GetUnderlying()}, OrderStatus::Created,
+  return {OrderId{std::move(basket_id).GetUnderlying()}, OrderStatus::Created,
           std::nullopt, delivery_location, weight};
 }
 
-auto Order::GetId() const noexcept -> OrderId { return id_; }
+auto Order::GetId() const -> OrderId { return id_; }
 
-auto Order::GetStatus() const noexcept -> OrderStatus { return status_; }
+auto Order::GetStatus() const -> OrderStatus { return status_; }
 
-auto Order::GetCourierId() const noexcept
+auto Order::GetCourierId() const
     -> std::optional<courier_aggregate::CourierId> {
   return courier_id_;
 }
 
-auto Order::GetDeliveryLocation() const noexcept -> shared_kernel::Location {
+auto Order::GetDeliveryLocation() const -> shared_kernel::Location {
   return delivery_location_;
 }
 
-auto Order::GetWeight() const noexcept -> shared_kernel::Weight {
-  return weight_;
-}
+auto Order::GetWeight() const -> shared_kernel::Weight { return weight_; }
 
-auto Order::IsCourierAssigned() const noexcept -> bool {
+auto Order::IsCourierAssigned() const -> bool {
   return courier_id_.has_value();
 }
 
-auto Order::AssignCourier(courier_aggregate::CourierId courier_id) -> void {
+auto Order::Assign(courier_aggregate::Courier const& courier) -> void {
   status_ = OrderStatus::Assigned;
-  courier_id_ = std::move(courier_id);
+  courier_id_ = courier.GetId();
 }
 
 auto Order::Complete() -> void {

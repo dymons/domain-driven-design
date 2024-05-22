@@ -8,6 +8,10 @@
 #include "order_status.hpp"
 #include "strong_typedefs.hpp"
 
+namespace delivery::core::domain::courier_aggregate {
+class Courier;
+}  // namespace delivery::core::domain::courier_aggregate
+
 namespace delivery::core::domain::order_aggregate {
 
 class Order {
@@ -16,6 +20,8 @@ class Order {
   std::optional<courier_aggregate::CourierId> courier_id_;
   shared_kernel::Location delivery_location_;
   shared_kernel::Weight weight_;
+
+  // Constructors
 
   Order(OrderId id, OrderStatus status,
         std::optional<courier_aggregate::CourierId> courier_id,
@@ -31,17 +37,18 @@ class Order {
                                    shared_kernel::Location delivery_location,
                                    shared_kernel::Weight weight) -> Order;
 
-  [[nodiscard]] auto GetId() const noexcept -> OrderId;
-  [[nodiscard]] auto GetStatus() const noexcept -> OrderStatus;
-  [[nodiscard]] auto GetCourierId() const noexcept
-      -> std::optional<courier_aggregate::CourierId>;
-  [[nodiscard]] auto GetDeliveryLocation() const noexcept
-      -> shared_kernel::Location;
-  [[nodiscard]] auto GetWeight() const noexcept -> shared_kernel::Weight;
-  [[nodiscard]] auto IsCourierAssigned() const noexcept -> bool;
+  // Observers
 
-  auto AssignCourier(courier_aggregate::CourierId courier_id) -> void;
+  auto GetId() const -> OrderId;
+  auto GetStatus() const -> OrderStatus;
+  auto GetCourierId() const -> std::optional<courier_aggregate::CourierId>;
+  auto GetDeliveryLocation() const -> shared_kernel::Location;
+  auto GetWeight() const -> shared_kernel::Weight;
+  auto IsCourierAssigned() const -> bool;
 
+  // Modifiers
+
+  auto Assign(courier_aggregate::Courier const& courier) -> void;
   auto Complete() -> void;
 };
 

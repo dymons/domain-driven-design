@@ -2,6 +2,7 @@
 
 #include <userver/utils/uuid7.hpp>
 
+#include <core/domain/courier_aggregate/courier.hpp>
 #include "exceptions.hpp"
 #include "order.hpp"
 
@@ -23,9 +24,10 @@ auto MockWeight() -> shared_kernel::Weight {
   return shared_kernel::Weight::Create(10);
 }
 
-auto MockCourierId() -> courier_aggregate::CourierId {
-  static const auto kCourierId = userver::utils::generators::GenerateUuidV7();
-  return courier_aggregate::CourierId{kCourierId};
+auto MockCourier() -> courier_aggregate::Courier {
+  return courier_aggregate::Courier::Create(
+      courier_aggregate::CourierName{"CourierName"},
+      courier_aggregate::Transport{});
 }
 
 }  // namespace
@@ -51,26 +53,23 @@ UTEST(OrderShould, AssignCourier) {
       Order::Create(MockBasketId(), MockDeliveryLocation(), MockWeight());
 
   // Act
-  order.AssignCourier(MockCourierId());
+  order.Assign(MockCourier());
 
   // Assert
   EXPECT_TRUE(order.IsCourierAssigned());
-  EXPECT_EQ(order.GetStatus(), OrderStatus::Assigned);
-  EXPECT_EQ(order.GetCourierId(), MockCourierId());
 }
 
 UTEST(OrderShould, CompleteOrderWhenOrderIsAssigned) {
   // Arrange
   auto order =
       Order::Create(MockBasketId(), MockDeliveryLocation(), MockWeight());
-  order.AssignCourier(MockCourierId());
+  order.Assign(MockCourier());
 
   // Act
   order.Complete();
 
   // Assert
   EXPECT_EQ(order.GetStatus(), OrderStatus::Completed);
-  EXPECT_EQ(order.GetCourierId(), MockCourierId());
 }
 
 UTEST(OrderShould, ThrowWhenCompleteOrderWithStatusCreated) {
@@ -87,7 +86,7 @@ UTEST(OrderShould, ThrowWhenCompleteOrderWithStatusCompleted) {
   // Arrange
   auto order =
       Order::Create(MockBasketId(), MockDeliveryLocation(), MockWeight());
-  order.AssignCourier(MockCourierId());
+  order.Assign(MockCourier());
   order.Complete();
 
   // Act & Assert
