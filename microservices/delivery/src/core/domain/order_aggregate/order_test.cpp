@@ -30,14 +30,17 @@ auto MockCourier() -> courier_aggregate::Courier {
       courier_aggregate::Transport{});
 }
 
+auto MockOrder() -> Order {
+  return Order::Create(MockBasketId(), MockDeliveryLocation(), MockWeight());
+}
+
 }  // namespace
 
 UTEST(OrderShould, BeConstructibleWithRequiredProperties) {
   // Arrange
 
   // Act
-  auto const order =
-      Order::Create(MockBasketId(), MockDeliveryLocation(), MockWeight());
+  auto const order = MockOrder();
 
   // Assert
   EXPECT_EQ(order.GetId(), OrderId{MockBasketId().GetUnderlying()});
@@ -49,8 +52,7 @@ UTEST(OrderShould, BeConstructibleWithRequiredProperties) {
 
 UTEST(OrderShould, AssignCourier) {
   // Arrange
-  auto order =
-      Order::Create(MockBasketId(), MockDeliveryLocation(), MockWeight());
+  auto order = MockOrder();
 
   // Act
   order.Assign(MockCourier());
@@ -61,8 +63,7 @@ UTEST(OrderShould, AssignCourier) {
 
 UTEST(OrderShould, CompleteOrderWhenOrderIsAssigned) {
   // Arrange
-  auto order =
-      Order::Create(MockBasketId(), MockDeliveryLocation(), MockWeight());
+  auto order = MockOrder();
   order.Assign(MockCourier());
 
   // Act
@@ -74,24 +75,24 @@ UTEST(OrderShould, CompleteOrderWhenOrderIsAssigned) {
 
 UTEST(OrderShould, ThrowWhenCompleteOrderWithStatusCreated) {
   // Arrange
-  auto order =
-      Order::Create(MockBasketId(), MockDeliveryLocation(), MockWeight());
+  auto order = MockOrder();
 
   // Act & Assert
   EXPECT_EQ(order.GetStatus(), OrderStatus::Created);
-  EXPECT_THROW(order.Complete(), IllegalStateException);
+  EXPECT_THROW(order.Complete(), CanNotCompleteOrderWithoutCourier);
 }
 
-UTEST(OrderShould, ThrowWhenCompleteOrderWithStatusCompleted) {
+UTEST(OrderShould, DoNothingWhenCompleteOrderWithStatusCompleted) {
   // Arrange
-  auto order =
-      Order::Create(MockBasketId(), MockDeliveryLocation(), MockWeight());
+  auto order = MockOrder();
   order.Assign(MockCourier());
   order.Complete();
 
-  // Act & Assert
+  // Act
+  order.Complete();
+
+  // Assert
   EXPECT_EQ(order.GetStatus(), OrderStatus::Completed);
-  EXPECT_THROW(order.Complete(), IllegalStateException);
 }
 
 }  // namespace delivery::core::domain::order_aggregate

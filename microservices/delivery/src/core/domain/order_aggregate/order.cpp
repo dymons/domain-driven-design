@@ -1,7 +1,6 @@
 #include "order.hpp"
 
 #include <core/domain/courier_aggregate/courier.hpp>
-#include "exceptions.hpp"
 
 namespace delivery::core::domain::order_aggregate {
 
@@ -37,8 +36,8 @@ auto Order::Assign(courier_aggregate::Courier const& courier) -> void {
 }
 
 auto Order::Complete() -> void {
-  if (status_ != OrderStatus::Assigned) {
-    throw IllegalStateException{"Only the assigned order can be completed"};
+  if (not IsCourierAssigned()) {
+    throw CanNotCompleteOrderWithoutCourier{};
   }
 
   status_ = OrderStatus::Completed;

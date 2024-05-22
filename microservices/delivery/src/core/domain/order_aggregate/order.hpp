@@ -5,6 +5,7 @@
 #include <core/domain/courier_aggregate/strong_typedefs.hpp>
 #include <core/domain/shared_kernel/location.hpp>
 #include <core/domain/shared_kernel/weight.hpp>
+#include "exceptions.hpp"
 #include "order_status.hpp"
 #include "strong_typedefs.hpp"
 
@@ -13,6 +14,13 @@ class Courier;
 }  // namespace delivery::core::domain::courier_aggregate
 
 namespace delivery::core::domain::order_aggregate {
+
+struct CanNotCompleteOrderWithoutCourier final : IllegalStateException {
+  CanNotCompleteOrderWithoutCourier() : IllegalStateException {""} {}
+  auto what() const noexcept -> const char* final {
+    return "Only the assigned order can be completed";
+  }
+};
 
 class Order {
   OrderId id_;
