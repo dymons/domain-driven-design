@@ -33,7 +33,7 @@ class Weight {
     \ingroup
         SharedKernel
   */
-  [[nodiscard]] static auto Create(int weight) -> Weight;
+  [[nodiscard]] static auto Create(int value) -> Weight;
 
   // Observers
 
