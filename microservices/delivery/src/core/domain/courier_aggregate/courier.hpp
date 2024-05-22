@@ -2,10 +2,26 @@
 
 #include <core/domain/shared_kernel/location.hpp>
 #include "courier_status.hpp"
+#include "exceptions.hpp"
 #include "strong_typedefs.hpp"
 #include "transport.hpp"
 
 namespace delivery::core::domain::courier_aggregate {
+
+struct TryAssignOrderWhenNotAvailable final : IllegalStateException {
+  TryAssignOrderWhenNotAvailable() : IllegalStateException{""} {}
+  auto what() const noexcept -> const char* final {
+    return "You cannot take an order to work if the courier has not started "
+           "the working day";
+  }
+};
+
+struct TryAssignOrderWhenCourierHasAlreadyBusy final : IllegalStateException {
+  TryAssignOrderWhenCourierHasAlreadyBusy() : IllegalStateException{""} {}
+  auto what() const noexcept -> const char* final {
+    return "You can't take an order to work if the courier is already busy";
+  }
+};
 
 class Courier {
   CourierId id_;
@@ -13,6 +29,8 @@ class Courier {
   Transport transport_;
   shared_kernel::Location current_location_;
   CourierStatus status_;
+
+  // Constructors
 
   Courier(CourierId id, CourierName name, Transport transport,
           shared_kernel::Location current_location, CourierStatus status)
@@ -26,12 +44,21 @@ class Courier {
   [[nodiscard]] static auto Create(CourierName name,
                                    Transport transport) -> Courier;
 
-  [[nodiscard]] auto GetId() const noexcept -> CourierId;
-  [[nodiscard]] auto GetName() const noexcept -> CourierName;
-  [[nodiscard]] auto GetTransport() const noexcept -> Transport;
-  [[nodiscard]] auto GetCurrentLocation() const noexcept
-      -> shared_kernel::Location;
-  [[nodiscard]] auto GetStatus() const noexcept -> CourierStatus;
+  // Observers
+
+  auto GetId() const -> CourierId;
+  auto GetName() const -> CourierName;
+  auto GetTransport() const -> Transport;
+  auto GetCurrentLocation() const -> shared_kernel::Location;
+  auto GetStatus() const -> CourierStatus;
+
+  // Modifiers
+
+  auto MoveTo(shared_kernel::Location location) -> void;
+  auto StartWork() -> void;
+  auto StopWork() -> void;
+  auto InWork() -> void;
+  auto CalculateTimeToPoint(shared_kernel::Location location) -> void;
 };
 
 }  // namespace delivery::core::domain::courier_aggregate

@@ -55,7 +55,7 @@ UTEST(OrderShould, AssignCourier) {
   auto order = MockOrder();
 
   // Act
-  order.Assign(MockCourier());
+  order.AssignCourier(MockCourier());
 
   // Assert
   EXPECT_TRUE(order.IsCourierAssigned());
@@ -64,7 +64,7 @@ UTEST(OrderShould, AssignCourier) {
 UTEST(OrderShould, CompleteOrderWhenOrderIsAssigned) {
   // Arrange
   auto order = MockOrder();
-  order.Assign(MockCourier());
+  order.AssignCourier(MockCourier());
 
   // Act
   order.Complete();
@@ -85,7 +85,7 @@ UTEST(OrderShould, ThrowWhenCompleteOrderWithStatusCreated) {
 UTEST(OrderShould, DoNothingWhenCompleteOrderWithStatusCompleted) {
   // Arrange
   auto order = MockOrder();
-  order.Assign(MockCourier());
+  order.AssignCourier(MockCourier());
   order.Complete();
 
   // Act

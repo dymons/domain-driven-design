@@ -30,7 +30,7 @@ auto Order::IsCourierAssigned() const -> bool {
   return courier_id_.has_value();
 }
 
-auto Order::Assign(courier_aggregate::Courier const& courier) -> void {
+auto Order::AssignCourier(courier_aggregate::Courier const& courier) -> void {
   status_ = OrderStatus::Assigned;
   courier_id_ = courier.GetId();
 }

@@ -12,16 +12,37 @@ auto Courier::Create(CourierName name, Transport transport) -> Courier {
       CourierStatus::NotAvailable};
 }
 
-auto Courier::GetId() const noexcept -> CourierId { return id_; }
+auto Courier::GetId() const -> CourierId { return id_; }
 
-auto Courier::GetName() const noexcept -> CourierName { return name_; }
+auto Courier::GetName() const -> CourierName { return name_; }
 
-auto Courier::GetTransport() const noexcept -> Transport { return transport_; }
+auto Courier::GetTransport() const -> Transport { return transport_; }
 
-auto Courier::GetCurrentLocation() const noexcept -> shared_kernel::Location {
+auto Courier::GetCurrentLocation() const -> shared_kernel::Location {
   return current_location_;
 }
 
-auto Courier::GetStatus() const noexcept -> CourierStatus { return status_; }
+auto Courier::GetStatus() const -> CourierStatus { return status_; }
+
+auto Courier::MoveTo(shared_kernel::Location const location) -> void {}
+
+auto Courier::StartWork() -> void {
+  if (status_ == CourierStatus::NotAvailable) {
+    throw TryAssignOrderWhenNotAvailable{};
+  }
+  if (status_ == CourierStatus::Busy) {
+    throw TryAssignOrderWhenCourierHasAlreadyBusy{};
+  }
+
+  status_ = CourierStatus::Busy;
+}
+
+auto Courier::StopWork() -> void {}
+
+auto Courier::InWork() -> void {}
+
+auto Courier::CalculateTimeToPoint(shared_kernel::Location location) -> void {
+
+}
 
 }  // namespace delivery::core::domain::courier_aggregate

@@ -56,7 +56,7 @@ class Order {
 
   // Modifiers
 
-  auto Assign(courier_aggregate::Courier const& courier) -> void;
+  auto AssignCourier(courier_aggregate::Courier const& courier) -> void;
   auto Complete() -> void;
 };
 
