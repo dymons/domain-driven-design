@@ -4,6 +4,8 @@
 
 namespace delivery::core::domain::order_aggregate {
 
+// TODO (dymons) Use smart enum
+
 enum class OrderStatus {
   Created,
   Assigned,
