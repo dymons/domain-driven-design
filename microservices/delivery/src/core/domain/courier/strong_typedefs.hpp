@@ -16,8 +16,7 @@ using Duration = userver::utils::StrongTypedef<struct DurationTag, int>;
 using Speed = userver::utils::StrongTypedef<struct SpeedTag, int>;
 using Time = userver::utils::StrongTypedef<struct TimeTag, double>;
 
-using TransportId =
-    userver::utils::StrongTypedef<struct TransportIdTag, int>;
+using TransportId = userver::utils::StrongTypedef<struct TransportIdTag, int>;
 using TransportName =
     userver::utils::StrongTypedef<struct TransportNameTag, std::string>;
 

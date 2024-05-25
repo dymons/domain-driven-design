@@ -59,8 +59,8 @@ class Courier {
     \brief
         Factory method, constructs Courier with name and transport
   */
-  [[nodiscard]] static auto Create(CourierName name,
-                                   Transport transport) -> Courier;
+  [[nodiscard]] static auto Create(CourierName name, Transport transport)
+      -> Courier;
 
   /*!
     \brief

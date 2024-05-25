@@ -38,8 +38,7 @@ class Order {
 
   // Constructors
 
-  Order(OrderId id, Status status,
-        std::optional<courier::CourierId> courier_id,
+  Order(OrderId id, Status status, std::optional<courier::CourierId> courier_id,
         shared_kernel::Location delivery_location, shared_kernel::Weight weight)
       : id_(std::move(id)),
         status_(status),

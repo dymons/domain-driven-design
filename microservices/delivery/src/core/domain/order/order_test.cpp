@@ -24,8 +24,8 @@ auto MockWeight() -> shared_kernel::Weight {
   return shared_kernel::Weight::Create(10);
 }
 
-auto MockCourier(courier::Status status =
-                     courier::Status::NotAvailable) -> courier::Courier {
+auto MockCourier(courier::Status status = courier::Status::NotAvailable)
+    -> courier::Courier {
   return courier::Courier::Hydrate(
       courier::CourierId{"CourierId"}, courier::CourierName{"CourierName"},
       courier::Transport::kPedestrian, shared_kernel::Location::kMinLocation,

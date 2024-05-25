@@ -16,8 +16,8 @@ auto Courier::Create(CourierName name, Transport transport) -> Courier {
 }
 
 auto Courier::Hydrate(CourierId id, CourierName name, Transport transport,
-                      shared_kernel::Location current_location,
-                      Status status) -> Courier {
+                      shared_kernel::Location current_location, Status status)
+    -> Courier {
   return {std::move(id), std::move(name), std::move(transport),
           current_location, status};
 }

@@ -12,4 +12,4 @@ struct IllegalStateException : std::runtime_error {
   using std::runtime_error::runtime_error;
 };
 
-} // namespace delivery::core::domain::order
+}  // namespace delivery::core::domain::order
