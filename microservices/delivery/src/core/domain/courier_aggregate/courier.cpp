@@ -13,7 +13,7 @@ auto Courier::Create(CourierName name, Transport transport) -> Courier {
       CourierStatus::NotAvailable};
 }
 
-auto Courier::Restore(CourierId id, CourierName name, Transport transport,
+auto Courier::Hydrate(CourierId id, CourierName name, Transport transport,
                       shared_kernel::Location current_location,
                       CourierStatus status) -> Courier {
   return {std::move(id), std::move(name), std::move(transport),

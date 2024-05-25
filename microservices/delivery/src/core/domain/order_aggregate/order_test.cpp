@@ -27,7 +27,7 @@ auto MockWeight() -> shared_kernel::Weight {
 auto MockCourier(courier_aggregate::CourierStatus status =
                      courier_aggregate::CourierStatus::NotAvailable)
     -> courier_aggregate::Courier {
-  return courier_aggregate::Courier::Restore(
+  return courier_aggregate::Courier::Hydrate(
       courier_aggregate::CourierId{"CourierId"},
       courier_aggregate::CourierName{"CourierName"},
       courier_aggregate::Transport::kPedestrian,
