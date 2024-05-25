@@ -35,10 +35,10 @@ auto Order::AssignCourier(courier_aggregate::Courier& courier) -> void {
     throw CantAssignOrderToBusyCourier{};
   }
 
+  courier.InWork();
+
   status_ = OrderStatus::Assigned;
   courier_id_ = courier.GetId();
-
-  courier.InWork();
 }
 
 auto Order::Complete() -> void {
