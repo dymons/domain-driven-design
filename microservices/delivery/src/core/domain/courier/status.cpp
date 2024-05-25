@@ -1,4 +1,4 @@
-#include "courier_status.hpp"
+#include "status.hpp"
 
 #include <userver/utils/trivial_map.hpp>
 

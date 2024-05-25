@@ -2,8 +2,8 @@
 
 #include <core/domain/shared_kernel/location.hpp>
 #include <utility>
-#include "courier_status.hpp"
 #include "exceptions.hpp"
+#include "status.hpp"
 #include "strong_typedefs.hpp"
 #include "transport.hpp"
 
