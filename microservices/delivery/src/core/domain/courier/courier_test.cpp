@@ -2,7 +2,7 @@
 
 #include "courier.hpp"
 
-namespace delivery::core::domain::courier_aggregate {
+namespace delivery::core::domain::courier {
 
 namespace {
 
@@ -85,4 +85,4 @@ UTEST(CourierShould, CanCalculateTimeToLocation) {
   EXPECT_EQ(time, Time{18});
 }
 
-}  // namespace delivery::core::domain::courier_aggregate
+}  // namespace delivery::core::domain::courier

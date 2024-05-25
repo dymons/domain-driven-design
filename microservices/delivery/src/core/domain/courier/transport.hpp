@@ -3,7 +3,7 @@
 #include <core/domain/shared_kernel/weight.hpp>
 #include "strong_typedefs.hpp"
 
-namespace delivery::core::domain::courier_aggregate {
+namespace delivery::core::domain::courier {
 
 class Transport {
   TransportId id_;
@@ -31,4 +31,4 @@ class Transport {
   auto GetCapacity() const -> shared_kernel::Weight;
 };
 
-}  // namespace delivery::core::domain::courier_aggregate
+}  // namespace delivery::core::domain::courier

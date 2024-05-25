@@ -7,7 +7,7 @@
 #include "strong_typedefs.hpp"
 #include "transport.hpp"
 
-namespace delivery::core::domain::courier_aggregate {
+namespace delivery::core::domain::courier {
 
 struct TryStopWorkingWithIncompleteDelivery final : IllegalStateException {
   TryStopWorkingWithIncompleteDelivery() : IllegalStateException{""} {}
@@ -89,4 +89,4 @@ class Courier {
   auto InWork() -> void;
 };
 
-}  // namespace delivery::core::domain::courier_aggregate
+}  // namespace delivery::core::domain::courier

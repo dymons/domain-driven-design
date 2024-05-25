@@ -2,7 +2,7 @@
 
 #include <userver/utils/uuid7.hpp>
 
-#include <core/domain/courier_aggregate/courier.hpp>
+#include <core/domain/courier/courier.hpp>
 #include "exceptions.hpp"
 #include "order.hpp"
 
@@ -24,14 +24,12 @@ auto MockWeight() -> shared_kernel::Weight {
   return shared_kernel::Weight::Create(10);
 }
 
-auto MockCourier(courier_aggregate::CourierStatus status =
-                     courier_aggregate::CourierStatus::NotAvailable)
-    -> courier_aggregate::Courier {
-  return courier_aggregate::Courier::Hydrate(
-      courier_aggregate::CourierId{"CourierId"},
-      courier_aggregate::CourierName{"CourierName"},
-      courier_aggregate::Transport::kPedestrian,
-      shared_kernel::Location::kMinLocation, status);
+auto MockCourier(courier::CourierStatus status =
+                     courier::CourierStatus::NotAvailable) -> courier::Courier {
+  return courier::Courier::Hydrate(
+      courier::CourierId{"CourierId"}, courier::CourierName{"CourierName"},
+      courier::Transport::kPedestrian, shared_kernel::Location::kMinLocation,
+      status);
 }
 
 auto MockOrder() -> Order {
@@ -57,20 +55,20 @@ UTEST(OrderShould, BeConstructibleWithRequiredProperties) {
 UTEST(OrderShould, AssignCourier) {
   // Arrange
   auto order = MockOrder();
-  auto courier = MockCourier(courier_aggregate::CourierStatus::Ready);
+  auto courier = MockCourier(courier::CourierStatus::Ready);
 
   // Act
   order.AssignCourier(courier);
 
   // Assert
   EXPECT_TRUE(order.IsCourierAssigned());
-  EXPECT_EQ(courier.GetStatus(), courier_aggregate::CourierStatus::Busy);
+  EXPECT_EQ(courier.GetStatus(), courier::CourierStatus::Busy);
 }
 
 UTEST(OrderShould, ThrowWhenAssignBusyCourier) {
   // Arrange
   auto order = MockOrder();
-  auto courier = MockCourier(courier_aggregate::CourierStatus::Busy);
+  auto courier = MockCourier(courier::CourierStatus::Busy);
 
   // Act
 
@@ -104,7 +102,7 @@ UTEST(OrderShould, ThrowWhenCompleteOrderWithStatusCreated) {
 UTEST(OrderShould, DoNothingWhenCompleteOrderWithStatusCompleted) {
   // Arrange
   auto order = MockOrder();
-  auto courier = MockCourier(courier_aggregate::CourierStatus::Ready);
+  auto courier = MockCourier(courier::CourierStatus::Ready);
   order.AssignCourier(courier);
   order.Complete();
 

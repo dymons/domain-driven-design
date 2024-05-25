@@ -35,4 +35,4 @@ auto FromString(std::string_view const status) -> OrderStatus {
   return status_as_enum.value();
 }
 
-}  // namespace delivery::core::domain::order_aggregate
+}  // namespace delivery::core::domain::order

@@ -3,7 +3,7 @@
 #include <userver/utils/uuid7.hpp>
 #include <utility>
 
-namespace delivery::core::domain::courier_aggregate {
+namespace delivery::core::domain::courier {
 
 auto Courier::Create(CourierName name, Transport transport) -> Courier {
   if (name.GetUnderlying().empty()) {
@@ -100,4 +100,4 @@ auto Courier::CalculateTimeToPoint(shared_kernel::Location location) const
               static_cast<double>(transport_.GetSpeed().GetUnderlying())};
 }
 
-}  // namespace delivery::core::domain::courier_aggregate
+}  // namespace delivery::core::domain::courier

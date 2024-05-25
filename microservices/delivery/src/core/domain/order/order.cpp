@@ -1,6 +1,6 @@
 #include "order.hpp"
 
-#include <core/domain/courier_aggregate/courier.hpp>
+#include <core/domain/courier/courier.hpp>
 
 namespace delivery::core::domain::order_aggregate {
 
@@ -15,8 +15,7 @@ auto Order::GetId() const -> OrderId { return id_; }
 
 auto Order::GetStatus() const -> OrderStatus { return status_; }
 
-auto Order::GetCourierId() const
-    -> std::optional<courier_aggregate::CourierId> {
+auto Order::GetCourierId() const -> std::optional<courier::CourierId> {
   return courier_id_;
 }
 
@@ -31,8 +30,8 @@ auto Order::IsCourierAssigned() const -> bool {
 }
 
 // TODO (dymons) Use domain event for eventual consistency to assign courier?
-auto Order::AssignCourier(courier_aggregate::Courier& courier) -> void {
-  if (courier.GetStatus() == courier_aggregate::CourierStatus::Busy) {
+auto Order::AssignCourier(courier::Courier& courier) -> void {
+  if (courier.GetStatus() == courier::CourierStatus::Busy) {
     throw CantAssignOrderToBusyCourier{};
   }
 

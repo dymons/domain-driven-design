@@ -2,7 +2,7 @@
 
 #include <stdexcept>
 
-namespace delivery::core::domain::courier_aggregate {
+namespace delivery::core::domain::order_aggregate {
 
 struct ArgumentException : std::invalid_argument {
   using std::invalid_argument::invalid_argument;
@@ -12,4 +12,4 @@ struct IllegalStateException : std::runtime_error {
   using std::runtime_error::runtime_error;
 };
 
-} // namespace delivery::core::domain::courier_aggregate
+} // namespace delivery::core::domain::order

@@ -2,28 +2,28 @@
 
 #include <optional>
 
-#include <core/domain/courier_aggregate/strong_typedefs.hpp>
+#include <core/domain/courier/strong_typedefs.hpp>
 #include <core/domain/shared_kernel/location.hpp>
 #include <core/domain/shared_kernel/weight.hpp>
 #include "exceptions.hpp"
 #include "order_status.hpp"
 #include "strong_typedefs.hpp"
 
-namespace delivery::core::domain::courier_aggregate {
+namespace delivery::core::domain::courier {
 class Courier;
-}  // namespace delivery::core::domain::courier_aggregate
+}  // namespace delivery::core::domain::courier
 
 namespace delivery::core::domain::order_aggregate {
 
 struct CantCompletedNotAssignedOrder final : IllegalStateException {
-  CantCompletedNotAssignedOrder() : IllegalStateException {""} {}
+  CantCompletedNotAssignedOrder() : IllegalStateException{""} {}
   auto what() const noexcept -> const char* final {
     return "Only the assigned order can be completed";
   }
 };
 
 struct CantAssignOrderToBusyCourier final : IllegalStateException {
-  CantAssignOrderToBusyCourier() : IllegalStateException {""} {}
+  CantAssignOrderToBusyCourier() : IllegalStateException{""} {}
   auto what() const noexcept -> const char* final {
     return "Only the assigned order can be completed";
   }
@@ -32,14 +32,14 @@ struct CantAssignOrderToBusyCourier final : IllegalStateException {
 class Order {
   OrderId id_;
   OrderStatus status_;
-  std::optional<courier_aggregate::CourierId> courier_id_;
+  std::optional<courier::CourierId> courier_id_;
   shared_kernel::Location delivery_location_;
   shared_kernel::Weight weight_;
 
   // Constructors
 
   Order(OrderId id, OrderStatus status,
-        std::optional<courier_aggregate::CourierId> courier_id,
+        std::optional<courier::CourierId> courier_id,
         shared_kernel::Location delivery_location, shared_kernel::Weight weight)
       : id_(std::move(id)),
         status_(status),
@@ -56,14 +56,14 @@ class Order {
 
   auto GetId() const -> OrderId;
   auto GetStatus() const -> OrderStatus;
-  auto GetCourierId() const -> std::optional<courier_aggregate::CourierId>;
+  auto GetCourierId() const -> std::optional<courier::CourierId>;
   auto GetDeliveryLocation() const -> shared_kernel::Location;
   auto GetWeight() const -> shared_kernel::Weight;
   auto IsCourierAssigned() const -> bool;
 
   // Modifiers
 
-  auto AssignCourier(courier_aggregate::Courier& courier) -> void;
+  auto AssignCourier(courier::Courier& courier) -> void;
   auto Complete() -> void;
 };
 

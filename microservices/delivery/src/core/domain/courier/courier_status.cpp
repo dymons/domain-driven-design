@@ -4,7 +4,7 @@
 
 #include "exceptions.hpp"
 
-namespace delivery::core::domain::courier_aggregate {
+namespace delivery::core::domain::courier {
 
 namespace {
 
@@ -36,4 +36,4 @@ auto FromString(std::string_view const status) -> CourierStatus {
   return status_as_enum.value();
 }
 
-}  // namespace delivery::core::domain::courier_aggregate
+}  // namespace delivery::core::domain::courier

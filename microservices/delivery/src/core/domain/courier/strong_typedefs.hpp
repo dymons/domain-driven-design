@@ -2,7 +2,7 @@
 
 #include <userver/utils/strong_typedef.hpp>
 
-namespace delivery::core::domain::courier_aggregate {
+namespace delivery::core::domain::courier {
 
 // TODO (dymons) Use libraries to work with Duration/Speed/Time
 // TODO (dymons) Use refinement types
@@ -21,4 +21,4 @@ using TransportId =
 using TransportName =
     userver::utils::StrongTypedef<struct TransportNameTag, std::string>;
 
-}  // namespace delivery::core::domain::courier_aggregate
+}  // namespace delivery::core::domain::courier

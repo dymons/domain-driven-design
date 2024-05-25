@@ -1,6 +1,6 @@
 #include "transport.hpp"
 
-namespace delivery::core::domain::courier_aggregate {
+namespace delivery::core::domain::courier {
 
 const Transport Transport::kPedestrian =
     Transport{TransportId{1}, TransportName{"pedestrian"}, Speed{1},
@@ -25,4 +25,4 @@ auto Transport::GetCapacity() const -> shared_kernel::Weight {
   return capacity_;
 }
 
-}  // namespace delivery::core::domain::courier_aggregate
+}  // namespace delivery::core::domain::courier
