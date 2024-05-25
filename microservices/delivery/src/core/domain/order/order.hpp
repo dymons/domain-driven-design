@@ -53,12 +53,12 @@ class Order {
 
   // Observers
 
-  auto GetId() const -> OrderId;
-  auto GetStatus() const -> Status;
-  auto GetCourierId() const -> std::optional<courier::CourierId>;
-  auto GetDeliveryLocation() const -> shared_kernel::Location;
-  auto GetWeight() const -> shared_kernel::Weight;
-  auto IsCourierAssigned() const -> bool;
+  auto GetId() const noexcept -> OrderId;
+  auto GetStatus() const noexcept -> Status;
+  auto GetCourierId() const noexcept -> std::optional<courier::CourierId>;
+  auto GetDeliveryLocation() const noexcept -> shared_kernel::Location;
+  auto GetWeight() const noexcept -> shared_kernel::Weight;
+  auto IsCourierAssigned() const noexcept -> bool;
 
   // Modifiers
 

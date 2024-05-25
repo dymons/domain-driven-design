@@ -11,21 +11,23 @@ auto Order::Create(BasketId basket_id,
           std::nullopt, delivery_location, weight};
 }
 
-auto Order::GetId() const -> OrderId { return id_; }
+auto Order::GetId() const noexcept -> OrderId { return id_; }
 
-auto Order::GetStatus() const -> Status { return status_; }
+auto Order::GetStatus() const noexcept -> Status { return status_; }
 
-auto Order::GetCourierId() const -> std::optional<courier::CourierId> {
+auto Order::GetCourierId() const noexcept -> std::optional<courier::CourierId> {
   return courier_id_;
 }
 
-auto Order::GetDeliveryLocation() const -> shared_kernel::Location {
+auto Order::GetDeliveryLocation() const noexcept -> shared_kernel::Location {
   return delivery_location_;
 }
 
-auto Order::GetWeight() const -> shared_kernel::Weight { return weight_; }
+auto Order::GetWeight() const noexcept -> shared_kernel::Weight {
+  return weight_;
+}
 
-auto Order::IsCourierAssigned() const -> bool {
+auto Order::IsCourierAssigned() const noexcept -> bool {
   return courier_id_.has_value();
 }
 

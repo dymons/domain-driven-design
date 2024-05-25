@@ -22,17 +22,17 @@ auto Courier::Hydrate(CourierId id, CourierName name, Transport transport,
           current_location, status};
 }
 
-auto Courier::GetId() const -> CourierId { return id_; }
+auto Courier::GetId() const noexcept -> CourierId { return id_; }
 
-auto Courier::GetName() const -> CourierName { return name_; }
+auto Courier::GetName() const noexcept -> CourierName { return name_; }
 
-auto Courier::GetTransport() const -> Transport { return transport_; }
+auto Courier::GetTransport() const noexcept -> Transport { return transport_; }
 
-auto Courier::GetCurrentLocation() const -> shared_kernel::Location {
+auto Courier::GetCurrentLocation() const noexcept -> shared_kernel::Location {
   return current_location_;
 }
 
-auto Courier::GetStatus() const -> Status { return status_; }
+auto Courier::GetStatus() const noexcept -> Status { return status_; }
 
 auto Courier::MoveTo(shared_kernel::Location const to_location) -> void {
   if (current_location_ == to_location) {
@@ -93,8 +93,8 @@ auto Courier::InWork() -> void {
   status_ = Status::Busy;
 }
 
-auto Courier::CalculateTimeToPoint(shared_kernel::Location location) const
-    -> Time {
+auto Courier::CalculateTimeToPoint(
+    shared_kernel::Location location) const noexcept -> Time {
   auto const distance = current_location_.DistanceTo(location);
   return Time{static_cast<double>(distance.GetUnderlying()) /
               static_cast<double>(transport_.GetSpeed().GetUnderlying())};

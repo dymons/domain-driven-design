@@ -73,12 +73,12 @@ class Courier {
 
   // Observers
 
-  auto GetId() const -> CourierId;
-  auto GetName() const -> CourierName;
-  auto GetTransport() const -> Transport;
-  auto GetCurrentLocation() const -> shared_kernel::Location;
-  auto GetStatus() const -> Status;
-  auto CalculateTimeToPoint(shared_kernel::Location location) const -> Time;
+  auto GetId() const noexcept -> CourierId;
+  auto GetName() const noexcept -> CourierName;
+  auto GetTransport() const noexcept -> Transport;
+  auto GetCurrentLocation() const noexcept -> shared_kernel::Location;
+  auto GetStatus() const noexcept -> Status;
+  auto CalculateTimeToPoint(shared_kernel::Location) const noexcept -> Time;
 
   // Modifiers
 
