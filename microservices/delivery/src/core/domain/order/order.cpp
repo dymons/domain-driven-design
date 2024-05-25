@@ -1,6 +1,9 @@
 #include "order.hpp"
 
+#include <userver/utils/exception.hpp>
+
 #include <core/domain/courier/courier.hpp>
+#include "exceptions.hpp"
 
 namespace delivery::core::domain::order {
 
@@ -34,7 +37,8 @@ auto Order::IsCourierAssigned() const noexcept -> bool {
 // TODO (dymons) Use domain event for eventual consistency to assign courier?
 auto Order::AssignCourier(courier::Courier& courier) -> void {
   if (courier.GetStatus() == courier::Status::Busy) {
-    throw CantAssignOrderToBusyCourier{};
+    userver::utils::LogErrorAndThrow<CantAssignOrderToBusyCourier>(
+        "Courier is busy, can't assign courier to the order");
   }
 
   courier.InWork();
@@ -45,7 +49,8 @@ auto Order::AssignCourier(courier::Courier& courier) -> void {
 
 auto Order::Complete() -> void {
   if (not IsCourierAssigned()) {
-    throw CantCompletedNotAssignedOrder{};
+    userver::utils::LogErrorAndThrow<CantCompletedNotAssignedOrder>(
+        "Only the assigned order can be completed");
   }
 
   status_ = Status::Completed;

@@ -5,7 +5,6 @@
 #include <core/domain/courier/strong_typedefs.hpp>
 #include <core/domain/shared_kernel/location.hpp>
 #include <core/domain/shared_kernel/weight.hpp>
-#include "exceptions.hpp"
 #include "status.hpp"
 #include "strong_typedefs.hpp"
 
@@ -14,20 +13,6 @@ class Courier;
 }  // namespace delivery::core::domain::courier
 
 namespace delivery::core::domain::order {
-
-struct CantCompletedNotAssignedOrder final : IllegalStateException {
-  CantCompletedNotAssignedOrder() : IllegalStateException{""} {}
-  auto what() const noexcept -> const char* final {
-    return "Only the assigned order can be completed";
-  }
-};
-
-struct CantAssignOrderToBusyCourier final : IllegalStateException {
-  CantAssignOrderToBusyCourier() : IllegalStateException{""} {}
-  auto what() const noexcept -> const char* final {
-    return "Only the assigned order can be completed";
-  }
-};
 
 class Order {
   OrderId id_;
