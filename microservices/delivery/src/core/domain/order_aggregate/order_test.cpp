@@ -64,6 +64,7 @@ UTEST(OrderShould, AssignCourier) {
 
   // Assert
   EXPECT_TRUE(order.IsCourierAssigned());
+  EXPECT_EQ(courier.GetStatus(), courier_aggregate::CourierStatus::Busy);
 }
 
 UTEST(OrderShould, ThrowWhenAssignBusyCourier) {
