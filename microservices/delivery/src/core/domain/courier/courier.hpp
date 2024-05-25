@@ -1,7 +1,6 @@
 #pragma once
 
 #include <core/domain/shared_kernel/location.hpp>
-#include <utility>
 #include "exceptions.hpp"
 #include "status.hpp"
 #include "strong_typedefs.hpp"
