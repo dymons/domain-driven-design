@@ -6,6 +6,10 @@
 namespace delivery::core::domain::courier_aggregate {
 
 auto Courier::Create(CourierName name, Transport transport) -> Courier {
+  if (name.GetUnderlying().empty()) {
+    throw ArgumentException{"Courier name should not be empty"};
+  }
+
   return {CourierId{userver::utils::generators::GenerateUuidV7()},
           std::move(name), std::move(transport),
           shared_kernel::Location::kMinLocation, CourierStatus::NotAvailable};

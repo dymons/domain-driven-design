@@ -27,4 +27,13 @@ UTEST(CourierShould, BeConstructibleWithRequiredProperties) {
             shared_kernel::Location::kMinLocation);
 }
 
+UTEST(CourierShould, ThrowWhenCreateCourierWithEmptyName) {
+  // Arrange
+  auto courier_name = CourierName{""};
+
+  // Act & Assert
+  EXPECT_THROW(auto const _ = Courier::Create(courier_name, MockTransport()),
+               ArgumentException);
+}
+
 }  // namespace delivery::core::domain::courier_aggregate
