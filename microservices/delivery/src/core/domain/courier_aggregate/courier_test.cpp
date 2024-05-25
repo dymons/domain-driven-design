@@ -24,8 +24,7 @@ UTEST(CourierShould, BeConstructibleWithRequiredProperties) {
   EXPECT_EQ(courier.GetStatus(), CourierStatus::NotAvailable);
   EXPECT_EQ(courier.GetName(), MockCourierName());
   EXPECT_EQ(courier.GetCurrentLocation(),
-            shared_kernel::Location::Create(shared_kernel::X{1},
-                                            shared_kernel::Y{1}));
+            shared_kernel::Location::kMinLocation);
 }
 
 }  // namespace delivery::core::domain::courier_aggregate

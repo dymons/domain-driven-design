@@ -6,11 +6,9 @@
 namespace delivery::core::domain::courier_aggregate {
 
 auto Courier::Create(CourierName name, Transport transport) -> Courier {
-  return {
-      CourierId{userver::utils::generators::GenerateUuidV7()}, std::move(name),
-      std::move(transport),
-      shared_kernel::Location::Create(shared_kernel::X{1}, shared_kernel::Y{1}),
-      CourierStatus::NotAvailable};
+  return {CourierId{userver::utils::generators::GenerateUuidV7()},
+          std::move(name), std::move(transport),
+          shared_kernel::Location::kMinLocation, CourierStatus::NotAvailable};
 }
 
 auto Courier::Hydrate(CourierId id, CourierName name, Transport transport,
