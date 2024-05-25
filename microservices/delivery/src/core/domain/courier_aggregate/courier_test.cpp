@@ -50,4 +50,27 @@ UTEST(CourierShould, MoveToLocation) {
                                             shared_kernel::Y{1}));
 }
 
+UTEST(CourierShould, CanStartWork) {
+  // Arrange
+  auto courier = Courier::Create(MockCourierName(), MockTransport());
+
+  // Act
+  courier.StartWork();
+
+  // Assert
+  EXPECT_EQ(courier.GetStatus(), CourierStatus::Ready);
+}
+
+UTEST(CourierShould, CanStopWork) {
+  // Arrange
+  auto courier = Courier::Create(MockCourierName(), MockTransport());
+  courier.StartWork();
+
+  // Act
+  courier.StopWork();
+
+  // Assert
+  EXPECT_EQ(courier.GetStatus(), CourierStatus::NotAvailable);
+}
+
 }  // namespace delivery::core::domain::courier_aggregate
