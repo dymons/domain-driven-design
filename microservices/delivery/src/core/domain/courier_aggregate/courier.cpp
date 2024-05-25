@@ -57,6 +57,22 @@ auto Courier::MoveTo(shared_kernel::Location const to_location) -> void {
 }
 
 auto Courier::StartWork() -> void {
+  if (status_ == CourierStatus::Busy) {
+    throw TryStartWorkingWhenAlreadyStarted{};
+  }
+
+  status_ = CourierStatus::Ready;
+}
+
+auto Courier::StopWork() -> void {
+  if (status_ == CourierStatus::Busy) {
+    throw TryStopWorkingWithIncompleteDelivery{};
+  }
+
+  status_ = CourierStatus::NotAvailable;
+}
+
+auto Courier::InWork() -> void {
   if (status_ == CourierStatus::NotAvailable) {
     throw TryAssignOrderWhenNotAvailable{};
   }
@@ -67,10 +83,10 @@ auto Courier::StartWork() -> void {
   status_ = CourierStatus::Busy;
 }
 
-auto Courier::StopWork() -> void {}
-
-auto Courier::InWork() -> void {}
-
-auto Courier::CalculateTimeToPoint(shared_kernel::Location location) -> void {}
+auto Courier::CalculateTimeToPoint(shared_kernel::Location location) -> Time {
+  auto const distance = current_location_.DistanceTo(location);
+  return Time{static_cast<double>(distance.GetUnderlying()) /
+              static_cast<double>(transport_.GetSpeed().GetUnderlying())};
+}
 
 }  // namespace delivery::core::domain::courier_aggregate
