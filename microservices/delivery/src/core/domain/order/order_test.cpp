@@ -6,7 +6,7 @@
 #include "exceptions.hpp"
 #include "order.hpp"
 
-namespace delivery::core::domain::order_aggregate {
+namespace delivery::core::domain::order {
 
 namespace {
 
@@ -113,4 +113,4 @@ UTEST(OrderShould, DoNothingWhenCompleteOrderWithStatusCompleted) {
   EXPECT_EQ(order.GetStatus(), Status::Completed);
 }
 
-}  // namespace delivery::core::domain::order_aggregate
+}  // namespace delivery::core::domain::order

@@ -2,7 +2,7 @@
 
 #include <core/domain/courier/courier.hpp>
 
-namespace delivery::core::domain::order_aggregate {
+namespace delivery::core::domain::order {
 
 auto Order::Create(BasketId basket_id,
                    shared_kernel::Location delivery_location,
@@ -49,4 +49,4 @@ auto Order::Complete() -> void {
   status_ = Status::Completed;
 }
 
-}  // namespace delivery::core::domain::order_aggregate
+}  // namespace delivery::core::domain::order

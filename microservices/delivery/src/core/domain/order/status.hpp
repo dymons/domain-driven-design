@@ -2,7 +2,7 @@
 
 #include <string>
 
-namespace delivery::core::domain::order_aggregate {
+namespace delivery::core::domain::order {
 
 // TODO (dymons) Use smart enum
 

@@ -13,7 +13,7 @@ namespace delivery::core::domain::courier {
 class Courier;
 }  // namespace delivery::core::domain::courier
 
-namespace delivery::core::domain::order_aggregate {
+namespace delivery::core::domain::order {
 
 struct CantCompletedNotAssignedOrder final : IllegalStateException {
   CantCompletedNotAssignedOrder() : IllegalStateException{""} {}
@@ -67,4 +67,4 @@ class Order {
   auto Complete() -> void;
 };
 
-}  // namespace delivery::core::domain::order_aggregate
+}  // namespace delivery::core::domain::order
