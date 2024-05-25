@@ -30,6 +30,7 @@ auto Order::IsCourierAssigned() const -> bool {
   return courier_id_.has_value();
 }
 
+// TODO (dymons) Use domain event for eventual consistency to assign courier?
 auto Order::AssignCourier(courier_aggregate::Courier& courier) -> void {
   if (courier.GetStatus() == courier_aggregate::CourierStatus::Busy) {
     throw CantAssignOrderToBusyCourier{};
