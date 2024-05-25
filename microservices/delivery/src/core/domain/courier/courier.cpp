@@ -1,7 +1,9 @@
 #include "courier.hpp"
 
-#include <userver/utils/uuid7.hpp>
 #include <utility>
+
+#include <userver/utils/exception.hpp>
+#include <userver/utils/uuid7.hpp>
 
 namespace delivery::core::domain::courier {
 
@@ -16,8 +18,8 @@ auto Courier::Create(CourierName name, Transport transport) -> Courier {
 }
 
 auto Courier::Hydrate(CourierId id, CourierName name, Transport transport,
-                      shared_kernel::Location current_location, Status status)
-    -> Courier {
+                      shared_kernel::Location current_location,
+                      Status status) -> Courier {
   return {std::move(id), std::move(name), std::move(transport),
           current_location, status};
 }
@@ -68,7 +70,8 @@ auto Courier::MoveTo(shared_kernel::Location const to_location) -> void {
 
 auto Courier::StartWork() -> void {
   if (status_ == Status::Busy) {
-    throw TryStartWorkingWhenAlreadyStarted{};
+    userver::utils::LogErrorAndThrow<TryStartWorkingWhenAlreadyStarted>(
+        "You cannot start work if it has already been started earlier");
   }
 
   status_ = Status::Ready;
@@ -76,7 +79,8 @@ auto Courier::StartWork() -> void {
 
 auto Courier::StopWork() -> void {
   if (status_ == Status::Busy) {
-    throw TryStopWorkingWithIncompleteDelivery{};
+    userver::utils::LogErrorAndThrow<TryStopWorkingWithIncompleteDelivery>(
+        "You cannot stop working if there is an incomplete delivery");
   }
 
   status_ = Status::NotAvailable;
@@ -84,10 +88,13 @@ auto Courier::StopWork() -> void {
 
 auto Courier::InWork() -> void {
   if (status_ == Status::NotAvailable) {
-    throw TryAssignOrderWhenNotAvailable{};
+    userver::utils::LogErrorAndThrow<TryAssignOrderWhenNotAvailable>(
+        "You cannot take an order to work if the courier has not started the "
+        "working day");
   }
   if (status_ == Status::Busy) {
-    throw TryAssignOrderWhenCourierHasAlreadyBusy{};
+    userver::utils::LogErrorAndThrow<TryAssignOrderWhenCourierHasAlreadyBusy>(
+        "You can't take an order to work if the courier is already busy");
   }
 
   status_ = Status::Busy;

@@ -12,4 +12,20 @@ struct IllegalStateException : std::runtime_error {
   using std::runtime_error::runtime_error;
 };
 
+struct TryStopWorkingWithIncompleteDelivery final : IllegalStateException {
+  using IllegalStateException::IllegalStateException;
+};
+
+struct TryStartWorkingWhenAlreadyStarted final : IllegalStateException {
+  using IllegalStateException::IllegalStateException;
+};
+
+struct TryAssignOrderWhenNotAvailable final : IllegalStateException {
+  using IllegalStateException::IllegalStateException;
+};
+
+struct TryAssignOrderWhenCourierHasAlreadyBusy final : IllegalStateException {
+  using IllegalStateException::IllegalStateException;
+};
+
 }  // namespace delivery::core::domain::courier

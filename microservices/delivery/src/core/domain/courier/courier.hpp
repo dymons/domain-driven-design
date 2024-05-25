@@ -8,35 +8,6 @@
 
 namespace delivery::core::domain::courier {
 
-struct TryStopWorkingWithIncompleteDelivery final : IllegalStateException {
-  TryStopWorkingWithIncompleteDelivery() : IllegalStateException{""} {}
-  auto what() const noexcept -> const char* final {
-    return "You cannot stop working if there is an incomplete delivery";
-  }
-};
-
-struct TryStartWorkingWhenAlreadyStarted final : IllegalStateException {
-  TryStartWorkingWhenAlreadyStarted() : IllegalStateException{""} {}
-  auto what() const noexcept -> const char* final {
-    return "You cannot start work if it has already been started earlier";
-  }
-};
-
-struct TryAssignOrderWhenNotAvailable final : IllegalStateException {
-  TryAssignOrderWhenNotAvailable() : IllegalStateException{""} {}
-  auto what() const noexcept -> const char* final {
-    return "You cannot take an order to work if the courier has not started "
-           "the working day";
-  }
-};
-
-struct TryAssignOrderWhenCourierHasAlreadyBusy final : IllegalStateException {
-  TryAssignOrderWhenCourierHasAlreadyBusy() : IllegalStateException{""} {}
-  auto what() const noexcept -> const char* final {
-    return "You can't take an order to work if the courier is already busy";
-  }
-};
-
 class Courier {
   CourierId id_;
   CourierName name_;
@@ -59,8 +30,8 @@ class Courier {
     \brief
         Factory method, constructs Courier with name and transport
   */
-  [[nodiscard]] static auto Create(CourierName name, Transport transport)
-      -> Courier;
+  [[nodiscard]] static auto Create(CourierName name,
+                                   Transport transport) -> Courier;
 
   /*!
     \brief
