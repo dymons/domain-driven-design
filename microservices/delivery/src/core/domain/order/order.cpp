@@ -7,13 +7,13 @@ namespace delivery::core::domain::order_aggregate {
 auto Order::Create(BasketId basket_id,
                    shared_kernel::Location delivery_location,
                    shared_kernel::Weight weight) -> Order {
-  return {OrderId{std::move(basket_id).GetUnderlying()}, OrderStatus::Created,
+  return {OrderId{std::move(basket_id).GetUnderlying()}, Status::Created,
           std::nullopt, delivery_location, weight};
 }
 
 auto Order::GetId() const -> OrderId { return id_; }
 
-auto Order::GetStatus() const -> OrderStatus { return status_; }
+auto Order::GetStatus() const -> Status { return status_; }
 
 auto Order::GetCourierId() const -> std::optional<courier::CourierId> {
   return courier_id_;
@@ -37,7 +37,7 @@ auto Order::AssignCourier(courier::Courier& courier) -> void {
 
   courier.InWork();
 
-  status_ = OrderStatus::Assigned;
+  status_ = Status::Assigned;
   courier_id_ = courier.GetId();
 }
 
@@ -46,7 +46,7 @@ auto Order::Complete() -> void {
     throw CantCompletedNotAssignedOrder{};
   }
 
-  status_ = OrderStatus::Completed;
+  status_ = Status::Completed;
 }
 
 }  // namespace delivery::core::domain::order_aggregate

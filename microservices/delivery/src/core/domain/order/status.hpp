@@ -6,13 +6,13 @@ namespace delivery::core::domain::order_aggregate {
 
 // TODO (dymons) Use smart enum
 
-enum class OrderStatus {
+enum class Status {
   Created,
   Assigned,
   Completed,
 };
 
-[[nodiscard]] auto ToString(OrderStatus status) -> std::string;
-[[nodiscard]] auto FromString(std::string_view status) -> OrderStatus;
+[[nodiscard]] auto ToString(Status status) -> std::string;
+[[nodiscard]] auto FromString(std::string_view status) -> Status;
 
 }  // namespace delivery::core::domain::order

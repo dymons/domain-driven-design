@@ -6,7 +6,7 @@
 #include <core/domain/shared_kernel/location.hpp>
 #include <core/domain/shared_kernel/weight.hpp>
 #include "exceptions.hpp"
-#include "order_status.hpp"
+#include "status.hpp"
 #include "strong_typedefs.hpp"
 
 namespace delivery::core::domain::courier {
@@ -31,14 +31,14 @@ struct CantAssignOrderToBusyCourier final : IllegalStateException {
 
 class Order {
   OrderId id_;
-  OrderStatus status_;
+  Status status_;
   std::optional<courier::CourierId> courier_id_;
   shared_kernel::Location delivery_location_;
   shared_kernel::Weight weight_;
 
   // Constructors
 
-  Order(OrderId id, OrderStatus status,
+  Order(OrderId id, Status status,
         std::optional<courier::CourierId> courier_id,
         shared_kernel::Location delivery_location, shared_kernel::Weight weight)
       : id_(std::move(id)),
@@ -55,7 +55,7 @@ class Order {
   // Observers
 
   auto GetId() const -> OrderId;
-  auto GetStatus() const -> OrderStatus;
+  auto GetStatus() const -> Status;
   auto GetCourierId() const -> std::optional<courier::CourierId>;
   auto GetDeliveryLocation() const -> shared_kernel::Location;
   auto GetWeight() const -> shared_kernel::Weight;

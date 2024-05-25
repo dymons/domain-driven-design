@@ -46,7 +46,7 @@ UTEST(OrderShould, BeConstructibleWithRequiredProperties) {
 
   // Assert
   EXPECT_EQ(order.GetId(), OrderId{MockBasketId().GetUnderlying()});
-  EXPECT_EQ(order.GetStatus(), OrderStatus::Created);
+  EXPECT_EQ(order.GetStatus(), Status::Created);
   EXPECT_EQ(order.GetCourierId(), std::nullopt);
   EXPECT_EQ(order.GetDeliveryLocation(), MockDeliveryLocation());
   EXPECT_EQ(order.GetWeight(), MockWeight());
@@ -87,7 +87,7 @@ UTEST(OrderShould, CompleteOrderWhenOrderIsAssigned) {
   order.Complete();
 
   // Assert
-  EXPECT_EQ(order.GetStatus(), OrderStatus::Completed);
+  EXPECT_EQ(order.GetStatus(), Status::Completed);
 }
 
 UTEST(OrderShould, ThrowWhenCompleteOrderWithStatusCreated) {
@@ -95,7 +95,7 @@ UTEST(OrderShould, ThrowWhenCompleteOrderWithStatusCreated) {
   auto order = MockOrder();
 
   // Act & Assert
-  EXPECT_EQ(order.GetStatus(), OrderStatus::Created);
+  EXPECT_EQ(order.GetStatus(), Status::Created);
   EXPECT_THROW(order.Complete(), CantCompletedNotAssignedOrder);
 }
 
@@ -110,7 +110,7 @@ UTEST(OrderShould, DoNothingWhenCompleteOrderWithStatusCompleted) {
   order.Complete();
 
   // Assert
-  EXPECT_EQ(order.GetStatus(), OrderStatus::Completed);
+  EXPECT_EQ(order.GetStatus(), Status::Completed);
 }
 
 }  // namespace delivery::core::domain::order_aggregate
