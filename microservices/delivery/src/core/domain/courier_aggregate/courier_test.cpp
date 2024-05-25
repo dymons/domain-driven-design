@@ -36,4 +36,18 @@ UTEST(CourierShould, ThrowWhenCreateCourierWithEmptyName) {
                ArgumentException);
 }
 
+UTEST(CourierShould, MoveToLocation) {
+  // Arrange
+  auto courier = Courier::Create(MockCourierName(), Transport::kBicycle);
+
+  // Act
+  courier.MoveTo(shared_kernel::Location::Create(shared_kernel::X{5},
+                                                 shared_kernel::Y{5}));
+
+  // Assert
+  EXPECT_EQ(courier.GetCurrentLocation(),
+            shared_kernel::Location::Create(shared_kernel::X{3},
+                                            shared_kernel::Y{1}));
+}
+
 }  // namespace delivery::core::domain::courier_aggregate
