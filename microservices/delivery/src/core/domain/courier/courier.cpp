@@ -12,12 +12,12 @@ auto Courier::Create(CourierName name, Transport transport) -> Courier {
 
   return {CourierId{userver::utils::generators::GenerateUuidV7()},
           std::move(name), std::move(transport),
-          shared_kernel::Location::kMinLocation, CourierStatus::NotAvailable};
+          shared_kernel::Location::kMinLocation, Status::NotAvailable};
 }
 
 auto Courier::Hydrate(CourierId id, CourierName name, Transport transport,
                       shared_kernel::Location current_location,
-                      CourierStatus status) -> Courier {
+                      Status status) -> Courier {
   return {std::move(id), std::move(name), std::move(transport),
           current_location, status};
 }
@@ -32,7 +32,7 @@ auto Courier::GetCurrentLocation() const -> shared_kernel::Location {
   return current_location_;
 }
 
-auto Courier::GetStatus() const -> CourierStatus { return status_; }
+auto Courier::GetStatus() const -> Status { return status_; }
 
 auto Courier::MoveTo(shared_kernel::Location const to_location) -> void {
   if (current_location_ == to_location) {
@@ -59,38 +59,38 @@ auto Courier::MoveTo(shared_kernel::Location const to_location) -> void {
 
   auto reached_location = shared_kernel::Location::Create(new_x, new_y);
 
-  if (status_ == CourierStatus::Busy && reached_location == to_location) {
-    status_ = CourierStatus::Ready;
+  if (status_ == Status::Busy && reached_location == to_location) {
+    status_ = Status::Ready;
   }
 
   current_location_ = reached_location;
 }
 
 auto Courier::StartWork() -> void {
-  if (status_ == CourierStatus::Busy) {
+  if (status_ == Status::Busy) {
     throw TryStartWorkingWhenAlreadyStarted{};
   }
 
-  status_ = CourierStatus::Ready;
+  status_ = Status::Ready;
 }
 
 auto Courier::StopWork() -> void {
-  if (status_ == CourierStatus::Busy) {
+  if (status_ == Status::Busy) {
     throw TryStopWorkingWithIncompleteDelivery{};
   }
 
-  status_ = CourierStatus::NotAvailable;
+  status_ = Status::NotAvailable;
 }
 
 auto Courier::InWork() -> void {
-  if (status_ == CourierStatus::NotAvailable) {
+  if (status_ == Status::NotAvailable) {
     throw TryAssignOrderWhenNotAvailable{};
   }
-  if (status_ == CourierStatus::Busy) {
+  if (status_ == Status::Busy) {
     throw TryAssignOrderWhenCourierHasAlreadyBusy{};
   }
 
-  status_ = CourierStatus::Busy;
+  status_ = Status::Busy;
 }
 
 auto Courier::CalculateTimeToPoint(shared_kernel::Location location) const

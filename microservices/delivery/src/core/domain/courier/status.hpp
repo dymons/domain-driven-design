@@ -6,13 +6,13 @@ namespace delivery::core::domain::courier {
 
 // TODO (dymons) Use smart enum
 
-enum class CourierStatus {
+enum class Status {
   NotAvailable,
   Ready,
   Busy,
 };
 
-[[nodiscard]] auto ToString(CourierStatus status) -> std::string;
-[[nodiscard]] auto FromString(std::string_view status) -> CourierStatus;
+[[nodiscard]] auto ToString(Status status) -> std::string;
+[[nodiscard]] auto FromString(std::string_view status) -> Status;
 
 }  // namespace delivery::core::domain::courier

@@ -21,7 +21,7 @@ UTEST(CourierShould, BeConstructibleWithRequiredProperties) {
   auto const courier = Courier::Create(MockCourierName(), MockTransport());
 
   // Assert
-  EXPECT_EQ(courier.GetStatus(), CourierStatus::NotAvailable);
+  EXPECT_EQ(courier.GetStatus(), Status::NotAvailable);
   EXPECT_EQ(courier.GetName(), MockCourierName());
   EXPECT_EQ(courier.GetCurrentLocation(),
             shared_kernel::Location::kMinLocation);
@@ -58,7 +58,7 @@ UTEST(CourierShould, CanStartWork) {
   courier.StartWork();
 
   // Assert
-  EXPECT_EQ(courier.GetStatus(), CourierStatus::Ready);
+  EXPECT_EQ(courier.GetStatus(), Status::Ready);
 }
 
 UTEST(CourierShould, CanStopWork) {
@@ -70,7 +70,7 @@ UTEST(CourierShould, CanStopWork) {
   courier.StopWork();
 
   // Assert
-  EXPECT_EQ(courier.GetStatus(), CourierStatus::NotAvailable);
+  EXPECT_EQ(courier.GetStatus(), Status::NotAvailable);
 }
 
 UTEST(CourierShould, CanCalculateTimeToLocation) {

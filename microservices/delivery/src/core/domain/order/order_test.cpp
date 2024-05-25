@@ -24,8 +24,8 @@ auto MockWeight() -> shared_kernel::Weight {
   return shared_kernel::Weight::Create(10);
 }
 
-auto MockCourier(courier::CourierStatus status =
-                     courier::CourierStatus::NotAvailable) -> courier::Courier {
+auto MockCourier(courier::Status status =
+                     courier::Status::NotAvailable) -> courier::Courier {
   return courier::Courier::Hydrate(
       courier::CourierId{"CourierId"}, courier::CourierName{"CourierName"},
       courier::Transport::kPedestrian, shared_kernel::Location::kMinLocation,
@@ -55,20 +55,20 @@ UTEST(OrderShould, BeConstructibleWithRequiredProperties) {
 UTEST(OrderShould, AssignCourier) {
   // Arrange
   auto order = MockOrder();
-  auto courier = MockCourier(courier::CourierStatus::Ready);
+  auto courier = MockCourier(courier::Status::Ready);
 
   // Act
   order.AssignCourier(courier);
 
   // Assert
   EXPECT_TRUE(order.IsCourierAssigned());
-  EXPECT_EQ(courier.GetStatus(), courier::CourierStatus::Busy);
+  EXPECT_EQ(courier.GetStatus(), courier::Status::Busy);
 }
 
 UTEST(OrderShould, ThrowWhenAssignBusyCourier) {
   // Arrange
   auto order = MockOrder();
-  auto courier = MockCourier(courier::CourierStatus::Busy);
+  auto courier = MockCourier(courier::Status::Busy);
 
   // Act
 
@@ -102,7 +102,7 @@ UTEST(OrderShould, ThrowWhenCompleteOrderWithStatusCreated) {
 UTEST(OrderShould, DoNothingWhenCompleteOrderWithStatusCompleted) {
   // Arrange
   auto order = MockOrder();
-  auto courier = MockCourier(courier::CourierStatus::Ready);
+  auto courier = MockCourier(courier::Status::Ready);
   order.AssignCourier(courier);
   order.Complete();
 

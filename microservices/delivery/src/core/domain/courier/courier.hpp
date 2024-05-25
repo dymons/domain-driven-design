@@ -43,12 +43,12 @@ class Courier {
   CourierName name_;
   Transport transport_;
   shared_kernel::Location current_location_;
-  CourierStatus status_;
+  Status status_;
 
   // Constructors
 
   Courier(CourierId id, CourierName name, Transport transport,
-          shared_kernel::Location current_location, CourierStatus status)
+          shared_kernel::Location current_location, Status status)
       : id_(std::move(id)),
         name_(std::move(name)),
         transport_(std::move(transport)),
@@ -70,7 +70,7 @@ class Courier {
   [[nodiscard]] static auto Hydrate(CourierId id, CourierName name,
                                     Transport transport,
                                     shared_kernel::Location current_location,
-                                    CourierStatus status) -> Courier;
+                                    Status status) -> Courier;
 
   // Observers
 
@@ -78,7 +78,7 @@ class Courier {
   auto GetName() const -> CourierName;
   auto GetTransport() const -> Transport;
   auto GetCurrentLocation() const -> shared_kernel::Location;
-  auto GetStatus() const -> CourierStatus;
+  auto GetStatus() const -> Status;
   auto CalculateTimeToPoint(shared_kernel::Location location) const -> Time;
 
   // Modifiers
