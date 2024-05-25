@@ -14,7 +14,7 @@ using CourierName =
 
 using Duration = userver::utils::StrongTypedef<struct DurationTag, int>;
 using Speed = userver::utils::StrongTypedef<struct SpeedTag, int>;
-using Time = userver::utils::StrongTypedef<struct TimeTag, int>;
+using Time = userver::utils::StrongTypedef<struct TimeTag, double>;
 
 using TransportId =
     userver::utils::StrongTypedef<struct TransportIdTag, int>;
