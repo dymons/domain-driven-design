@@ -30,14 +30,20 @@ auto Order::IsCourierAssigned() const -> bool {
   return courier_id_.has_value();
 }
 
-auto Order::AssignCourier(courier_aggregate::Courier const& courier) -> void {
+auto Order::AssignCourier(courier_aggregate::Courier& courier) -> void {
+  if (courier.GetStatus() == courier_aggregate::CourierStatus::Busy) {
+    throw CantAssignOrderToBusyCourier{};
+  }
+
   status_ = OrderStatus::Assigned;
   courier_id_ = courier.GetId();
+
+  courier.InWork();
 }
 
 auto Order::Complete() -> void {
   if (not IsCourierAssigned()) {
-    throw CanNotCompleteOrderWithoutCourier{};
+    throw CantCompletedNotAssignedOrder{};
   }
 
   status_ = OrderStatus::Completed;

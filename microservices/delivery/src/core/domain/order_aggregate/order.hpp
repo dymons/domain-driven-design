@@ -15,8 +15,15 @@ class Courier;
 
 namespace delivery::core::domain::order_aggregate {
 
-struct CanNotCompleteOrderWithoutCourier final : IllegalStateException {
-  CanNotCompleteOrderWithoutCourier() : IllegalStateException {""} {}
+struct CantCompletedNotAssignedOrder final : IllegalStateException {
+  CantCompletedNotAssignedOrder() : IllegalStateException {""} {}
+  auto what() const noexcept -> const char* final {
+    return "Only the assigned order can be completed";
+  }
+};
+
+struct CantAssignOrderToBusyCourier final : IllegalStateException {
+  CantAssignOrderToBusyCourier() : IllegalStateException {""} {}
   auto what() const noexcept -> const char* final {
     return "Only the assigned order can be completed";
   }
@@ -56,7 +63,7 @@ class Order {
 
   // Modifiers
 
-  auto AssignCourier(courier_aggregate::Courier const& courier) -> void;
+  auto AssignCourier(courier_aggregate::Courier& courier) -> void;
   auto Complete() -> void;
 };
 

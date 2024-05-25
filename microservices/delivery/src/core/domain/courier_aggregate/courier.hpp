@@ -1,6 +1,7 @@
 #pragma once
 
 #include <core/domain/shared_kernel/location.hpp>
+#include <utility>
 #include "courier_status.hpp"
 #include "exceptions.hpp"
 #include "strong_typedefs.hpp"
@@ -36,7 +37,7 @@ class Courier {
           shared_kernel::Location current_location, CourierStatus status)
       : id_(std::move(id)),
         name_(std::move(name)),
-        transport_(transport),
+        transport_(std::move(transport)),
         current_location_(current_location),
         status_(status) {}
 

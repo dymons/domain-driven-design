@@ -27,7 +27,7 @@ auto MockWeight() -> shared_kernel::Weight {
 auto MockCourier() -> courier_aggregate::Courier {
   return courier_aggregate::Courier::Create(
       courier_aggregate::CourierName{"CourierName"},
-      courier_aggregate::Transport{});
+      courier_aggregate::Transport::kPedestrian);
 }
 
 auto MockOrder() -> Order {
@@ -53,9 +53,10 @@ UTEST(OrderShould, BeConstructibleWithRequiredProperties) {
 UTEST(OrderShould, AssignCourier) {
   // Arrange
   auto order = MockOrder();
+  auto courier = MockCourier();
 
   // Act
-  order.AssignCourier(MockCourier());
+  order.AssignCourier(courier);
 
   // Assert
   EXPECT_TRUE(order.IsCourierAssigned());
@@ -64,7 +65,8 @@ UTEST(OrderShould, AssignCourier) {
 UTEST(OrderShould, CompleteOrderWhenOrderIsAssigned) {
   // Arrange
   auto order = MockOrder();
-  order.AssignCourier(MockCourier());
+  auto courier = MockCourier();
+  order.AssignCourier(courier);
 
   // Act
   order.Complete();
@@ -79,13 +81,14 @@ UTEST(OrderShould, ThrowWhenCompleteOrderWithStatusCreated) {
 
   // Act & Assert
   EXPECT_EQ(order.GetStatus(), OrderStatus::Created);
-  EXPECT_THROW(order.Complete(), CanNotCompleteOrderWithoutCourier);
+  EXPECT_THROW(order.Complete(), CantCompletedNotAssignedOrder);
 }
 
 UTEST(OrderShould, DoNothingWhenCompleteOrderWithStatusCompleted) {
   // Arrange
   auto order = MockOrder();
-  order.AssignCourier(MockCourier());
+  auto courier = MockCourier();
+  order.AssignCourier(courier);
   order.Complete();
 
   // Act

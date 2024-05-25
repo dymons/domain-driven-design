@@ -10,7 +10,7 @@ auto MockCourierName() -> CourierName {
   return CourierName{"some_courier_name"};
 }
 
-auto MockTransport() -> Transport { return Transport{}; }
+auto MockTransport() -> Transport { return Transport::kPedestrian; }
 
 }  // namespace
 
