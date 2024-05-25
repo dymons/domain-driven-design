@@ -1,15 +1,23 @@
 #include "courier.hpp"
 
 #include <userver/utils/uuid7.hpp>
+#include <utility>
 
 namespace delivery::core::domain::courier_aggregate {
 
 auto Courier::Create(CourierName name, Transport transport) -> Courier {
   return {
       CourierId{userver::utils::generators::GenerateUuidV7()}, std::move(name),
-      transport,
+      std::move(transport),
       shared_kernel::Location::Create(shared_kernel::X{1}, shared_kernel::Y{1}),
       CourierStatus::NotAvailable};
+}
+
+auto Courier::Restore(CourierId id, CourierName name, Transport transport,
+                      shared_kernel::Location current_location,
+                      CourierStatus status) -> Courier {
+  return {std::move(id), std::move(name), std::move(transport),
+          current_location, status};
 }
 
 auto Courier::GetId() const -> CourierId { return id_; }

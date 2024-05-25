@@ -59,6 +59,11 @@ class Courier {
   [[nodiscard]] static auto Create(CourierName name,
                                    Transport transport) -> Courier;
 
+  [[nodiscard]] static auto Restore(CourierId id, CourierName name,
+                                    Transport transport,
+                                    shared_kernel::Location current_location,
+                                    CourierStatus status) -> Courier;
+
   // Observers
 
   auto GetId() const -> CourierId;
