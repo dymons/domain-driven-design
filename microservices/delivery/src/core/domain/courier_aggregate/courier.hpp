@@ -86,7 +86,7 @@ class Courier {
   auto StartWork() -> void;
   auto StopWork() -> void;
   auto InWork() -> void;
-  auto CalculateTimeToPoint(shared_kernel::Location location) -> Time;
+  auto CalculateTimeToPoint(shared_kernel::Location location) const -> Time;
 };
 
 }  // namespace delivery::core::domain::courier_aggregate

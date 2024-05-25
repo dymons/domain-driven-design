@@ -73,4 +73,16 @@ UTEST(CourierShould, CanStopWork) {
   EXPECT_EQ(courier.GetStatus(), CourierStatus::NotAvailable);
 }
 
+UTEST(CourierShould, CanCalculateTimeToLocation) {
+  // Arrange
+  auto courier = Courier::Create(MockCourierName(), MockTransport());
+
+  // Act
+  auto const time =
+      courier.CalculateTimeToPoint(shared_kernel::Location::kMaxLocation);
+
+  // Assert
+  EXPECT_EQ(time, Time{18});
+}
+
 }  // namespace delivery::core::domain::courier_aggregate

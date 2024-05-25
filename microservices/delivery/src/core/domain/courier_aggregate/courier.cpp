@@ -93,7 +93,8 @@ auto Courier::InWork() -> void {
   status_ = CourierStatus::Busy;
 }
 
-auto Courier::CalculateTimeToPoint(shared_kernel::Location location) -> Time {
+auto Courier::CalculateTimeToPoint(shared_kernel::Location location) const
+    -> Time {
   auto const distance = current_location_.DistanceTo(location);
   return Time{static_cast<double>(distance.GetUnderlying()) /
               static_cast<double>(transport_.GetSpeed().GetUnderlying())};
