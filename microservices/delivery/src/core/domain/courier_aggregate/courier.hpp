@@ -79,6 +79,7 @@ class Courier {
   auto GetTransport() const -> Transport;
   auto GetCurrentLocation() const -> shared_kernel::Location;
   auto GetStatus() const -> CourierStatus;
+  auto CalculateTimeToPoint(shared_kernel::Location location) const -> Time;
 
   // Modifiers
 
@@ -86,7 +87,6 @@ class Courier {
   auto StartWork() -> void;
   auto StopWork() -> void;
   auto InWork() -> void;
-  auto CalculateTimeToPoint(shared_kernel::Location location) const -> Time;
 };
 
 }  // namespace delivery::core::domain::courier_aggregate
