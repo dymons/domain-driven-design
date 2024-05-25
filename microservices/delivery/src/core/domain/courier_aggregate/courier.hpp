@@ -9,6 +9,20 @@
 
 namespace delivery::core::domain::courier_aggregate {
 
+struct TryStopWorkingWithIncompleteDelivery final : IllegalStateException {
+  TryStopWorkingWithIncompleteDelivery() : IllegalStateException{""} {}
+  auto what() const noexcept -> const char* final {
+    return "You cannot stop working if there is an incomplete delivery";
+  }
+};
+
+struct TryStartWorkingWhenAlreadyStarted final : IllegalStateException {
+  TryStartWorkingWhenAlreadyStarted() : IllegalStateException{""} {}
+  auto what() const noexcept -> const char* final {
+    return "You cannot start work if it has already been started earlier";
+  }
+};
+
 struct TryAssignOrderWhenNotAvailable final : IllegalStateException {
   TryAssignOrderWhenNotAvailable() : IllegalStateException{""} {}
   auto what() const noexcept -> const char* final {

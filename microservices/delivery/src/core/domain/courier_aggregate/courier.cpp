@@ -24,7 +24,37 @@ auto Courier::GetCurrentLocation() const -> shared_kernel::Location {
 
 auto Courier::GetStatus() const -> CourierStatus { return status_; }
 
-auto Courier::MoveTo(shared_kernel::Location const location) -> void {}
+auto Courier::MoveTo(shared_kernel::Location const to_location) -> void {
+  if (current_location_ == to_location) {
+    return;
+  }
+
+  auto cruise_range = transport_.GetSpeed().GetUnderlying();
+
+  auto new_x = current_location_.GetX();
+  if (new_x != to_location.GetX()) {
+    new_x = shared_kernel::X{
+        std::min(current_location_.GetX().GetUnderlying() + cruise_range,
+                 to_location.GetX().GetUnderlying())};
+    cruise_range -= (to_location.GetX().GetUnderlying() -
+                     current_location_.GetX().GetUnderlying());
+  }
+
+  auto new_y = current_location_.GetY();
+  if (new_y != to_location.GetY() && cruise_range > 0) {
+    new_y = shared_kernel::Y{
+        std::min(current_location_.GetY().GetUnderlying() + cruise_range,
+                 to_location.GetY().GetUnderlying())};
+  }
+
+  auto reached_location = shared_kernel::Location::Create(new_x, new_y);
+
+  if (status_ == CourierStatus::Busy && reached_location == to_location) {
+    status_ = CourierStatus::Ready;
+  }
+
+  current_location_ = reached_location;
+}
 
 auto Courier::StartWork() -> void {
   if (status_ == CourierStatus::NotAvailable) {
@@ -41,8 +71,6 @@ auto Courier::StopWork() -> void {}
 
 auto Courier::InWork() -> void {}
 
-auto Courier::CalculateTimeToPoint(shared_kernel::Location location) -> void {
-
-}
+auto Courier::CalculateTimeToPoint(shared_kernel::Location location) -> void {}
 
 }  // namespace delivery::core::domain::courier_aggregate
