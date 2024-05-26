@@ -21,7 +21,7 @@ auto MockDeliveryLocation() -> shared_kernel::Location {
 }
 
 auto MockWeight() -> shared_kernel::Weight {
-  return shared_kernel::Weight::Create(10);
+  return shared_kernel::Weight{10};
 }
 
 auto MockCourier(courier::Status status = courier::Status::NotAvailable)

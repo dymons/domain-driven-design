@@ -4,12 +4,12 @@
 
 namespace delivery::core::domain::shared_kernel {
 
-auto Weight::Create(int const value) -> Weight {
+Weight::Weight(int const value) : value_(value) {
   if (value <= 0) {
     throw ArgumentException{"The weight must be a positive value"};
   }
-
-  return Weight{value};
 }
+
+auto Weight::GetWeight() const noexcept -> int { return value_; }
 
 }  // namespace delivery::core::domain::shared_kernel

@@ -7,16 +7,14 @@ namespace delivery::core::domain::shared_kernel {
 class Weight {
   int value_;
 
+ public:
   // Constructors
 
-  explicit Weight(int value) : value_(value) {}
-
- public:
-  [[nodiscard]] static auto Create(int value) -> Weight;
+  Weight(int value);
 
   // Observers
 
-  [[nodiscard]] auto GetWeight() const noexcept -> int { return value_; }
+  [[nodiscard]] auto GetWeight() const noexcept -> int;
 
   auto operator<=>(Weight const&) const -> std::strong_ordering = default;
 };
