@@ -11,6 +11,9 @@ class Order;
 namespace delivery::core::ports {
 
 class IOrderRepository {
+  using Order = domain::order::Order;
+  using OrderId = domain::order::OrderId;
+
  public:
   virtual ~IOrderRepository() = default;
 
@@ -20,13 +23,11 @@ class IOrderRepository {
   IOrderRepository& operator=(IOrderRepository const&) = delete;
   IOrderRepository& operator=(IOrderRepository&&) = delete;
 
-  virtual auto Add(domain::order::Order const&) const -> void = 0;
-  virtual auto Update(domain::order::Order const&) const -> void = 0;
-  virtual auto GetById(domain::order::OrderId const&) const
-      -> domain::order::Order = 0;
-  virtual auto GetAllNotAssigned() const
-      -> std::vector<domain::order::Order> = 0;
-  virtual auto GetAllAssigned() const -> std::vector<domain::order::Order> = 0;
+  virtual auto Add(Order const&) const -> void = 0;
+  virtual auto Update(Order const&) const -> void = 0;
+  virtual auto GetById(OrderId const&) const -> Order = 0;
+  virtual auto GetAllNotAssigned() const -> std::vector<Order> = 0;
+  virtual auto GetAllAssigned() const -> std::vector<Order> = 0;
 };
 
 }  // namespace delivery::core::ports
