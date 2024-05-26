@@ -4,6 +4,7 @@
 
 namespace delivery::infrastructure::adapters::postgres {
 
-core::ports::ICourierRepositoryRef MakeCourierRepository();
+userver::utils::SharedRef<const core::ports::ICourierRepository>
+MakeCourierRepository();
 
 }  // namespace delivery::infrastructure::adapters::postgres

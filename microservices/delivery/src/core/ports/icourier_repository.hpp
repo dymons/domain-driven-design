@@ -31,7 +31,4 @@ class ICourierRepository {
   virtual auto GetAllBusy() const -> std::vector<domain::courier::Courier> = 0;
 };
 
-using ICourierRepositoryRef =
-    userver::utils::SharedRef<const ICourierRepository>;
-
 }  // namespace delivery::core::ports

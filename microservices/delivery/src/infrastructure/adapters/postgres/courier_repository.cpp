@@ -29,7 +29,8 @@ class CourierRepository final : public core::ports::ICourierRepository {
   }
 };
 
-core::ports::ICourierRepositoryRef MakeCourierRepository() {
+userver::utils::SharedRef<const core::ports::ICourierRepository>
+MakeCourierRepository() {
   return userver::utils::MakeSharedRef<const CourierRepository>();
 }
 
