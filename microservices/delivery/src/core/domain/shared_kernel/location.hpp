@@ -26,9 +26,9 @@ class Location {
 
   // Observers
 
-  [[nodiscard]] auto GetX() const noexcept -> X { return X{x_}; }
-  [[nodiscard]] auto GetY() const noexcept -> Y { return Y{y_}; }
-  [[nodiscard]] auto DistanceTo(Location const&) const noexcept -> Distance;
+  auto GetX() const noexcept -> X;
+  auto GetY() const noexcept -> Y;
+  auto DistanceTo(Location const&) const noexcept -> Distance;
 
   auto operator<=>(Location const&) const -> std::strong_ordering = default;
 };

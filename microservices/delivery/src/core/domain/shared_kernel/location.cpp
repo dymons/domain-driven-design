@@ -27,6 +27,10 @@ auto Location::Create(X const x, Y const y) -> Location {
   return Location{x, y};
 }
 
+auto Location::GetX() const noexcept -> X { return X{x_}; }
+
+auto Location::GetY() const noexcept -> Y { return Y{y_}; }
+
 auto Location::DistanceTo(Location const& other) const noexcept -> Distance {
   return Distance{
       std::abs(GetX().GetUnderlying() - other.GetX().GetUnderlying()) +
