@@ -2,23 +2,28 @@
 
 #include <cmath>
 
+#include <fmt/format.h>
+
 #include "exceptions.hpp"
 
 namespace delivery::core::domain::shared_kernel {
 
-namespace {
-
-void ValidateCoordinate(int const coord) {
-  if (coord < 1 || coord > 10) {
-    throw ArgumentException{"The coordinate should be in range from 1 to 10"};
-  }
-}
-
-}  // namespace
+const Location Location::kMinLocation = Location{X{1}, Y{1}};
+const Location Location::kMaxLocation = Location{X{10}, Y{10}};
 
 auto Location::Create(X const x, Y const y) -> Location {
-  ValidateCoordinate(x.GetUnderlying());
-  ValidateCoordinate(y.GetUnderlying());
+  if (x < kMinLocation.GetX() || x > kMaxLocation.GetX()) {
+    throw ArgumentException{
+        fmt::format("The coordinate x should be in range from {} to {}",
+                    kMinLocation.GetX().GetUnderlying(),
+                    kMaxLocation.GetX().GetUnderlying())};
+  }
+  if (y < kMinLocation.GetY() || y > kMaxLocation.GetY()) {
+    throw ArgumentException{
+        fmt::format("The coordinate y should be in range from {} to {}",
+                    kMinLocation.GetY().GetUnderlying(),
+                    kMaxLocation.GetY().GetUnderlying())};
+  }
   return Location{x, y};
 }
 

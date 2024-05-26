@@ -6,7 +6,7 @@ namespace delivery::core::domain::shared_kernel {
 
 class Weight {
   /// Weight, stores the value in kilograms
-  int weight_;
+  int value_;
 
   // Constructors
 
@@ -14,7 +14,7 @@ class Weight {
     \brief
         User constructor, constructs Weight with predefined weight
   */
-  explicit Weight(int weight) : weight_(weight) {}
+  explicit Weight(int value) : value_(value) {}
 
  public:
   /*!
@@ -33,7 +33,7 @@ class Weight {
     \ingroup
         SharedKernel
   */
-  [[nodiscard]] static auto Create(int weight) -> Weight;
+  [[nodiscard]] static auto Create(int value) -> Weight;
 
   // Observers
 
@@ -41,7 +41,7 @@ class Weight {
     \brief
         Get the weight
   */
-  [[nodiscard]] auto GetWeight() const noexcept -> int { return weight_; }
+  [[nodiscard]] auto GetWeight() const noexcept -> int { return value_; }
 
   /*!
     \brief
