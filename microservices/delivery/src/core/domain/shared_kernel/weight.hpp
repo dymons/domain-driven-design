@@ -14,7 +14,7 @@ class Weight {
 
   // Observers
 
-  [[nodiscard]] auto GetWeight() const noexcept -> int;
+  auto GetWeight() const noexcept -> int;
 
   auto operator<=>(Weight const&) const -> std::strong_ordering = default;
 };
