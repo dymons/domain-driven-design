@@ -40,8 +40,12 @@ add_library(${PROJECT_NAME}_objs OBJECT
     src/core/domain/order/order.cpp
     src/core/ports/icourier_repository.hpp
     src/core/ports/icourier_repository.cpp
+    src/core/ports/iorder_repository.hpp
+    src/core/ports/iorder_repository.cpp
     src/infrastructure/adapters/postgres/courier_repository.hpp
     src/infrastructure/adapters/postgres/courier_repository.cpp
+    src/infrastructure/adapters/postgres/order_repository.hpp
+    src/infrastructure/adapters/postgres/order_repository.cpp
 )
 target_link_libraries(${PROJECT_NAME}_objs PUBLIC userver-core)
 target_include_directories(${PROJECT_NAME}_objs PUBLIC src)

@@ -2,8 +2,6 @@
 
 #include <vector>
 
-#include <userver/utils/not_null.hpp>
-
 #include <core/domain/courier/strong_typedefs.hpp>
 
 namespace delivery::core::domain::courier {
