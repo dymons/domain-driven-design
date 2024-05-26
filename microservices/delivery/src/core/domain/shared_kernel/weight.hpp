@@ -18,7 +18,7 @@ class Weight {
 
   [[nodiscard]] auto GetWeight() const noexcept -> int { return value_; }
 
-  constexpr auto operator<=>(Weight const&) const = default;
+  auto operator<=>(Weight const&) const -> std::strong_ordering = default;
 };
 
 }  // namespace delivery::core::domain::shared_kernel
