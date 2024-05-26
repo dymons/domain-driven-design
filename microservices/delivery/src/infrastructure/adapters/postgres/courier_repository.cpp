@@ -1,8 +1,10 @@
 #include "courier_repository.hpp"
 
 #include <userver/storages/postgres/cluster.hpp>
+#include <userver/utils/exception.hpp>
 
 #include <core/domain/courier/courier.hpp>
+#include <core/ports/exceptions.hpp>
 
 namespace delivery::infrastructure::adapters::postgres {
 
@@ -39,7 +41,7 @@ class CourierRepository final : public core::ports::ICourierRepository {
 
   auto Update(Courier const&) const -> void final {}
 
-  auto GetById(CourierId const& courier_id) const -> Courier final {
+  auto GetById(CourierId const& courier_id) const -> Courier final try {
     auto result =
         cluster_->Execute(userver::storages::postgres::ClusterHostType::kMaster,
                           "SELECT id, status, payload"
@@ -49,6 +51,8 @@ class CourierRepository final : public core::ports::ICourierRepository {
 
     return FromRecord(result.AsSingleRow<CourierRecord>(
         userver::storages::postgres::kRowTag));
+  } catch (const userver::storages::postgres::NonSingleRowResultSet& ex) {
+    userver::utils::LogErrorAndThrow<core::ports::CourierNotFound>(ex.what());
   }
 
   auto GetAllReady() const -> std::vector<Courier> final { return {}; }

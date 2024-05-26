@@ -42,6 +42,8 @@ add_library(${PROJECT_NAME}_objs OBJECT
     src/core/ports/icourier_repository.cpp
     src/core/ports/iorder_repository.hpp
     src/core/ports/iorder_repository.cpp
+    src/core/ports/exceptions.hpp
+    src/core/ports/exceptions.cpp
     src/infrastructure/adapters/postgres/courier_repository.hpp
     src/infrastructure/adapters/postgres/courier_repository.cpp
     src/infrastructure/adapters/postgres/order_repository.hpp
