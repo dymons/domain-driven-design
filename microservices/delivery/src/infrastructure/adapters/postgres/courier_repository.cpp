@@ -1,5 +1,7 @@
 #include "courier_repository.hpp"
 
+#include <userver/storages/postgres/cluster.hpp>
+
 #include <core/domain/courier/courier.hpp>
 
 namespace delivery::infrastructure::adapters::postgres {
@@ -7,6 +9,9 @@ namespace delivery::infrastructure::adapters::postgres {
 class CourierRepository final : public core::ports::ICourierRepository {
  public:
   ~CourierRepository() final = default;
+
+  explicit CourierRepository(userver::storages::postgres::ClusterPtr cluster)
+      : cluster_(std::move(cluster)) {}
 
   auto Add(core::domain::courier::Courier const&) const -> void final {}
 
@@ -27,11 +32,15 @@ class CourierRepository final : public core::ports::ICourierRepository {
   auto GetAllBusy() const -> std::vector<core::domain::courier::Courier> final {
     return {};
   }
+
+ private:
+  userver::storages::postgres::ClusterPtr cluster_;
 };
 
 userver::utils::SharedRef<const core::ports::ICourierRepository>
-MakeCourierRepository() {
-  return userver::utils::MakeSharedRef<const CourierRepository>();
+MakeCourierRepository(userver::storages::postgres::ClusterPtr cluster) {
+  return userver::utils::MakeSharedRef<const CourierRepository>(
+      std::move(cluster));
 }
 
 }  // namespace delivery::infrastructure::adapters::postgres

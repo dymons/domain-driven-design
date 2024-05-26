@@ -1,6 +1,12 @@
 cmake_minimum_required(VERSION 3.12)
 project(delivery CXX)
 
+# Adding userver dependency
+find_package(userver COMPONENTS core postgresql QUIET)
+
+# Enable userver libraries that are needed in this project
+set(USERVER_FEATURE_POSTGRESQL ON CACHE BOOL "" FORCE)
+
 # Compatibility mode: some systems don't support these features
 set(USERVER_FEATURE_CRYPTOPP_BLAKE2 OFF CACHE BOOL "" FORCE)
 set(USERVER_FEATURE_GRPC_CHANNELZ OFF CACHE BOOL "" FORCE)
@@ -39,6 +45,7 @@ add_library(${PROJECT_NAME}_objs OBJECT
 )
 target_link_libraries(${PROJECT_NAME}_objs PUBLIC userver-core)
 target_include_directories(${PROJECT_NAME}_objs PUBLIC src)
+target_link_libraries(${PROJECT_NAME}_objs PUBLIC userver::postgresql)
 
 # The Service
 add_executable(${PROJECT_NAME} src/main.cpp)
