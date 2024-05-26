@@ -11,6 +11,7 @@ class Order;
 namespace delivery::core::ports {
 
 class IOrderRepository {
+ protected:
   using Order = domain::order::Order;
   using OrderId = domain::order::OrderId;
 

@@ -11,6 +11,7 @@ class Courier;
 namespace delivery::core::ports {
 
 class ICourierRepository {
+ protected:
   using Courier = domain::courier::Courier;
   using CourierId = domain::courier::CourierId;
 
