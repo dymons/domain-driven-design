@@ -8,9 +8,6 @@ CREATE TABLE IF NOT EXISTS delivery.orders
     status     TEXT        NOT NULL,
     payload    JSONB       NOT NULL,
 
-    created_at TIMESTAMPTZ NOT NULL NOT NULL DEFAULT (NOW() AT TIME ZONE 'UTC'),
-    updated_at TIMESTAMPTZ NOT NULL NOT NULL DEFAULT (NOW() AT TIME ZONE 'UTC'),
-
     PRIMARY KEY (id)
 );
 
@@ -19,9 +16,6 @@ CREATE TABLE IF NOT EXISTS delivery.couriers
     id         TEXT        NOT NULL,
     status     TEXT        NOT NULL,
     payload    JSONB       NOT NULL,
-
-    created_at TIMESTAMPTZ NOT NULL NOT NULL DEFAULT (NOW() AT TIME ZONE 'UTC'),
-    updated_at TIMESTAMPTZ NOT NULL NOT NULL DEFAULT (NOW() AT TIME ZONE 'UTC'),
 
     PRIMARY KEY (id)
 );
