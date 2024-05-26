@@ -17,7 +17,7 @@ class ICourierRepository {
  public:
   virtual ~ICourierRepository() = default;
 
-  ICourierRepository() = delete;
+  ICourierRepository() = default;
   ICourierRepository(ICourierRepository const&) = delete;
   ICourierRepository(ICourierRepository&&) = delete;
   ICourierRepository& operator=(ICourierRepository const&) = delete;
@@ -32,6 +32,6 @@ class ICourierRepository {
 };
 
 using ICourierRepositoryRef =
-    userver::utils::NotNull<std::shared_ptr<const ICourierRepository>>;
+    userver::utils::SharedRef<const ICourierRepository>;
 
 }  // namespace delivery::core::ports
