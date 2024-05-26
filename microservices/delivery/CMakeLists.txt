@@ -32,6 +32,8 @@ add_library(${PROJECT_NAME}_objs OBJECT
     src/core/domain/courier/transport.cpp
     src/core/domain/order/order.hpp
     src/core/domain/order/order.cpp
+    src/core/ports/icourier_repository.hpp
+    src/core/ports/icourier_repository.cpp
 )
 target_link_libraries(${PROJECT_NAME}_objs PUBLIC userver-core)
 target_include_directories(${PROJECT_NAME}_objs PUBLIC src)
