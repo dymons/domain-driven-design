@@ -9,6 +9,8 @@
 #include <core/domain/courier/courier.hpp>
 #include <core/ports/exceptions.hpp>
 
+#include "dto/location.hpp"
+
 namespace delivery::infrastructure::adapters::postgres {
 
 namespace {
@@ -20,16 +22,11 @@ struct TransportRecord {
   int capacity;
 };
 
-struct LocationRecord {
-  int x;
-  int y;
-};
-
 struct CourierRecord final {
   std::string id;
   std::string name;
   TransportRecord transport;
-  LocationRecord current_location;
+  dto::Location current_location;
   std::string status;
 };
 
@@ -164,10 +161,4 @@ template <>
 struct ::userver::storages::postgres::io::CppToUserPg<
     delivery::infrastructure::adapters::postgres::TransportRecord> {
   static constexpr DBTypeName postgres_name = "transport";
-};
-
-template <>
-struct ::userver::storages::postgres::io::CppToUserPg<
-    delivery::infrastructure::adapters::postgres::LocationRecord> {
-  static constexpr DBTypeName postgres_name = "location";
 };
