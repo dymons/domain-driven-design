@@ -72,18 +72,36 @@ class CourierRepository final : public core::ports::ICourierRepository {
       : cluster_(std::move(cluster)) {}
 
   auto Add(Courier const& courier) const -> void final {
-    const auto record = ToRecord(courier);
-
-    auto result =
+    auto const record = ToRecord(courier);
+    auto const result =
         cluster_->Execute(userver::storages::postgres::ClusterHostType::kMaster,
                           "INSERT INTO delivery.couriers "
                           "(id, name, transport, current_location, status)"
-                          "VALUES ($1, $2, $3, $4, $5) ",
+                          "VALUES ($1, $2, $3, $4, $5)",
                           record.id, record.name, record.transport,
                           record.current_location, record.status);
+
+    if (result.IsEmpty()) {
+      userver::utils::LogErrorAndThrow<core::ports::CourierAlreadyExists>(
+          fmt::format("Courier with id={} already exists", courier.GetId()));
+    }
   }
 
-  auto Update(Courier const&) const -> void final {}
+  auto Update(Courier const& courier) const -> void final {
+    auto const record = ToRecord(courier);
+    auto const result = cluster_->Execute(
+        userver::storages::postgres::ClusterHostType::kMaster,
+        "UPDATE delivery.couriers "
+        "SET id=$1, name=$2, transport=$3, current_location=$4, status=$5"
+        "WHERE id = $1",
+        record.id, record.name, record.transport, record.current_location,
+        record.status);
+
+    if (result.IsEmpty()) {
+      userver::utils::LogErrorAndThrow<core::ports::CourierNotFound>(
+          fmt::format("Not found courier by id={}", courier.GetId()));
+    }
+  }
 
   auto GetById(CourierId const& courier_id) const -> Courier final try {
     auto result =
