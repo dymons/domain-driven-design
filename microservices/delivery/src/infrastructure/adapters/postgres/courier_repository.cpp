@@ -14,28 +14,6 @@
 
 namespace delivery::infrastructure::adapters::postgres {
 
-// TODO (dymons) Use enum at PG to store status
-
-namespace {
-//
-// core::domain::courier::Courier FromRecord(dto::Courier const& record) {
-//  return core::domain::courier::Courier::Hydrate(
-//      core::domain::courier::CourierId{record.id},
-//      core::domain::courier::CourierName{record.name},
-//      dto::Convert(record.transport), dto::Convert(record.current_location),
-//      core::domain::courier::FromString(record.status));
-//}
-//
-// dto::Courier ToRecord(core::domain::courier::Courier const& courier) {
-//  return {.id = courier.GetId().GetUnderlying(),
-//          .name = courier.GetName().GetUnderlying(),
-//          .status = ToString(courier.GetStatus()),
-//          .transport = dto::Convert(courier.GetTransport()),
-//          .current_location = dto::Convert(courier.GetCurrentLocation())};
-//}
-
-}  // namespace
-
 class CourierRepository final : public core::ports::ICourierRepository {
   using core::ports::ICourierRepository::Courier;
   using core::ports::ICourierRepository::CourierId;
