@@ -27,8 +27,8 @@ class ICourierRepository {
   virtual auto Add(Courier const&) const -> void = 0;
   virtual auto Update(Courier const&) const -> void = 0;
   virtual auto GetById(CourierId const&) const -> Courier = 0;
-  virtual auto GetAllReady() const -> std::vector<Courier> = 0;
-  virtual auto GetAllBusy() const -> std::vector<Courier> = 0;
+  virtual auto GetByReadyStatus() const -> std::vector<Courier> = 0;
+  virtual auto GetByBusyStatus() const -> std::vector<Courier> = 0;
 };
 
 }  // namespace delivery::core::ports

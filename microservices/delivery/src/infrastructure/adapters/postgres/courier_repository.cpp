@@ -1,6 +1,9 @@
 #include "courier_repository.hpp"
 
+#include <ranges>
+
 #include <userver/storages/postgres/cluster.hpp>
+#include <userver/utils/algo.hpp>
 #include <userver/utils/exception.hpp>
 
 #include <core/domain/courier/courier.hpp>
@@ -30,9 +33,9 @@ struct CourierRecord final {
   std::string status;
 };
 
-core::domain::courier::Courier FromRecord(CourierRecord&& record) {
+core::domain::courier::Courier FromRecord(CourierRecord const& record) {
   return core::domain::courier::Courier::Hydrate(
-      core::domain::courier::CourierId{std::move(record.id)},
+      core::domain::courier::CourierId{record.id},
       core::domain::courier::CourierName{record.name},
       core::domain::courier::Transport::kBicycle,
       core::domain::shared_kernel::Location::kMaxLocation,
@@ -106,7 +109,7 @@ class CourierRepository final : public core::ports::ICourierRepository {
   auto GetById(CourierId const& courier_id) const -> Courier final try {
     auto result =
         cluster_->Execute(userver::storages::postgres::ClusterHostType::kMaster,
-                          "SELECT id, status, payload"
+                          "SELECT id, name, transport, current_location, status"
                           "FROM delivery.couriers"
                           "WHERE id = $1",
                           courier_id.GetUnderlying());
@@ -117,11 +120,29 @@ class CourierRepository final : public core::ports::ICourierRepository {
     userver::utils::LogErrorAndThrow<core::ports::CourierNotFound>(ex.what());
   }
 
-  auto GetAllReady() const -> std::vector<Courier> final { return {}; }
+  auto GetByReadyStatus() const -> std::vector<Courier> final {
+    return GetByStatus(core::domain::courier::Status::Ready);
+  }
 
-  auto GetAllBusy() const -> std::vector<Courier> final { return {}; }
+  auto GetByBusyStatus() const -> std::vector<Courier> final {
+    return GetByStatus(core::domain::courier::Status::Busy);
+  }
 
  private:
+  auto GetByStatus(core::domain::courier::Status status) const
+      -> std::vector<Courier> {
+    auto result =
+        cluster_->Execute(userver::storages::postgres::ClusterHostType::kMaster,
+                          "SELECT id, name, transport, current_location, status"
+                          "FROM delivery.couriers"
+                          "WHERE status = $1",
+                          ToString(status));
+
+    auto records = result.AsContainer<std::vector<CourierRecord>>();
+    auto couriers = records | std::ranges::views::transform(FromRecord);
+    return userver::utils::AsContainer<std::vector<Courier>>(couriers);
+  }
+
   userver::storages::postgres::ClusterPtr cluster_;
 };
 
