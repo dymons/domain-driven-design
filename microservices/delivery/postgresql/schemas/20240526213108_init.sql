@@ -23,22 +23,22 @@ CREATE TYPE weight AS
 
 CREATE TABLE IF NOT EXISTS delivery.orders
 (
-    id               TEXT  NOT NULL,
-    name             TEXT  NOT NULL,
-    transport        JSONB NOT NULL,
-    current_location JSONB NOT NULL,
-    status           TEXT  NOT NULL,
+    id                TEXT     NOT NULL,
+    status            TEXT     NOT NULL,
+    courier_id        TEXT,
+    delivery_location location NOT NULL,
+    weight            weight   NOT NULL,
 
     PRIMARY KEY (id)
 );
 
 CREATE TABLE IF NOT EXISTS delivery.couriers
 (
-    id               TEXT    NOT NULL,
-    name             TEXT    NOT NULL,
-    transport        JSONB   NOT NULL,
-    current_location JSONB   NOT NULL,
-    status           INTEGER NOT NULL,
+    id               TEXT      NOT NULL,
+    name             TEXT      NOT NULL,
+    status           TEXT      NOT NULL,
+    transport        transport NOT NULL,
+    current_location location  NOT NULL,
 
     PRIMARY KEY (id)
 );
@@ -53,7 +53,8 @@ DROP INDEX IF EXISTS idx_couriers_status;
 DROP INDEX IF EXISTS idx_orders_status;
 DROP TABLE IF EXISTS delivery.couriers;
 DROP TABLE IF EXISTS delivery.orders;
-DROP TYPE transport;
-DROP TYPE location;
+DROP TYPE IF EXISTS weight;
+DROP TYPE IF EXISTS location;
+DROP TYPE IF EXISTS transport;
 DROP SCHEMA IF EXISTS delivery;
 -- +goose StatementEnd

@@ -1,8 +1,12 @@
 #include "order_repository.hpp"
 
 #include <userver/storages/postgres/cluster.hpp>
+#include <userver/utils/exception.hpp>
 
 #include <core/domain/order/order.hpp>
+#include <core/ports/exceptions.hpp>
+
+#include "dto/order.hpp"
 
 namespace delivery::infrastructure::adapters::postgres {
 
@@ -16,22 +20,90 @@ class OrderRepository final : public core::ports::IOrderRepository {
   explicit OrderRepository(userver::storages::postgres::ClusterPtr cluster)
       : cluster_(std::move(cluster)) {}
 
-  auto Add(Order const&) const -> void final {}
+  auto Add(Order const& order) const -> void final {
+    auto const record = dto::Convert(order);
+    auto const result =
+        cluster_->Execute(userver::storages::postgres::ClusterHostType::kMaster,
+                          "INSERT INTO delivery.orders"
+                          "(id, status, courier_id, delivery_location, weight)"
+                          "VALUES ($1, $2, $3, $4, $5)",
+                          record.id, record.status, record.courier_id,
+                          record.delivery_location, record.weight);
 
-  auto Update(Order const&) const -> void final {}
-
-  auto GetById(OrderId const&) const -> Order final {
-    return Order::Create(core::domain::order::BasketId{"BasketId"},
-                         core::domain::shared_kernel::Location::kMaxLocation,
-                         core::domain::shared_kernel::Weight{0});
+    if (result.IsEmpty()) {
+      userver::utils::LogErrorAndThrow<core::ports::OrderAlreadyExists>(
+          fmt::format("Order with id={} already exists", order.GetId()));
+    }
   }
 
-  auto GetAllNotAssigned() const -> std::vector<Order> final { return {}; }
+  auto Update(Order const& order) const -> void final {
+    auto const record = dto::Convert(order);
+    auto const result = cluster_->Execute(
+        userver::storages::postgres::ClusterHostType::kMaster,
+        "UPDATE delivery.orders"
+        "SET id=$1, status=$2, courier_id=$3, delivery_location=$4, weight=$5"
+        "WHERE id = $1",
+        record.id, record.status, record.courier_id, record.delivery_location,
+        record.weight);
 
-  auto GetAllAssigned() const -> std::vector<Order> final { return {}; }
+    if (result.IsEmpty()) {
+      userver::utils::LogErrorAndThrow<core::ports::OrderNotFound>(
+          fmt::format("Not found order by id={}", order.GetId()));
+    }
+  }
+
+  auto GetById(OrderId const& order_id) const -> Order final try {
+    auto const result = cluster_->Execute(
+        userver::storages::postgres::ClusterHostType::kMaster,
+        "SELECT id, status, courier_id, delivery_location, weight"
+        "FROM delivery.orders"
+        "WHERE id = $1",
+        order_id.GetUnderlying());
+
+    return dto::Convert(
+        result.AsSingleRow<dto::Order>(userver::storages::postgres::kRowTag));
+  } catch (const userver::storages::postgres::NonSingleRowResultSet& ex) {
+    userver::utils::LogErrorAndThrow<core::ports::OrderNotFound>(ex.what());
+  }
+
+  auto GetNotAssigned() const -> std::vector<Order> final {
+    auto const result = cluster_->Execute(
+        userver::storages::postgres::ClusterHostType::kMaster,
+        "SELECT id, status, courier_id, delivery_location, weight"
+        "FROM delivery.orders"
+        "WHERE status != $1",
+        core::domain::order::OrderStatus::kAssigned.ToString());
+
+    auto const records = result.AsContainer<std::vector<dto::Order>>();
+    auto orders = std::vector<Order>{};
+    orders.reserve(records.size());
+    for (auto const& record : records) {
+      orders.push_back(dto::Convert(record));
+    }
+
+    return orders;
+  }
+
+  auto GetAssigned() const -> std::vector<Order> final {
+    auto const result = cluster_->Execute(
+        userver::storages::postgres::ClusterHostType::kMaster,
+        "SELECT id, status, courier_id, delivery_location, weight"
+        "FROM delivery.orders"
+        "WHERE status = $1",
+        core::domain::order::OrderStatus::kAssigned.ToString());
+
+    auto const records = result.AsContainer<std::vector<dto::Order>>();
+    auto orders = std::vector<Order>{};
+    orders.reserve(records.size());
+    for (auto const& record : records) {
+      orders.push_back(dto::Convert(record));
+    }
+
+    return orders;
+  }
 
  private:
-  userver::storages::postgres::ClusterPtr cluster_;
+  const userver::storages::postgres::ClusterPtr cluster_;
 };
 
 auto MakeOrderRepository(userver::storages::postgres::ClusterPtr cluster)

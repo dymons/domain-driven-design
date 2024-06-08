@@ -3,6 +3,7 @@
 #include <userver/utils/exception.hpp>
 
 #include <core/domain/courier/courier.hpp>
+#include <utility>
 #include "exceptions.hpp"
 
 namespace delivery::core::domain::order {
@@ -12,6 +13,14 @@ auto Order::Create(BasketId basket_id,
                    shared_kernel::Weight weight) -> Order {
   return {OrderId{std::move(basket_id).GetUnderlying()}, OrderStatus::kCreated,
           std::nullopt, delivery_location, weight};
+}
+
+auto Order::Hydrate(OrderId id, OrderStatus status,
+                    std::optional<courier::CourierId> courier_id,
+                    shared_kernel::Location delivery_location,
+                    shared_kernel::Weight weight) -> Order {
+  return {std::move(id), status, std::move(courier_id), delivery_location,
+          weight};
 }
 
 auto Order::GetId() const noexcept -> OrderId { return id_; }

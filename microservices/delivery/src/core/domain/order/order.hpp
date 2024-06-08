@@ -23,7 +23,8 @@ class Order {
 
   // Constructors
 
-  Order(OrderId id, OrderStatus status, std::optional<courier::CourierId> courier_id,
+  Order(OrderId id, OrderStatus status,
+        std::optional<courier::CourierId> courier_id,
         shared_kernel::Location delivery_location, shared_kernel::Weight weight)
       : id_(std::move(id)),
         status_(status),
@@ -35,6 +36,12 @@ class Order {
   [[nodiscard]] static auto Create(BasketId basket_id,
                                    shared_kernel::Location delivery_location,
                                    shared_kernel::Weight weight) -> Order;
+
+  [[nodiscard]] static auto Hydrate(
+      OrderId id, OrderStatus status,
+      std::optional<courier::CourierId> courier_id,
+      shared_kernel::Location delivery_location,
+      shared_kernel::Weight weight) -> Order;
 
   // Observers
 

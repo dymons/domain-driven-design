@@ -27,8 +27,8 @@ class IOrderRepository {
   virtual auto Add(Order const&) const -> void = 0;
   virtual auto Update(Order const&) const -> void = 0;
   virtual auto GetById(OrderId const&) const -> Order = 0;
-  virtual auto GetAllNotAssigned() const -> std::vector<Order> = 0;
-  virtual auto GetAllAssigned() const -> std::vector<Order> = 0;
+  virtual auto GetNotAssigned() const -> std::vector<Order> = 0;
+  virtual auto GetAssigned() const -> std::vector<Order> = 0;
 };
 
 }  // namespace delivery::core::ports
