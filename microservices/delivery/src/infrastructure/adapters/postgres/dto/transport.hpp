@@ -4,6 +4,8 @@
 
 #include <userver/storages/postgres/io/user_types.hpp>
 
+#include "weight.hpp"
+
 namespace delivery::core::domain::courier {
 class Transport;
 }  // namespace delivery::core::domain::courier
@@ -14,7 +16,7 @@ struct Transport {
   int id{};
   std::string name{};
   int speed{};
-  int capacity{};
+  Weight capacity{};
 };
 
 auto Convert(core::domain::courier::Transport const&) -> Transport;

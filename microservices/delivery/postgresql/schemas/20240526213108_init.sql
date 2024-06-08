@@ -16,6 +16,11 @@ CREATE TYPE location AS
     y INTEGER
 );
 
+CREATE TYPE weight AS
+(
+    value INTEGER
+);
+
 CREATE TABLE IF NOT EXISTS delivery.orders
 (
     id               TEXT  NOT NULL,
