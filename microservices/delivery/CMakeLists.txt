@@ -23,43 +23,12 @@ userver_setup_environment()
 set(CMAKE_CXX_STANDARD 23)
 
 # Common sources
-#file(GLOB_RECURSE DSAC_LIBRARY_SOURCES "src/*.hpp" "src/*.cpp" "src/*.S")
-#file(GLOB_RECURSE DSAC_LIBRARY_HEADERS "include/*.hpp")
+file(GLOB_RECURSE ${PROJECT_NAME}_SOURCES "src/*.hpp" "src/*.cpp")
+list(FILTER ${PROJECT_NAME}_SOURCES EXCLUDE REGEX ".*_test\\.cpp$")
+list(FILTER ${PROJECT_NAME}_SOURCES EXCLUDE REGEX ".*main\\.cpp$")
 
-add_library(${PROJECT_NAME}_objs OBJECT
-    src/hello.hpp
-    src/hello.cpp
-    src/core/domain/shared_kernel/weight.hpp
-    src/core/domain/shared_kernel/weight.cpp
-    src/core/domain/shared_kernel/location.hpp
-    src/core/domain/shared_kernel/location.cpp
-    src/core/domain/shared_kernel/exceptions.hpp
-    src/core/domain/shared_kernel/exceptions.cpp
-    src/core/domain/courier/courier.hpp
-    src/core/domain/courier/courier.cpp
-    src/core/domain/courier/transport.hpp
-    src/core/domain/courier/transport.cpp
-    src/core/domain/order/order.hpp
-    src/core/domain/order/order.cpp
-    src/core/ports/icourier_repository.hpp
-    src/core/ports/icourier_repository.cpp
-    src/core/ports/iorder_repository.hpp
-    src/core/ports/iorder_repository.cpp
-    src/core/ports/exceptions.hpp
-    src/core/ports/exceptions.cpp
-    src/infrastructure/adapters/postgres/courier_repository.hpp
-    src/infrastructure/adapters/postgres/courier_repository.cpp
-    src/infrastructure/adapters/postgres/order_repository.hpp
-    src/infrastructure/adapters/postgres/order_repository.cpp
-    src/infrastructure/adapters/postgres/dto/location.hpp
-    src/infrastructure/adapters/postgres/dto/location.cpp
-    src/infrastructure/adapters/postgres/dto/transport.hpp
-    src/infrastructure/adapters/postgres/dto/transport.cpp
-    src/infrastructure/adapters/postgres/dto/courier.hpp
-    src/infrastructure/adapters/postgres/dto/courier.cpp
-    src/infrastructure/adapters/postgres/dto/weight.hpp
-    src/infrastructure/adapters/postgres/dto/weight.cpp
-)
+add_library(${PROJECT_NAME}_objs OBJECT ${${PROJECT_NAME}_SOURCES})
+
 target_link_libraries(${PROJECT_NAME}_objs PUBLIC userver-core)
 target_include_directories(${PROJECT_NAME}_objs PUBLIC src)
 target_link_libraries(${PROJECT_NAME}_objs PUBLIC userver::postgresql)

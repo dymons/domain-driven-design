@@ -10,14 +10,14 @@ namespace {
 
 constexpr userver::utils::TrivialBiMap kOrderStatusMapping = [](auto selector) {
   return selector()
-      .Case(std::string_view{"created"}, OrderStatus::Created)
-      .Case(std::string_view{"assigned"}, OrderStatus::Assigned)
-      .Case(std::string_view{"completed"}, OrderStatus::Completed);
+      .Case(std::string_view{"created"}, Status::Created)
+      .Case(std::string_view{"assigned"}, Status::Assigned)
+      .Case(std::string_view{"completed"}, Status::Completed);
 };
 
 }  // namespace
 
-auto ToString(OrderStatus const status) -> std::string {
+auto ToString(Status const status) -> std::string {
   auto const status_as_string = kOrderStatusMapping.TryFindBySecond(status);
   if (not status_as_string.has_value()) {
     throw ArgumentException{"Cant convert status std::string"};
@@ -26,7 +26,7 @@ auto ToString(OrderStatus const status) -> std::string {
   return std::string{status_as_string.value()};
 }
 
-auto FromString(std::string_view const status) -> OrderStatus {
+auto FromString(std::string_view const status) -> Status {
   auto const status_as_enum = kOrderStatusMapping.TryFindByFirst(status);
   if (not status_as_enum.has_value()) {
     throw ArgumentException{"Cant convert to OrderStatus"};
