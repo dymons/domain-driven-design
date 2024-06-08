@@ -22,13 +22,13 @@ class Location {
   static const Location kMinLocation;
   static const Location kMaxLocation;
 
-  [[nodiscard]] static auto Create(X x, Y y) -> Location;
+  [[nodiscard]] static auto Create(X, Y) -> Location;
 
   // Observers
 
-  auto GetX() const noexcept -> X;
-  auto GetY() const noexcept -> Y;
-  auto DistanceTo(Location const&) const noexcept -> Distance;
+  [[nodiscard]] auto GetX() const noexcept -> X;
+  [[nodiscard]] auto GetY() const noexcept -> Y;
+  [[nodiscard]] auto DistanceTo(Location const&) const noexcept -> Distance;
 
   auto operator<=>(Location const&) const -> std::strong_ordering = default;
 };

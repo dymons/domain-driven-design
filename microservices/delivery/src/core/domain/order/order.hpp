@@ -33,27 +33,24 @@ class Order {
         weight_(weight) {}
 
  public:
-  [[nodiscard]] static auto Create(BasketId basket_id,
-                                   Location delivery_location, Weight weight)
-      -> Order;
+  [[nodiscard]] static auto Create(BasketId, Location, Weight) -> Order;
 
-  [[nodiscard]] static auto Hydrate(
-      OrderId id, OrderStatus status,
-      std::optional<courier::CourierId> courier_id, Location delivery_location,
-      Weight weight) -> Order;
+  [[nodiscard]] static auto Hydrate(OrderId, OrderStatus,
+                                    std::optional<courier::CourierId>, Location,
+                                    Weight) -> Order;
 
   // Observers
 
-  auto GetId() const noexcept -> OrderId;
-  auto GetStatus() const noexcept -> OrderStatus;
+  [[nodiscard]] auto GetId() const noexcept -> OrderId;
+  [[nodiscard]] auto GetStatus() const noexcept -> OrderStatus;
   auto GetCourierId() const noexcept -> std::optional<courier::CourierId>;
-  auto GetDeliveryLocation() const noexcept -> Location;
-  auto GetWeight() const noexcept -> Weight;
-  auto IsCourierAssigned() const noexcept -> bool;
+  [[nodiscard]] auto GetDeliveryLocation() const noexcept -> Location;
+  [[nodiscard]] auto GetWeight() const noexcept -> Weight;
+  [[nodiscard]] auto IsCourierAssigned() const noexcept -> bool;
 
   // Modifiers
 
-  auto AssignCourier(courier::Courier& courier) -> void;
+  auto AssignCourier(courier::Courier&) -> void;
   auto Complete() -> void;
 };
 
