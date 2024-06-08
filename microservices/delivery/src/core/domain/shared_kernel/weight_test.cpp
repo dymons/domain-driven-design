@@ -12,7 +12,7 @@ UTEST(WeightShould, BeCorrectWhenParamsIsCorrectOnCreated) {
   auto const weight = Weight{10};
 
   // Assert
-  EXPECT_EQ(weight.GetWeight(), 10);
+  ASSERT_EQ(weight.GetWeight(), 10);
 }
 
 UTEST(WeightShould, ThrowExceptionWhenParamsIsInCorrectOnCreated) {
@@ -20,7 +20,7 @@ UTEST(WeightShould, ThrowExceptionWhenParamsIsInCorrectOnCreated) {
 
   // Act & Assert
   for (auto const weight : {0, -1}) {
-    EXPECT_THROW(auto const _ = Weight{weight}, ArgumentException);
+    ASSERT_THROW(auto const _ = Weight{weight}, ArgumentException);
   }
 }
 
@@ -33,7 +33,7 @@ UTEST(WeightShould, BeEqualWhenAllPropertiesIsEqual) {
   auto const result = first == second;
 
   // Assert
-  EXPECT_TRUE(result);
+  ASSERT_TRUE(result);
 }
 
 UTEST(WeightShould, BeNotEqualWhenAllPropertiesIsEqual) {
@@ -45,7 +45,7 @@ UTEST(WeightShould, BeNotEqualWhenAllPropertiesIsEqual) {
   auto const result = first == second;
 
   // Assert
-  EXPECT_FALSE(result);
+  ASSERT_FALSE(result);
 }
 
 UTEST(WeightShould, CanCompareMoreThen) {
@@ -57,7 +57,7 @@ UTEST(WeightShould, CanCompareMoreThen) {
   auto const result = first > second;
 
   // Assert
-  EXPECT_TRUE(result);
+  ASSERT_TRUE(result);
 }
 
 UTEST(WeightShould, CanCompareLessThen) {
@@ -69,7 +69,7 @@ UTEST(WeightShould, CanCompareLessThen) {
   auto const result = first < second;
 
   // Assert
-  EXPECT_FALSE(result);
+  ASSERT_FALSE(result);
 }
 
 }  // namespace delivery::core::domain::shared_kernel

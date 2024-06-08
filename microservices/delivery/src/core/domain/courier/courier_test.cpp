@@ -21,9 +21,9 @@ UTEST(CourierShould, BeConstructibleWithRequiredProperties) {
   auto const courier = Courier::Create(MockCourierName(), MockTransport());
 
   // Assert
-  EXPECT_TRUE(courier.GetStatus().IsNotAvailable());
-  EXPECT_EQ(courier.GetName(), MockCourierName());
-  EXPECT_EQ(courier.GetCurrentLocation(),
+  ASSERT_TRUE(courier.GetStatus().IsNotAvailable());
+  ASSERT_EQ(courier.GetName(), MockCourierName());
+  ASSERT_EQ(courier.GetCurrentLocation(),
             shared_kernel::Location::kMinLocation);
 }
 
@@ -32,7 +32,7 @@ UTEST(CourierShould, ThrowWhenCreateCourierWithEmptyName) {
   auto courier_name = CourierName{""};
 
   // Act & Assert
-  EXPECT_THROW(auto const _ = Courier::Create(courier_name, MockTransport()),
+  ASSERT_THROW(auto const _ = Courier::Create(courier_name, MockTransport()),
                ArgumentException);
 }
 
@@ -45,7 +45,7 @@ UTEST(CourierShould, MoveToLocation) {
                                                  shared_kernel::Y{5}));
 
   // Assert
-  EXPECT_EQ(courier.GetCurrentLocation(),
+  ASSERT_EQ(courier.GetCurrentLocation(),
             shared_kernel::Location::Create(shared_kernel::X{3},
                                             shared_kernel::Y{1}));
 }
@@ -58,7 +58,7 @@ UTEST(CourierShould, CanStartWork) {
   courier.StartWork();
 
   // Assert
-  EXPECT_TRUE(courier.GetStatus().IsReady());
+  ASSERT_TRUE(courier.GetStatus().IsReady());
 }
 
 UTEST(CourierShould, CanStopWork) {
@@ -70,7 +70,7 @@ UTEST(CourierShould, CanStopWork) {
   courier.StopWork();
 
   // Assert
-  EXPECT_TRUE(courier.GetStatus().IsNotAvailable());
+  ASSERT_TRUE(courier.GetStatus().IsNotAvailable());
 }
 
 UTEST(CourierShould, CanCalculateTimeToLocation) {
@@ -82,7 +82,7 @@ UTEST(CourierShould, CanCalculateTimeToLocation) {
       courier.CalculateTimeToPoint(shared_kernel::Location::kMaxLocation);
 
   // Assert
-  EXPECT_EQ(time, Time{18});
+  ASSERT_EQ(time, Time{18});
 }
 
 }  // namespace delivery::core::domain::courier

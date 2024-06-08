@@ -16,8 +16,8 @@ UTEST(LocationShould, BeCorrectWhenParamsIsCorrectOnCreated) {
       auto const location = Location::Create(X{x}, Y{y});
 
       // Assert
-      EXPECT_EQ(location.GetX(), X{x});
-      EXPECT_EQ(location.GetY(), Y{y});
+      ASSERT_EQ(location.GetX(), X{x});
+      ASSERT_EQ(location.GetY(), Y{y});
     }
   }
 }
@@ -33,7 +33,7 @@ UTEST(LocationShould, ThrowExceptionWhenParamsIsInCorrectOnCreated) {
 
   // Act & Assert
   for (auto const location : kUnexpectedLocations) {
-    EXPECT_THROW(
+    ASSERT_THROW(
         auto const _ = Location::Create(X{location.first}, Y{location.second}),
         ArgumentException);
   }
@@ -48,7 +48,7 @@ UTEST(LocationShould, BeEqualWhenAllPropertiesIsEqual) {
   auto const result = first == second;
 
   // Assert
-  EXPECT_TRUE(result);
+  ASSERT_TRUE(result);
 }
 
 UTEST(LocationShould, CanCompareMoreThen) {
@@ -60,7 +60,7 @@ UTEST(LocationShould, CanCompareMoreThen) {
   auto const result = first > second;
 
   // Assert
-  EXPECT_TRUE(result);
+  ASSERT_TRUE(result);
 }
 
 UTEST(LocationShould, CanCompareMoreLess) {
@@ -72,7 +72,7 @@ UTEST(LocationShould, CanCompareMoreLess) {
   auto const result = first < second;
 
   // Assert
-  EXPECT_FALSE(result);
+  ASSERT_FALSE(result);
 }
 
 UTEST(LocationShould, CanCalculateDistanceToOtherLocation) {
@@ -84,7 +84,7 @@ UTEST(LocationShould, CanCalculateDistanceToOtherLocation) {
   auto const distance = first.DistanceTo(second);
 
   // Assert
-  EXPECT_EQ(distance, Distance{10});
+  ASSERT_EQ(distance, Distance{10});
 }
 
 UTEST(LocationShould, HaveZeroDistanceWhenLocationIsEqual) {
@@ -95,7 +95,7 @@ UTEST(LocationShould, HaveZeroDistanceWhenLocationIsEqual) {
   auto const distance = location.DistanceTo(location);
 
   // Assert
-  EXPECT_EQ(distance, Distance{0});
+  ASSERT_EQ(distance, Distance{0});
 }
 
 UTEST(LocationShould, DistanceToNotDependOrderArguments) {
@@ -108,7 +108,7 @@ UTEST(LocationShould, DistanceToNotDependOrderArguments) {
   auto const distance2 = second.DistanceTo(first);
 
   // Assert
-  EXPECT_EQ(distance1, distance2);
+  ASSERT_EQ(distance1, distance2);
 }
 
 }  // namespace delivery::core::domain::shared_kernel
