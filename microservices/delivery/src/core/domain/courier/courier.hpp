@@ -26,17 +26,9 @@ class Courier {
         status_(status) {}
 
  public:
-  /*!
-    \brief
-        Factory method, constructs Courier with name and transport
-  */
   [[nodiscard]] static auto Create(CourierName name,
                                    Transport transport) -> Courier;
 
-  /*!
-    \brief
-        Hydrate method, restore object without validation
-  */
   [[nodiscard]] static auto Hydrate(CourierId id, CourierName name,
                                     Transport transport,
                                     shared_kernel::Location current_location,
