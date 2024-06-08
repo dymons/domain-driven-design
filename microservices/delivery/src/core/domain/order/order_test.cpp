@@ -44,11 +44,11 @@ UTEST(OrderShould, BeConstructibleWithRequiredProperties) {
   auto const order = MockOrder();
 
   // Assert
-  EXPECT_EQ(order.GetId(), OrderId{MockBasketId().GetUnderlying()});
-  EXPECT_EQ(order.GetStatus(), Status::Created);
-  EXPECT_EQ(order.GetCourierId(), std::nullopt);
-  EXPECT_EQ(order.GetDeliveryLocation(), MockDeliveryLocation());
-  EXPECT_EQ(order.GetWeight(), MockWeight());
+  ASSERT_EQ(order.GetId(), OrderId{MockBasketId().GetUnderlying()});
+  ASSERT_EQ(order.GetStatus(), Status::Created);
+  ASSERT_EQ(order.GetCourierId(), std::nullopt);
+  ASSERT_EQ(order.GetDeliveryLocation(), MockDeliveryLocation());
+  ASSERT_EQ(order.GetWeight(), MockWeight());
 }
 
 UTEST(OrderShould, AssignCourier) {
@@ -60,8 +60,8 @@ UTEST(OrderShould, AssignCourier) {
   order.AssignCourier(courier);
 
   // Assert
-  EXPECT_TRUE(order.IsCourierAssigned());
-  EXPECT_TRUE(courier.GetStatus().IsBusy());
+  ASSERT_TRUE(order.IsCourierAssigned());
+  ASSERT_TRUE(courier.GetStatus().IsBusy());
 }
 
 UTEST(OrderShould, ThrowWhenAssignBusyCourier) {
@@ -72,7 +72,7 @@ UTEST(OrderShould, ThrowWhenAssignBusyCourier) {
   // Act
 
   // Assert
-  EXPECT_THROW(order.AssignCourier(courier), CantAssignOrderToBusyCourier);
+  ASSERT_THROW(order.AssignCourier(courier), CantAssignOrderToBusyCourier);
 }
 
 UTEST(OrderShould, CompleteOrderWhenOrderIsAssigned) {
@@ -86,7 +86,7 @@ UTEST(OrderShould, CompleteOrderWhenOrderIsAssigned) {
   order.Complete();
 
   // Assert
-  EXPECT_EQ(order.GetStatus(), Status::Completed);
+  ASSERT_EQ(order.GetStatus(), Status::Completed);
 }
 
 UTEST(OrderShould, ThrowWhenCompleteOrderWithStatusCreated) {
@@ -94,8 +94,8 @@ UTEST(OrderShould, ThrowWhenCompleteOrderWithStatusCreated) {
   auto order = MockOrder();
 
   // Act & Assert
-  EXPECT_EQ(order.GetStatus(), Status::Created);
-  EXPECT_THROW(order.Complete(), CantCompletedNotAssignedOrder);
+  ASSERT_EQ(order.GetStatus(), Status::Created);
+  ASSERT_THROW(order.Complete(), CantCompletedNotAssignedOrder);
 }
 
 UTEST(OrderShould, DoNothingWhenCompleteOrderWithStatusCompleted) {
@@ -109,7 +109,7 @@ UTEST(OrderShould, DoNothingWhenCompleteOrderWithStatusCompleted) {
   order.Complete();
 
   // Assert
-  EXPECT_EQ(order.GetStatus(), Status::Completed);
+  ASSERT_EQ(order.GetStatus(), Status::Completed);
 }
 
 }  // namespace delivery::core::domain::order
