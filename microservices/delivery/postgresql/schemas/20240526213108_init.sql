@@ -48,5 +48,7 @@ DROP INDEX IF EXISTS idx_couriers_status;
 DROP INDEX IF EXISTS idx_orders_status;
 DROP TABLE IF EXISTS delivery.couriers;
 DROP TABLE IF EXISTS delivery.orders;
+DROP TYPE transport;
+DROP TYPE location;
 DROP SCHEMA IF EXISTS delivery;
 -- +goose StatementEnd
