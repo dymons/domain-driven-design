@@ -26,12 +26,11 @@ set(CMAKE_CXX_STANDARD 23)
 file(GLOB_RECURSE ${PROJECT_NAME}_SOURCES "src/*.hpp" "src/*.cpp")
 list(FILTER ${PROJECT_NAME}_SOURCES EXCLUDE REGEX ".*_test\\.cpp$")
 list(FILTER ${PROJECT_NAME}_SOURCES EXCLUDE REGEX ".*main\\.cpp$")
-
 add_library(${PROJECT_NAME}_objs OBJECT ${${PROJECT_NAME}_SOURCES})
-
-target_link_libraries(${PROJECT_NAME}_objs PUBLIC userver-core)
 target_include_directories(${PROJECT_NAME}_objs PUBLIC src)
-target_link_libraries(${PROJECT_NAME}_objs PUBLIC userver::postgresql)
+
+# Dependencies
+target_link_libraries(${PROJECT_NAME}_objs PUBLIC userver-core userver::postgresql)
 
 # The Service
 add_executable(${PROJECT_NAME} src/main.cpp)
