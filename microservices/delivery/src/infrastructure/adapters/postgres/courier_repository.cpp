@@ -9,6 +9,7 @@
 #include <core/domain/courier/courier.hpp>
 #include <core/ports/exceptions.hpp>
 
+#include "dto/courier.hpp"
 #include "dto/location.hpp"
 #include "dto/transport.hpp"
 
@@ -18,15 +19,7 @@ namespace delivery::infrastructure::adapters::postgres {
 
 namespace {
 
-struct CourierRecord final {
-  std::string id;
-  std::string name;
-  dto::Transport transport;
-  dto::Location current_location;
-  std::string status;
-};
-
-core::domain::courier::Courier FromRecord(CourierRecord const& record) {
+core::domain::courier::Courier FromRecord(dto::Courier const& record) {
   return core::domain::courier::Courier::Hydrate(
       core::domain::courier::CourierId{record.id},
       core::domain::courier::CourierName{record.name},
@@ -41,10 +34,11 @@ core::domain::courier::Courier FromRecord(CourierRecord const& record) {
       core::domain::courier::FromString(record.status));
 }
 
-CourierRecord ToRecord(core::domain::courier::Courier const& courier) {
+dto::Courier ToRecord(core::domain::courier::Courier const& courier) {
   return {
       .id = courier.GetId().GetUnderlying(),
       .name = courier.GetName().GetUnderlying(),
+      .status = ToString(courier.GetStatus()),
       .transport =
           dto::Transport{
               .id = courier.GetTransport().GetId().GetUnderlying(),
@@ -57,7 +51,6 @@ CourierRecord ToRecord(core::domain::courier::Courier const& courier) {
               .x = courier.GetCurrentLocation().GetX().GetUnderlying(),
               .y = courier.GetCurrentLocation().GetY().GetUnderlying(),
           },
-      .status = ToString(courier.GetStatus()),
   };
 }
 
@@ -113,8 +106,8 @@ class CourierRepository final : public core::ports::ICourierRepository {
                           "WHERE id = $1",
                           courier_id.GetUnderlying());
 
-    return FromRecord(result.AsSingleRow<CourierRecord>(
-        userver::storages::postgres::kRowTag));
+    return FromRecord(
+        result.AsSingleRow<dto::Courier>(userver::storages::postgres::kRowTag));
   } catch (const userver::storages::postgres::NonSingleRowResultSet& ex) {
     userver::utils::LogErrorAndThrow<core::ports::CourierNotFound>(ex.what());
   }
@@ -137,7 +130,7 @@ class CourierRepository final : public core::ports::ICourierRepository {
                           "WHERE status = $1",
                           ToString(status));
 
-    auto records = result.AsContainer<std::vector<CourierRecord>>();
+    auto records = result.AsContainer<std::vector<dto::Courier>>();
     auto couriers = records | std::ranges::views::transform(FromRecord);
     return userver::utils::AsContainer<std::vector<Courier>>(couriers);
   }
