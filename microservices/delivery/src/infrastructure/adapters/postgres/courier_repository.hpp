@@ -7,7 +7,8 @@
 
 namespace delivery::infrastructure::adapters::postgres {
 
-[[nodiscard]] userver::utils::SharedRef<const core::ports::ICourierRepository>
-    MakeCourierRepository(userver::storages::postgres::ClusterPtr);
+[[nodiscard]] auto MakeCourierRepository(
+    userver::storages::postgres::ClusterPtr)
+    -> userver::utils::SharedRef<const core::ports::ICourierRepository>;
 
 }  // namespace delivery::infrastructure::adapters::postgres
