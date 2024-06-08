@@ -38,12 +38,8 @@ target_link_libraries(${PROJECT_NAME} PRIVATE ${PROJECT_NAME}_objs)
 
 
 # Unit Tests
-add_executable(${PROJECT_NAME}_unittest
-    src/core/domain/shared_kernel/weight_test.cpp
-    src/core/domain/shared_kernel/location_test.cpp
-    src/core/domain/order/order_test.cpp
-    src/core/domain/courier/courier_test.cpp
-)
+file(GLOB_RECURSE ${PROJECT_NAME}_UNITTESTS "src/*_test.cpp")
+add_executable(${PROJECT_NAME}_unittest ${${PROJECT_NAME}_UNITTESTS})
 target_link_libraries(${PROJECT_NAME}_unittest PRIVATE ${PROJECT_NAME}_objs userver-utest)
 add_google_tests(${PROJECT_NAME}_unittest)
 
