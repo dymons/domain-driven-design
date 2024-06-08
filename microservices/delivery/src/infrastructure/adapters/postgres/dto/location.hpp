@@ -4,9 +4,9 @@
 
 namespace delivery::infrastructure::adapters::postgres::dto {
 
-struct Location {
-  int x;
-  int y;
+struct Location final {
+  int x{};
+  int y{};
 };
 
 }  // namespace delivery::infrastructure::adapters::postgres::dto
