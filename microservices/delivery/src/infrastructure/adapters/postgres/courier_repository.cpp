@@ -149,7 +149,7 @@ class CourierRepository final : public core::ports::ICourierRepository {
     return userver::utils::AsContainer<std::vector<Courier>>(couriers);
   }
 
-  userver::storages::postgres::ClusterPtr cluster_;
+  const userver::storages::postgres::ClusterPtr cluster_;
 };
 
 userver::utils::SharedRef<const core::ports::ICourierRepository>
