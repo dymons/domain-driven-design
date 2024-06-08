@@ -8,11 +8,7 @@ class Weight {
   int value_;
 
  public:
-  // Constructors
-
   Weight(int value);
-
-  // Observers
 
   auto GetWeight() const noexcept -> int;
 

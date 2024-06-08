@@ -1,6 +1,12 @@
 cmake_minimum_required(VERSION 3.12)
 project(delivery CXX)
 
+# Adding userver dependency
+find_package(userver COMPONENTS core postgresql QUIET)
+
+# Enable userver libraries that are needed in this project
+set(USERVER_FEATURE_POSTGRESQL ON CACHE BOOL "" FORCE)
+
 # Compatibility mode: some systems don't support these features
 set(USERVER_FEATURE_CRYPTOPP_BLAKE2 OFF CACHE BOOL "" FORCE)
 set(USERVER_FEATURE_GRPC_CHANNELZ OFF CACHE BOOL "" FORCE)
@@ -32,9 +38,24 @@ add_library(${PROJECT_NAME}_objs OBJECT
     src/core/domain/courier/transport.cpp
     src/core/domain/order/order.hpp
     src/core/domain/order/order.cpp
+    src/core/ports/icourier_repository.hpp
+    src/core/ports/icourier_repository.cpp
+    src/core/ports/iorder_repository.hpp
+    src/core/ports/iorder_repository.cpp
+    src/core/ports/exceptions.hpp
+    src/core/ports/exceptions.cpp
+    src/infrastructure/adapters/postgres/courier_repository.hpp
+    src/infrastructure/adapters/postgres/courier_repository.cpp
+    src/infrastructure/adapters/postgres/order_repository.hpp
+    src/infrastructure/adapters/postgres/order_repository.cpp
+    src/infrastructure/adapters/postgres/dto/location.hpp
+    src/infrastructure/adapters/postgres/dto/location.cpp
+    src/infrastructure/adapters/postgres/dto/transport.hpp
+    src/infrastructure/adapters/postgres/dto/transport.cpp
 )
 target_link_libraries(${PROJECT_NAME}_objs PUBLIC userver-core)
 target_include_directories(${PROJECT_NAME}_objs PUBLIC src)
+target_link_libraries(${PROJECT_NAME}_objs PUBLIC userver::postgresql)
 
 # The Service
 add_executable(${PROJECT_NAME} src/main.cpp)

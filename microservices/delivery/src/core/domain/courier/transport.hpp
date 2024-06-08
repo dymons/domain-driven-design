@@ -18,6 +18,9 @@ class Transport {
       : id_(id), name_(std::move(name)), speed_(speed), capacity_(capacity) {}
 
  public:
+  static auto Hydrate(TransportId id, TransportName name, Speed speed,
+                      shared_kernel::Weight capacity) -> Transport;
+
   static const Transport kPedestrian;
   static const Transport kBicycle;
   static const Transport kScooter;

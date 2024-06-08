@@ -14,9 +14,13 @@ const Transport Transport::kScooter =
     Transport{TransportId{3}, TransportName{"scooter"}, Speed{3},
               shared_kernel::Weight{6}};
 
-const Transport Transport::kCar =
-    Transport{TransportId{4}, TransportName{"car"}, Speed{4},
-              shared_kernel::Weight{8}};
+const Transport Transport::kCar = Transport{
+    TransportId{4}, TransportName{"car"}, Speed{4}, shared_kernel::Weight{8}};
+
+auto Transport::Hydrate(TransportId id, TransportName name, Speed speed,
+                        shared_kernel::Weight capacity) -> Transport {
+  return Transport{id, std::move(name), speed, capacity};
+}
 
 auto Transport::GetId() const -> TransportId { return id_; }
 auto Transport::GetName() const -> TransportName { return name_; }
