@@ -16,14 +16,14 @@ namespace delivery::core::domain::order {
 
 class Order {
   OrderId id_;
-  Status status_;
+  OrderStatus status_;
   std::optional<courier::CourierId> courier_id_;
   shared_kernel::Location delivery_location_;
   shared_kernel::Weight weight_;
 
   // Constructors
 
-  Order(OrderId id, Status status, std::optional<courier::CourierId> courier_id,
+  Order(OrderId id, OrderStatus status, std::optional<courier::CourierId> courier_id,
         shared_kernel::Location delivery_location, shared_kernel::Weight weight)
       : id_(std::move(id)),
         status_(status),
@@ -39,7 +39,7 @@ class Order {
   // Observers
 
   auto GetId() const noexcept -> OrderId;
-  auto GetStatus() const noexcept -> Status;
+  auto GetStatus() const noexcept -> OrderStatus;
   auto GetCourierId() const noexcept -> std::optional<courier::CourierId>;
   auto GetDeliveryLocation() const noexcept -> shared_kernel::Location;
   auto GetWeight() const noexcept -> shared_kernel::Weight;

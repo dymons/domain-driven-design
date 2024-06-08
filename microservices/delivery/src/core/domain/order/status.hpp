@@ -4,15 +4,35 @@
 
 namespace delivery::core::domain::order {
 
-// TODO (dymons) Use smart enum
+class OrderStatus {
+  enum class Status {
+    Created,
+    Assigned,
+    Completed,
+  };
 
-enum class Status {
-  Created,
-  Assigned,
-  Completed,
+  // Constructors
+
+  explicit OrderStatus(Status status);
+
+ public:
+  static const OrderStatus kCreated;
+  static const OrderStatus kAssigned;
+  static const OrderStatus kCompleted;
+
+  [[nodiscard]] static auto FromString(std::string_view) -> OrderStatus;
+  [[nodiscard]] auto ToString() const -> std::string;
+
+  // Observers
+
+  [[nodiscard]] auto IsCreated() const noexcept -> bool;
+  [[nodiscard]] auto IsAssigned() const noexcept -> bool;
+  [[nodiscard]] auto IsCompleted() const noexcept -> bool;
+
+  auto operator<=>(OrderStatus const&) const = default;
+
+ private:
+  Status status_;
 };
-
-[[nodiscard]] auto ToString(Status status) -> std::string;
-[[nodiscard]] auto FromString(std::string_view status) -> Status;
 
 }  // namespace delivery::core::domain::order
