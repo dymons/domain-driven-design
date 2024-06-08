@@ -6,8 +6,8 @@ namespace delivery::infrastructure::adapters::postgres::dto {
 
 auto Convert(core::domain::courier::Courier const& courier) -> Courier {
   return {
-      .id = courier.GetId().GetUnderlying(),
-      .name = courier.GetName().GetUnderlying(),
+      .id = courier.GetId(),
+      .name = courier.GetName(),
       .status = ToString(courier.GetStatus()),
       .transport = dto::Convert(courier.GetTransport()),
       .current_location = dto::Convert(courier.GetCurrentLocation()),

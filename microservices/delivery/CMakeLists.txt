@@ -23,6 +23,9 @@ userver_setup_environment()
 set(CMAKE_CXX_STANDARD 23)
 
 # Common sources
+#file(GLOB_RECURSE DSAC_LIBRARY_SOURCES "src/*.hpp" "src/*.cpp" "src/*.S")
+#file(GLOB_RECURSE DSAC_LIBRARY_HEADERS "include/*.hpp")
+
 add_library(${PROJECT_NAME}_objs OBJECT
     src/hello.hpp
     src/hello.cpp

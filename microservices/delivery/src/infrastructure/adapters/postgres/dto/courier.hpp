@@ -2,6 +2,8 @@
 
 #include <string>
 
+#include <core/domain/courier/strong_typedefs.hpp>
+
 #include "location.hpp"
 #include "transport.hpp"
 
@@ -12,8 +14,8 @@ class Courier;
 namespace delivery::infrastructure::adapters::postgres::dto {
 
 struct Courier final {
-  std::string id{};
-  std::string name{};
+  core::domain::courier::CourierId id{};
+  core::domain::courier::CourierName name{};
   std::string status{};
   Transport transport{};
   Location current_location{};
