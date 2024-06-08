@@ -5,7 +5,7 @@
 #include "exceptions.hpp"
 #include "location.hpp"
 
-namespace delivery::core::domain::shared_kernel {
+namespace delivery::core::domain {
 
 UTEST(LocationShould, BeCorrectWhenParamsIsCorrectOnCreated) {
   // Arrange
@@ -111,4 +111,4 @@ UTEST(LocationShould, DistanceToNotDependOrderArguments) {
   ASSERT_EQ(distance1, distance2);
 }
 
-}  // namespace delivery::core::domain::shared_kernel
+}  // namespace delivery::core::domain

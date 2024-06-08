@@ -2,7 +2,7 @@
 
 #include <compare>
 
-namespace delivery::core::domain::shared_kernel {
+namespace delivery::core::domain {
 
 class Weight {
   int value_;
@@ -15,4 +15,4 @@ class Weight {
   auto operator<=>(Weight const&) const -> std::strong_ordering = default;
 };
 
-}  // namespace delivery::core::domain::shared_kernel
+}  // namespace delivery::core::domain

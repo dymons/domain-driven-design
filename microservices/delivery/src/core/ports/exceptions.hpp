@@ -20,4 +20,4 @@ struct OrderAlreadyExists : std::runtime_error {
   using std::runtime_error::runtime_error;
 };
 
-} // namespace delivery::core::ports
+}  // namespace delivery::core::ports

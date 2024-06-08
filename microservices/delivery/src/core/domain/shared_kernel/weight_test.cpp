@@ -3,7 +3,7 @@
 #include "exceptions.hpp"
 #include "weight.hpp"
 
-namespace delivery::core::domain::shared_kernel {
+namespace delivery::core::domain {
 
 UTEST(WeightShould, BeCorrectWhenParamsIsCorrectOnCreated) {
   // Arrange
@@ -72,4 +72,4 @@ UTEST(WeightShould, CanCompareLessThen) {
   ASSERT_FALSE(result);
 }
 
-}  // namespace delivery::core::domain::shared_kernel
+}  // namespace delivery::core::domain

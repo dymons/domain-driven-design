@@ -2,9 +2,9 @@
 
 #include <userver/storages/postgres/io/user_types.hpp>
 
-namespace delivery::core::domain::shared_kernel {
+namespace delivery::core::domain {
 class Location;
-}  // namespace delivery::core::domain::shared_kernel
+}  // namespace delivery::core::domain
 
 namespace delivery::infrastructure::adapters::postgres::dto {
 
@@ -13,8 +13,8 @@ struct Location final {
   int y{};
 };
 
-auto Convert(core::domain::shared_kernel::Location const&) -> Location;
-auto Convert(Location const&) -> core::domain::shared_kernel::Location;
+auto Convert(core::domain::Location const&) -> Location;
+auto Convert(Location const&) -> core::domain::Location;
 
 }  // namespace delivery::infrastructure::adapters::postgres::dto
 

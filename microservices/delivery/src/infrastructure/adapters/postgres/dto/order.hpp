@@ -2,8 +2,8 @@
 
 #include <string>
 
-#include <core/domain/order/strong_typedefs.hpp>
 #include <core/domain/courier/strong_typedefs.hpp>
+#include <core/domain/order/strong_typedefs.hpp>
 
 #include "location.hpp"
 #include "weight.hpp"

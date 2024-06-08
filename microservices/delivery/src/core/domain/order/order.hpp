@@ -18,14 +18,14 @@ class Order {
   OrderId id_;
   OrderStatus status_;
   std::optional<courier::CourierId> courier_id_;
-  shared_kernel::Location delivery_location_;
-  shared_kernel::Weight weight_;
+  Location delivery_location_;
+  Weight weight_;
 
   // Constructors
 
   Order(OrderId id, OrderStatus status,
         std::optional<courier::CourierId> courier_id,
-        shared_kernel::Location delivery_location, shared_kernel::Weight weight)
+        Location delivery_location, Weight weight)
       : id_(std::move(id)),
         status_(status),
         courier_id_(std::move(courier_id)),
@@ -34,22 +34,21 @@ class Order {
 
  public:
   [[nodiscard]] static auto Create(BasketId basket_id,
-                                   shared_kernel::Location delivery_location,
-                                   shared_kernel::Weight weight) -> Order;
+                                   Location delivery_location, Weight weight)
+      -> Order;
 
   [[nodiscard]] static auto Hydrate(
       OrderId id, OrderStatus status,
-      std::optional<courier::CourierId> courier_id,
-      shared_kernel::Location delivery_location,
-      shared_kernel::Weight weight) -> Order;
+      std::optional<courier::CourierId> courier_id, Location delivery_location,
+      Weight weight) -> Order;
 
   // Observers
 
   auto GetId() const noexcept -> OrderId;
   auto GetStatus() const noexcept -> OrderStatus;
   auto GetCourierId() const noexcept -> std::optional<courier::CourierId>;
-  auto GetDeliveryLocation() const noexcept -> shared_kernel::Location;
-  auto GetWeight() const noexcept -> shared_kernel::Weight;
+  auto GetDeliveryLocation() const noexcept -> Location;
+  auto GetWeight() const noexcept -> Weight;
   auto IsCourierAssigned() const noexcept -> bool;
 
   // Modifiers

@@ -2,9 +2,9 @@
 
 #include <userver/storages/postgres/io/user_types.hpp>
 
-namespace delivery::core::domain::shared_kernel {
+namespace delivery::core::domain {
 class Weight;
-}  // namespace delivery::core::domain::shared_kernel
+}  // namespace delivery::core::domain
 
 namespace delivery::infrastructure::adapters::postgres::dto {
 
@@ -12,8 +12,8 @@ struct Weight final {
   int value{};
 };
 
-auto Convert(core::domain::shared_kernel::Weight const&) -> Weight;
-auto Convert(Weight const&) -> core::domain::shared_kernel::Weight;
+auto Convert(core::domain::Weight const&) -> Weight;
+auto Convert(Weight const&) -> core::domain::Weight;
 
 }  // namespace delivery::infrastructure::adapters::postgres::dto
 

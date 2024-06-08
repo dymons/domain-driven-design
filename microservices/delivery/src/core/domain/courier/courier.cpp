@@ -13,13 +13,13 @@ auto Courier::Create(CourierName name, Transport transport) -> Courier {
   }
 
   return {CourierId{userver::utils::generators::GenerateUuidV7()},
-          std::move(name), std::move(transport),
-          shared_kernel::Location::kMinLocation, CourierStatus::kNotAvailable};
+          std::move(name), std::move(transport), Location::kMinLocation,
+          CourierStatus::kNotAvailable};
 }
 
 auto Courier::Hydrate(CourierId id, CourierName name, Transport transport,
-                      shared_kernel::Location current_location,
-                      CourierStatus status) -> Courier {
+                      Location current_location, CourierStatus status)
+    -> Courier {
   return {std::move(id), std::move(name), std::move(transport),
           current_location, status};
 }
@@ -30,13 +30,13 @@ auto Courier::GetName() const noexcept -> CourierName { return name_; }
 
 auto Courier::GetTransport() const noexcept -> Transport { return transport_; }
 
-auto Courier::GetCurrentLocation() const noexcept -> shared_kernel::Location {
+auto Courier::GetCurrentLocation() const noexcept -> Location {
   return current_location_;
 }
 
 auto Courier::GetStatus() const noexcept -> CourierStatus { return status_; }
 
-auto Courier::MoveTo(shared_kernel::Location const to_location) -> void {
+auto Courier::MoveTo(Location const to_location) -> void {
   if (current_location_ == to_location) {
     return;
   }
@@ -45,21 +45,19 @@ auto Courier::MoveTo(shared_kernel::Location const to_location) -> void {
 
   auto new_x = current_location_.GetX();
   if (new_x != to_location.GetX()) {
-    new_x = shared_kernel::X{
-        std::min(current_location_.GetX().GetUnderlying() + cruise_range,
-                 to_location.GetX().GetUnderlying())};
+    new_x = X{std::min(current_location_.GetX().GetUnderlying() + cruise_range,
+                       to_location.GetX().GetUnderlying())};
     cruise_range -= (to_location.GetX().GetUnderlying() -
                      current_location_.GetX().GetUnderlying());
   }
 
   auto new_y = current_location_.GetY();
   if (new_y != to_location.GetY() && cruise_range > 0) {
-    new_y = shared_kernel::Y{
-        std::min(current_location_.GetY().GetUnderlying() + cruise_range,
-                 to_location.GetY().GetUnderlying())};
+    new_y = Y{std::min(current_location_.GetY().GetUnderlying() + cruise_range,
+                       to_location.GetY().GetUnderlying())};
   }
 
-  auto reached_location = shared_kernel::Location::Create(new_x, new_y);
+  auto reached_location = Location::Create(new_x, new_y);
 
   if (status_.IsBusy() && reached_location == to_location) {
     status_ = CourierStatus::kReady;
@@ -100,8 +98,7 @@ auto Courier::InWork() -> void {
   status_ = CourierStatus::kBusy;
 }
 
-auto Courier::CalculateTimeToPoint(
-    shared_kernel::Location location) const noexcept -> Time {
+auto Courier::CalculateTimeToPoint(Location location) const noexcept -> Time {
   auto const distance = current_location_.DistanceTo(location);
   return Time{static_cast<double>(distance.GetUnderlying()) /
               static_cast<double>(transport_.GetSpeed().GetUnderlying())};

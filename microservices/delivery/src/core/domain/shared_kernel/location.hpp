@@ -4,7 +4,7 @@
 
 #include <userver/utils/strong_typedef.hpp>
 
-namespace delivery::core::domain::shared_kernel {
+namespace delivery::core::domain {
 
 using X = userver::utils::StrongTypedef<struct XTag, int>;
 using Y = userver::utils::StrongTypedef<struct YTag, int>;
@@ -33,4 +33,4 @@ class Location {
   auto operator<=>(Location const&) const -> std::strong_ordering = default;
 };
 
-}  // namespace delivery::core::domain::shared_kernel
+}  // namespace delivery::core::domain

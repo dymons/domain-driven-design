@@ -8,17 +8,15 @@
 
 namespace delivery::core::domain::order {
 
-auto Order::Create(BasketId basket_id,
-                   shared_kernel::Location delivery_location,
-                   shared_kernel::Weight weight) -> Order {
+auto Order::Create(BasketId basket_id, Location delivery_location,
+                   Weight weight) -> Order {
   return {OrderId{std::move(basket_id).GetUnderlying()}, OrderStatus::kCreated,
           std::nullopt, delivery_location, weight};
 }
 
 auto Order::Hydrate(OrderId id, OrderStatus status,
                     std::optional<courier::CourierId> courier_id,
-                    shared_kernel::Location delivery_location,
-                    shared_kernel::Weight weight) -> Order {
+                    Location delivery_location, Weight weight) -> Order {
   return {std::move(id), status, std::move(courier_id), delivery_location,
           weight};
 }
@@ -31,13 +29,11 @@ auto Order::GetCourierId() const noexcept -> std::optional<courier::CourierId> {
   return courier_id_;
 }
 
-auto Order::GetDeliveryLocation() const noexcept -> shared_kernel::Location {
+auto Order::GetDeliveryLocation() const noexcept -> Location {
   return delivery_location_;
 }
 
-auto Order::GetWeight() const noexcept -> shared_kernel::Weight {
-  return weight_;
-}
+auto Order::GetWeight() const noexcept -> Weight { return weight_; }
 
 auto Order::IsCourierAssigned() const noexcept -> bool {
   return courier_id_.has_value();

@@ -23,8 +23,7 @@ UTEST(CourierShould, BeConstructibleWithRequiredProperties) {
   // Assert
   ASSERT_TRUE(courier.GetStatus().IsNotAvailable());
   ASSERT_EQ(courier.GetName(), MockCourierName());
-  ASSERT_EQ(courier.GetCurrentLocation(),
-            shared_kernel::Location::kMinLocation);
+  ASSERT_EQ(courier.GetCurrentLocation(), Location::kMinLocation);
 }
 
 UTEST(CourierShould, ThrowWhenCreateCourierWithEmptyName) {
@@ -41,13 +40,10 @@ UTEST(CourierShould, MoveToLocation) {
   auto courier = Courier::Create(MockCourierName(), Transport::kBicycle);
 
   // Act
-  courier.MoveTo(shared_kernel::Location::Create(shared_kernel::X{5},
-                                                 shared_kernel::Y{5}));
+  courier.MoveTo(Location::Create(X{5}, Y{5}));
 
   // Assert
-  ASSERT_EQ(courier.GetCurrentLocation(),
-            shared_kernel::Location::Create(shared_kernel::X{3},
-                                            shared_kernel::Y{1}));
+  ASSERT_EQ(courier.GetCurrentLocation(), Location::Create(X{3}, Y{1}));
 }
 
 UTEST(CourierShould, CanStartWork) {
@@ -78,8 +74,7 @@ UTEST(CourierShould, CanCalculateTimeToLocation) {
   auto courier = Courier::Create(MockCourierName(), MockTransport());
 
   // Act
-  auto const time =
-      courier.CalculateTimeToPoint(shared_kernel::Location::kMaxLocation);
+  auto const time = courier.CalculateTimeToPoint(Location::kMaxLocation);
 
   // Assert
   ASSERT_EQ(time, Time{18});

@@ -6,7 +6,7 @@
 
 #include "exceptions.hpp"
 
-namespace delivery::core::domain::shared_kernel {
+namespace delivery::core::domain {
 
 const Location Location::kMinLocation = Location{X{1}, Y{1}};
 const Location Location::kMaxLocation = Location{X{10}, Y{10}};
@@ -37,4 +37,4 @@ auto Location::DistanceTo(Location const& other) const noexcept -> Distance {
       std::abs(GetY().GetUnderlying() - other.GetY().GetUnderlying())};
 }
 
-}  // namespace delivery::core::domain::shared_kernel
+}  // namespace delivery::core::domain

@@ -4,12 +4,12 @@
 
 namespace delivery::infrastructure::adapters::postgres::dto {
 
-auto Convert(core::domain::shared_kernel::Weight const& weight) -> Weight {
+auto Convert(core::domain::Weight const& weight) -> Weight {
   return {.value = weight.GetWeight()};
 }
 
-auto Convert(Weight const& weight) -> core::domain::shared_kernel::Weight {
-  return core::domain::shared_kernel::Weight{weight.value};
+auto Convert(Weight const& weight) -> core::domain::Weight {
+  return core::domain::Weight{weight.value};
 }
 
 }  // namespace delivery::infrastructure::adapters::postgres::dto

@@ -4,17 +4,16 @@
 
 namespace delivery::infrastructure::adapters::postgres::dto {
 
-auto Convert(core::domain::shared_kernel::Location const& loc) -> Location {
+auto Convert(core::domain::Location const& loc) -> Location {
   return {
       .x = loc.GetX().GetUnderlying(),
       .y = loc.GetY().GetUnderlying(),
   };
 }
 
-auto Convert(Location const& loc) -> core::domain::shared_kernel::Location {
-  return core::domain::shared_kernel::Location::Create(
-      core::domain::shared_kernel::X{loc.x},
-      core::domain::shared_kernel::Y{loc.y});
+auto Convert(Location const& loc) -> core::domain::Location {
+  return core::domain::Location::Create(core::domain::X{loc.x},
+                                        core::domain::Y{loc.y});
 }
 
 }  // namespace delivery::infrastructure::adapters::postgres::dto

@@ -15,20 +15,16 @@ auto MockBasketId() -> BasketId {
   return BasketId{kBasketId};
 }
 
-auto MockDeliveryLocation() -> shared_kernel::Location {
-  return shared_kernel::Location::Create(shared_kernel::X{5},
-                                         shared_kernel::Y{5});
-}
+auto MockDeliveryLocation() -> Location { return Location::Create(X{5}, Y{5}); }
 
-auto MockWeight() -> shared_kernel::Weight { return shared_kernel::Weight{10}; }
+auto MockWeight() -> Weight { return Weight{10}; }
 
 auto MockCourier(
     courier::CourierStatus status = courier::CourierStatus::kNotAvailable)
     -> courier::Courier {
   return courier::Courier::Hydrate(
       courier::CourierId{"CourierId"}, courier::CourierName{"CourierName"},
-      courier::Transport::kPedestrian, shared_kernel::Location::kMinLocation,
-      status);
+      courier::Transport::kPedestrian, Location::kMinLocation, status);
 }
 
 auto MockOrder() -> Order {
