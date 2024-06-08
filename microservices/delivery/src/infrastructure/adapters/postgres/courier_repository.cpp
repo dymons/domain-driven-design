@@ -23,11 +23,7 @@ core::domain::courier::Courier FromRecord(dto::Courier const& record) {
   return core::domain::courier::Courier::Hydrate(
       core::domain::courier::CourierId{record.id},
       core::domain::courier::CourierName{record.name},
-      core::domain::courier::Transport::Hydrate(
-          core::domain::courier::TransportId{record.transport.id},
-          core::domain::courier::TransportName{record.transport.name},
-          core::domain::courier::Speed{record.transport.speed},
-          core::domain::shared_kernel::Weight{record.transport.capacity}),
+      dto::Convert(record.transport),
       core::domain::shared_kernel::Location::Create(
           core::domain::shared_kernel::X{record.current_location.x},
           core::domain::shared_kernel::Y{record.current_location.y}),
@@ -39,13 +35,7 @@ dto::Courier ToRecord(core::domain::courier::Courier const& courier) {
       .id = courier.GetId().GetUnderlying(),
       .name = courier.GetName().GetUnderlying(),
       .status = ToString(courier.GetStatus()),
-      .transport =
-          dto::Transport{
-              .id = courier.GetTransport().GetId().GetUnderlying(),
-              .name = courier.GetTransport().GetName().GetUnderlying(),
-              .speed = courier.GetTransport().GetSpeed().GetUnderlying(),
-              .capacity = courier.GetTransport().GetCapacity().GetWeight(),
-          },
+      .transport = dto::Convert(courier.GetTransport()),
       .current_location =
           {
               .x = courier.GetCurrentLocation().GetX().GetUnderlying(),
