@@ -5,7 +5,6 @@
 namespace delivery::core::domain::courier {
 
 class CourierStatus final {
- public:
   enum class Status {
     NotAvailable,
     Ready,
@@ -16,6 +15,11 @@ class CourierStatus final {
 
   explicit CourierStatus(Status status);
 
+ public:
+  static const CourierStatus kNotAvailable;
+  static const CourierStatus kReady;
+  static const CourierStatus kBusy;
+
   static auto FromString(std::string_view status) -> CourierStatus;
   auto ToString() const -> std::string;
 
@@ -24,6 +28,8 @@ class CourierStatus final {
   auto IsNotAvailable() const noexcept -> bool;
   auto IsReady() const noexcept -> bool;
   auto IsBusy() const noexcept -> bool;
+
+  auto operator<=>(CourierStatus const&) const = default;
 
  private:
   Status status_;

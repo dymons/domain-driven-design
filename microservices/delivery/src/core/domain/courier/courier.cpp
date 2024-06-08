@@ -14,8 +14,7 @@ auto Courier::Create(CourierName name, Transport transport) -> Courier {
 
   return {CourierId{userver::utils::generators::GenerateUuidV7()},
           std::move(name), std::move(transport),
-          shared_kernel::Location::kMinLocation,
-          CourierStatus{CourierStatus::Status::NotAvailable}};
+          shared_kernel::Location::kMinLocation, CourierStatus::kNotAvailable};
 }
 
 auto Courier::Hydrate(CourierId id, CourierName name, Transport transport,
@@ -63,7 +62,7 @@ auto Courier::MoveTo(shared_kernel::Location const to_location) -> void {
   auto reached_location = shared_kernel::Location::Create(new_x, new_y);
 
   if (status_.IsBusy() && reached_location == to_location) {
-    status_ = CourierStatus{CourierStatus::Status::Ready};
+    status_ = CourierStatus::kReady;
   }
 
   current_location_ = reached_location;
@@ -75,7 +74,7 @@ auto Courier::StartWork() -> void {
         "You cannot start work if it has already been started earlier");
   }
 
-  status_ = CourierStatus{CourierStatus::Status::Ready};
+  status_ = CourierStatus::kReady;
 }
 
 auto Courier::StopWork() -> void {
@@ -84,7 +83,7 @@ auto Courier::StopWork() -> void {
         "You cannot stop working if there is an incomplete delivery");
   }
 
-  status_ = CourierStatus{CourierStatus::Status::NotAvailable};
+  status_ = CourierStatus::kNotAvailable;
 }
 
 auto Courier::InWork() -> void {
@@ -98,7 +97,7 @@ auto Courier::InWork() -> void {
         "You can't take an order to work if the courier is already busy");
   }
 
-  status_ = CourierStatus{CourierStatus::Status::Busy};
+  status_ = CourierStatus::kBusy;
 }
 
 auto Courier::CalculateTimeToPoint(

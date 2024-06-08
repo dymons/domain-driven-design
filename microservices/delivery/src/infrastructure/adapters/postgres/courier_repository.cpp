@@ -67,13 +67,11 @@ class CourierRepository final : public core::ports::ICourierRepository {
   }
 
   auto GetByReadyStatus() const -> std::vector<Courier> final {
-    return GetByStatus(core::domain::courier::CourierStatus{
-        core::domain::courier::CourierStatus::Status::Ready});
+    return GetByStatus(core::domain::courier::CourierStatus::kReady);
   }
 
   auto GetByBusyStatus() const -> std::vector<Courier> final {
-    return GetByStatus(core::domain::courier::CourierStatus{
-        core::domain::courier::CourierStatus::Status::Busy});
+    return GetByStatus(core::domain::courier::CourierStatus::kBusy);
   }
 
  private:

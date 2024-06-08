@@ -11,20 +11,28 @@ namespace {
 constexpr userver::utils::TrivialBiMap kCourierStatusMapping =
     [](auto selector) {
       return selector()
-          .Case(std::string_view{"not_available"},
-                CourierStatus::Status::NotAvailable)
-          .Case(std::string_view{"ready"}, CourierStatus::Status::Ready)
-          .Case(std::string_view{"busy"}, CourierStatus::Status::Busy);
+          .Case(std::string_view{"not_available"}, CourierStatus::kNotAvailable)
+          .Case(std::string_view{"ready"}, CourierStatus::kReady)
+          .Case(std::string_view{"busy"}, CourierStatus::kBusy);
     };
 
 }  // namespace
 
+const CourierStatus CourierStatus::kNotAvailable =
+    CourierStatus{CourierStatus::Status::NotAvailable};
+
+const CourierStatus CourierStatus::kReady =
+    CourierStatus{CourierStatus::Status::Ready};
+
+const CourierStatus CourierStatus::kBusy =
+    CourierStatus{CourierStatus::Status::Busy};
+
 CourierStatus::CourierStatus(Status const status) : status_{status} {}
 
 auto CourierStatus::ToString() const -> std::string {
-  auto const status_as_string = kCourierStatusMapping.TryFindBySecond(status_);
+  auto const status_as_string = kCourierStatusMapping.TryFindBySecond(*this);
   if (not status_as_string.has_value()) {
-    throw ArgumentException{"Cant convert status std::string"};
+    throw ArgumentException{"Cant convert status to std::string"};
   }
 
   return std::string{status_as_string.value()};
