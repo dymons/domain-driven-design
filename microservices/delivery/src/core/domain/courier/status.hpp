@@ -20,14 +20,14 @@ class CourierStatus final {
   static const CourierStatus kReady;
   static const CourierStatus kBusy;
 
-  static auto FromString(std::string_view status) -> CourierStatus;
-  auto ToString() const -> std::string;
+  [[nodiscard]] static auto FromString(std::string_view) -> CourierStatus;
+  [[nodiscard]] auto ToString() const -> std::string;
 
   // Observers
 
-  auto IsNotAvailable() const noexcept -> bool;
-  auto IsReady() const noexcept -> bool;
-  auto IsBusy() const noexcept -> bool;
+  [[nodiscard]] auto IsNotAvailable() const noexcept -> bool;
+  [[nodiscard]] auto IsReady() const noexcept -> bool;
+  [[nodiscard]] auto IsBusy() const noexcept -> bool;
 
   auto operator<=>(CourierStatus const&) const = default;
 
