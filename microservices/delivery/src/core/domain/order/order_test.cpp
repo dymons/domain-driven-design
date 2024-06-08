@@ -53,22 +53,10 @@ UTEST(OrderShould, AssignCourier) {
   auto courier = MockCourier(courier::CourierStatus::kReady);
 
   // Act
-  order.AssignCourier(courier);
+  order.AssignCourier(CourierId{courier.GetId().GetUnderlying()});
 
   // Assert
   ASSERT_TRUE(order.IsCourierAssigned());
-  ASSERT_TRUE(courier.GetStatus().IsBusy());
-}
-
-UTEST(OrderShould, ThrowWhenAssignBusyCourier) {
-  // Arrange
-  auto order = MockOrder();
-  auto courier = MockCourier(courier::CourierStatus::kBusy);
-
-  // Act
-
-  // Assert
-  ASSERT_THROW(order.AssignCourier(courier), CantAssignOrderToBusyCourier);
 }
 
 UTEST(OrderShould, CompleteOrderWhenOrderIsAssigned) {
@@ -76,7 +64,7 @@ UTEST(OrderShould, CompleteOrderWhenOrderIsAssigned) {
   auto order = MockOrder();
   auto courier = MockCourier();
   courier.StartWork();
-  order.AssignCourier(courier);
+  order.AssignCourier(CourierId{courier.GetId().GetUnderlying()});
 
   // Act
   order.Complete();
@@ -98,7 +86,7 @@ UTEST(OrderShould, DoNothingWhenCompleteOrderWithStatusCompleted) {
   // Arrange
   auto order = MockOrder();
   auto courier = MockCourier(courier::CourierStatus::kReady);
-  order.AssignCourier(courier);
+  order.AssignCourier(CourierId{courier.GetId().GetUnderlying()});
   order.Complete();
 
   // Act

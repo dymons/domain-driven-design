@@ -2,8 +2,6 @@
 
 #include <userver/utils/exception.hpp>
 
-#include <core/domain/courier/courier.hpp>
-#include <utility>
 #include "exceptions.hpp"
 
 namespace delivery::core::domain::order {
@@ -15,7 +13,7 @@ auto Order::Create(BasketId basket_id, Location delivery_location,
 }
 
 auto Order::Hydrate(OrderId id, OrderStatus status,
-                    std::optional<courier::CourierId> courier_id,
+                    std::optional<CourierId> courier_id,
                     Location delivery_location, Weight weight) -> Order {
   return {std::move(id), status, std::move(courier_id), delivery_location,
           weight};
@@ -25,7 +23,7 @@ auto Order::GetId() const noexcept -> OrderId { return id_; }
 
 auto Order::GetStatus() const noexcept -> OrderStatus { return status_; }
 
-auto Order::GetCourierId() const noexcept -> std::optional<courier::CourierId> {
+auto Order::GetCourierId() const noexcept -> std::optional<CourierId> {
   return courier_id_;
 }
 
@@ -39,16 +37,9 @@ auto Order::IsCourierAssigned() const noexcept -> bool {
   return courier_id_.has_value();
 }
 
-auto Order::AssignCourier(courier::Courier& courier) -> void {
-  if (courier.GetStatus().IsBusy()) {
-    userver::utils::LogErrorAndThrow<CantAssignOrderToBusyCourier>(
-        "Courier is busy, can't assign courier to the order");
-  }
-
-  courier.InWork();
-
+auto Order::AssignCourier(CourierId const& courier_id) -> void {
   status_ = OrderStatus::kAssigned;
-  courier_id_ = courier.GetId();
+  courier_id_ = courier_id;
 }
 
 auto Order::Complete() -> void {

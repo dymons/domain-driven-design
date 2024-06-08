@@ -2,7 +2,6 @@
 
 #include <string>
 
-#include <core/domain/courier/strong_typedefs.hpp>
 #include <core/domain/order/strong_typedefs.hpp>
 
 #include "location.hpp"
@@ -17,7 +16,7 @@ namespace delivery::infrastructure::adapters::postgres::dto {
 struct Order final {
   core::domain::order::OrderId id{};
   std::string status{};
-  std::optional<core::domain::courier::CourierId> courier_id{};
+  std::optional<core::domain::order::CourierId> courier_id{};
   Location delivery_location{};
   Weight weight{};
 };
