@@ -50,6 +50,8 @@ add_library(${PROJECT_NAME}_objs OBJECT
     src/infrastructure/adapters/postgres/order_repository.cpp
     src/infrastructure/adapters/postgres/dto/location.hpp
     src/infrastructure/adapters/postgres/dto/location.cpp
+    src/infrastructure/adapters/postgres/dto/transport.hpp
+    src/infrastructure/adapters/postgres/dto/transport.cpp
 )
 target_link_libraries(${PROJECT_NAME}_objs PUBLIC userver-core)
 target_include_directories(${PROJECT_NAME}_objs PUBLIC src)

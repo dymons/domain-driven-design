@@ -34,8 +34,8 @@ class OrderRepository final : public core::ports::IOrderRepository {
   userver::storages::postgres::ClusterPtr cluster_;
 };
 
-userver::utils::SharedRef<const core::ports::IOrderRepository>
-MakeOrderRepository(userver::storages::postgres::ClusterPtr cluster) {
+auto MakeOrderRepository(userver::storages::postgres::ClusterPtr cluster)
+    -> userver::utils::SharedRef<const core::ports::IOrderRepository> {
   return userver::utils::MakeSharedRef<const OrderRepository>(
       std::move(cluster));
 }

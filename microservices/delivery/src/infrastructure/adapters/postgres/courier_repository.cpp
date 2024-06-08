@@ -10,22 +10,18 @@
 #include <core/ports/exceptions.hpp>
 
 #include "dto/location.hpp"
+#include "dto/transport.hpp"
 
 namespace delivery::infrastructure::adapters::postgres {
 
-namespace {
+// TODO (dymons) Use enum at PG to store status
 
-struct TransportRecord {
-  int id;
-  std::string name;
-  int speed;
-  int capacity;
-};
+namespace {
 
 struct CourierRecord final {
   std::string id;
   std::string name;
-  TransportRecord transport;
+  dto::Transport transport;
   dto::Location current_location;
   std::string status;
 };
@@ -50,7 +46,7 @@ CourierRecord ToRecord(core::domain::courier::Courier const& courier) {
       .id = courier.GetId().GetUnderlying(),
       .name = courier.GetName().GetUnderlying(),
       .transport =
-          TransportRecord{
+          dto::Transport{
               .id = courier.GetTransport().GetId().GetUnderlying(),
               .name = courier.GetTransport().GetName().GetUnderlying(),
               .speed = courier.GetTransport().GetSpeed().GetUnderlying(),
@@ -149,16 +145,10 @@ class CourierRepository final : public core::ports::ICourierRepository {
   const userver::storages::postgres::ClusterPtr cluster_;
 };
 
-userver::utils::SharedRef<const core::ports::ICourierRepository>
-MakeCourierRepository(userver::storages::postgres::ClusterPtr cluster) {
+auto MakeCourierRepository(userver::storages::postgres::ClusterPtr cluster)
+    -> userver::utils::SharedRef<const core::ports::ICourierRepository> {
   return userver::utils::MakeSharedRef<const CourierRepository>(
       std::move(cluster));
 }
 
 }  // namespace delivery::infrastructure::adapters::postgres
-
-template <>
-struct ::userver::storages::postgres::io::CppToUserPg<
-    delivery::infrastructure::adapters::postgres::TransportRecord> {
-  static constexpr DBTypeName postgres_name = "transport";
-};
