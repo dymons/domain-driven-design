@@ -53,7 +53,7 @@ class CourierRepository final : public core::ports::ICourierRepository {
   }
 
   auto GetById(CourierId const& courier_id) const -> Courier final try {
-    auto result =
+    auto const result =
         cluster_->Execute(userver::storages::postgres::ClusterHostType::kMaster,
                           "SELECT id, name, transport, current_location, status"
                           "FROM delivery.couriers"
@@ -77,17 +77,17 @@ class CourierRepository final : public core::ports::ICourierRepository {
  private:
   auto GetByStatus(core::domain::courier::Status status) const
       -> std::vector<Courier> {
-    auto result =
+    auto const result =
         cluster_->Execute(userver::storages::postgres::ClusterHostType::kMaster,
                           "SELECT id, name, transport, current_location, status"
                           "FROM delivery.couriers"
                           "WHERE status = $1",
                           ToString(status));
 
-    auto records = result.AsContainer<std::vector<dto::Courier>>();
+    auto const records = result.AsContainer<std::vector<dto::Courier>>();
     auto couriers = std::vector<Courier>{};
     couriers.reserve(records.size());
-    for (auto&& record : records) {
+    for (auto const& record : records) {
       couriers.push_back(dto::Convert(record));
     }
 
