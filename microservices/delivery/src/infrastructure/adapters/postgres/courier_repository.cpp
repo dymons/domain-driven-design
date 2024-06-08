@@ -38,8 +38,10 @@ core::domain::courier::Courier FromRecord(CourierRecord const& record) {
       core::domain::courier::CourierId{record.id},
       core::domain::courier::CourierName{record.name},
       core::domain::courier::Transport::kBicycle,
-      core::domain::shared_kernel::Location::kMaxLocation,
-      core::domain::courier::Status::Busy);
+      core::domain::shared_kernel::Location::Create(
+          core::domain::shared_kernel::X{record.current_location.x},
+          core::domain::shared_kernel::Y{record.current_location.y}),
+      core::domain::courier::FromString(record.status));
 }
 
 CourierRecord ToRecord(core::domain::courier::Courier const& courier) {
