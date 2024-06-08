@@ -26,13 +26,10 @@ class Courier {
         status_(status) {}
 
  public:
-  [[nodiscard]] static auto Create(CourierName name, Transport transport)
-      -> Courier;
+  [[nodiscard]] static auto Create(CourierName, Transport) -> Courier;
 
-  [[nodiscard]] static auto Hydrate(CourierId id, CourierName name,
-                                    Transport transport,
-                                    Location current_location,
-                                    CourierStatus status) -> Courier;
+  [[nodiscard]] static auto Hydrate(CourierId, CourierName, Transport, Location,
+                                    CourierStatus) -> Courier;
 
   // Observers
 
@@ -40,8 +37,8 @@ class Courier {
   [[nodiscard]] auto GetName() const noexcept -> CourierName;
   [[nodiscard]] auto GetTransport() const noexcept -> Transport;
   [[nodiscard]] auto GetStatus() const noexcept -> CourierStatus;
-  auto GetCurrentLocation() const noexcept -> Location;
-  auto CalculateTimeToPoint(Location) const noexcept -> Time;
+  [[nodiscard]] auto GetCurrentLocation() const noexcept -> Location;
+  [[nodiscard]] auto CalculateTimeToPoint(Location) const noexcept -> Time;
 
   // Modifiers
 

@@ -13,7 +13,7 @@ class CourierStatus final {
 
   // Constructors
 
-  explicit CourierStatus(Status status);
+  explicit CourierStatus(Status);
 
  public:
   static const CourierStatus kNotAvailable;

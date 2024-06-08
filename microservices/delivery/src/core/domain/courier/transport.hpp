@@ -17,8 +17,7 @@ class Transport {
       : id_(id), name_(std::move(name)), speed_(speed), capacity_(capacity) {}
 
  public:
-  static auto Hydrate(TransportId id, TransportName name, Speed speed,
-                      Weight capacity) -> Transport;
+  static auto Hydrate(TransportId, TransportName, Speed, Weight) -> Transport;
 
   static const Transport kPedestrian;
   static const Transport kBicycle;
@@ -27,10 +26,10 @@ class Transport {
 
   // Observers
 
-  auto GetId() const -> TransportId;
-  auto GetName() const -> TransportName;
-  auto GetSpeed() const -> Speed;
-  auto GetCapacity() const -> Weight;
+  [[nodiscard]] auto GetId() const -> TransportId;
+  [[nodiscard]] auto GetName() const -> TransportName;
+  [[nodiscard]] auto GetSpeed() const -> Speed;
+  [[nodiscard]] auto GetCapacity() const -> Weight;
 };
 
 }  // namespace delivery::core::domain::courier
