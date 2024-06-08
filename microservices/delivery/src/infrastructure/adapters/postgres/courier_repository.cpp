@@ -1,7 +1,5 @@
 #include "courier_repository.hpp"
 
-#include <ranges>
-
 #include <userver/storages/postgres/cluster.hpp>
 #include <userver/utils/exception.hpp>
 
@@ -9,8 +7,6 @@
 #include <core/ports/exceptions.hpp>
 
 #include "dto/courier.hpp"
-#include "dto/location.hpp"
-#include "dto/transport.hpp"
 
 namespace delivery::infrastructure::adapters::postgres {
 
