@@ -37,7 +37,11 @@ core::domain::courier::Courier FromRecord(CourierRecord const& record) {
   return core::domain::courier::Courier::Hydrate(
       core::domain::courier::CourierId{record.id},
       core::domain::courier::CourierName{record.name},
-      core::domain::courier::Transport::kBicycle,
+      core::domain::courier::Transport::Hydrate(
+          core::domain::courier::TransportId{record.transport.id},
+          core::domain::courier::TransportName{record.transport.name},
+          core::domain::courier::Speed{record.transport.speed},
+          core::domain::shared_kernel::Weight{record.transport.capacity}),
       core::domain::shared_kernel::Location::Create(
           core::domain::shared_kernel::X{record.current_location.x},
           core::domain::shared_kernel::Y{record.current_location.y}),
