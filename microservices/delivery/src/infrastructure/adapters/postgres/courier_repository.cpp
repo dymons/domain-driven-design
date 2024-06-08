@@ -10,10 +10,24 @@ namespace delivery::infrastructure::adapters::postgres {
 
 namespace {
 
+struct TransportRecord {
+  int id;
+  std::string name;
+  int speed;
+  int capacity;
+};
+
+struct LocationRecord {
+  int x;
+  int y;
+};
+
 struct CourierRecord final {
   std::string id;
+  std::string name;
+  TransportRecord transport;
+  LocationRecord current_location;
   std::string status;
-  userver::formats::json::Value payload;
 };
 
 core::domain::courier::Courier FromRecord(CourierRecord&& record) {
