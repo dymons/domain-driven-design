@@ -33,10 +33,30 @@ struct CourierRecord final {
 core::domain::courier::Courier FromRecord(CourierRecord&& record) {
   return core::domain::courier::Courier::Hydrate(
       core::domain::courier::CourierId{std::move(record.id)},
-      core::domain::courier::CourierName{"CourierName"},
+      core::domain::courier::CourierName{record.name},
       core::domain::courier::Transport::kBicycle,
       core::domain::shared_kernel::Location::kMaxLocation,
       core::domain::courier::Status::Busy);
+}
+
+CourierRecord ToRecord(core::domain::courier::Courier const& courier) {
+  return {
+      .id = courier.GetId().GetUnderlying(),
+      .name = courier.GetName().GetUnderlying(),
+      .transport =
+          TransportRecord{
+              .id = courier.GetTransport().GetId().GetUnderlying(),
+              .name = courier.GetTransport().GetName().GetUnderlying(),
+              .speed = courier.GetTransport().GetSpeed().GetUnderlying(),
+              .capacity = courier.GetTransport().GetCapacity().GetWeight(),
+          },
+      .current_location =
+          {
+              .x = courier.GetCurrentLocation().GetX().GetUnderlying(),
+              .y = courier.GetCurrentLocation().GetY().GetUnderlying(),
+          },
+      .status = ToString(courier.GetStatus()),
+  };
 }
 
 }  // namespace
@@ -51,7 +71,17 @@ class CourierRepository final : public core::ports::ICourierRepository {
   explicit CourierRepository(userver::storages::postgres::ClusterPtr cluster)
       : cluster_(std::move(cluster)) {}
 
-  auto Add(Courier const&) const -> void final {}
+  auto Add(Courier const& courier) const -> void final {
+    const auto record = ToRecord(courier);
+
+    auto result =
+        cluster_->Execute(userver::storages::postgres::ClusterHostType::kMaster,
+                          "INSERT INTO delivery.couriers "
+                          "(id, name, transport, current_location, status)"
+                          "VALUES ($1, $2, $3, $4, $5) ",
+                          record.id, record.name, record.transport,
+                          record.current_location, record.status);
+  }
 
   auto Update(Courier const&) const -> void final {}
 
@@ -84,3 +114,15 @@ MakeCourierRepository(userver::storages::postgres::ClusterPtr cluster) {
 }
 
 }  // namespace delivery::infrastructure::adapters::postgres
+
+template <>
+struct ::userver::storages::postgres::io::CppToUserPg<
+    delivery::infrastructure::adapters::postgres::TransportRecord> {
+  static constexpr DBTypeName postgres_name = "transport";
+};
+
+template <>
+struct ::userver::storages::postgres::io::CppToUserPg<
+    delivery::infrastructure::adapters::postgres::LocationRecord> {
+  static constexpr DBTypeName postgres_name = "location";
+};

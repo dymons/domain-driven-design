@@ -2,6 +2,20 @@
 -- +goose StatementBegin
 CREATE SCHEMA IF NOT EXISTS delivery;
 
+CREATE TYPE transport AS
+(
+    id       INTEGER,
+    name     TEXT,
+    speed    INTEGER,
+    capacity INTEGER
+);
+
+CREATE TYPE location AS
+(
+    x INTEGER,
+    y INTEGER
+);
+
 CREATE TABLE IF NOT EXISTS delivery.orders
 (
     id               TEXT  NOT NULL,
@@ -15,11 +29,11 @@ CREATE TABLE IF NOT EXISTS delivery.orders
 
 CREATE TABLE IF NOT EXISTS delivery.couriers
 (
-    id               TEXT  NOT NULL,
-    status           TEXT  NOT NULL,
-    courier_id       TEXT,
-    current_location JSONB NOT NULL,
-    weight           INT   NOT NULL,
+    id               TEXT    NOT NULL,
+    name             TEXT    NOT NULL,
+    transport        JSONB   NOT NULL,
+    current_location JSONB   NOT NULL,
+    status           INTEGER NOT NULL,
 
     PRIMARY KEY (id)
 );
