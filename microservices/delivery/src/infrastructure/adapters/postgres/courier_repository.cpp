@@ -3,7 +3,6 @@
 #include <ranges>
 
 #include <userver/storages/postgres/cluster.hpp>
-#include <userver/utils/algo.hpp>
 #include <userver/utils/exception.hpp>
 
 #include <core/domain/courier/courier.hpp>
@@ -18,22 +17,22 @@ namespace delivery::infrastructure::adapters::postgres {
 // TODO (dymons) Use enum at PG to store status
 
 namespace {
-
-core::domain::courier::Courier FromRecord(dto::Courier const& record) {
-  return core::domain::courier::Courier::Hydrate(
-      core::domain::courier::CourierId{record.id},
-      core::domain::courier::CourierName{record.name},
-      dto::Convert(record.transport), dto::Convert(record.current_location),
-      core::domain::courier::FromString(record.status));
-}
-
-dto::Courier ToRecord(core::domain::courier::Courier const& courier) {
-  return {.id = courier.GetId().GetUnderlying(),
-          .name = courier.GetName().GetUnderlying(),
-          .status = ToString(courier.GetStatus()),
-          .transport = dto::Convert(courier.GetTransport()),
-          .current_location = dto::Convert(courier.GetCurrentLocation())};
-}
+//
+// core::domain::courier::Courier FromRecord(dto::Courier const& record) {
+//  return core::domain::courier::Courier::Hydrate(
+//      core::domain::courier::CourierId{record.id},
+//      core::domain::courier::CourierName{record.name},
+//      dto::Convert(record.transport), dto::Convert(record.current_location),
+//      core::domain::courier::FromString(record.status));
+//}
+//
+// dto::Courier ToRecord(core::domain::courier::Courier const& courier) {
+//  return {.id = courier.GetId().GetUnderlying(),
+//          .name = courier.GetName().GetUnderlying(),
+//          .status = ToString(courier.GetStatus()),
+//          .transport = dto::Convert(courier.GetTransport()),
+//          .current_location = dto::Convert(courier.GetCurrentLocation())};
+//}
 
 }  // namespace
 
@@ -48,7 +47,7 @@ class CourierRepository final : public core::ports::ICourierRepository {
       : cluster_(std::move(cluster)) {}
 
   auto Add(Courier const& courier) const -> void final {
-    auto const record = ToRecord(courier);
+    auto const record = dto::Convert(courier);
     auto const result =
         cluster_->Execute(userver::storages::postgres::ClusterHostType::kMaster,
                           "INSERT INTO delivery.couriers "
@@ -64,7 +63,7 @@ class CourierRepository final : public core::ports::ICourierRepository {
   }
 
   auto Update(Courier const& courier) const -> void final {
-    auto const record = ToRecord(courier);
+    auto const record = dto::Convert(courier);
     auto const result = cluster_->Execute(
         userver::storages::postgres::ClusterHostType::kMaster,
         "UPDATE delivery.couriers "
@@ -87,7 +86,7 @@ class CourierRepository final : public core::ports::ICourierRepository {
                           "WHERE id = $1",
                           courier_id.GetUnderlying());
 
-    return FromRecord(
+    return dto::Convert(
         result.AsSingleRow<dto::Courier>(userver::storages::postgres::kRowTag));
   } catch (const userver::storages::postgres::NonSingleRowResultSet& ex) {
     userver::utils::LogErrorAndThrow<core::ports::CourierNotFound>(ex.what());
@@ -112,8 +111,13 @@ class CourierRepository final : public core::ports::ICourierRepository {
                           ToString(status));
 
     auto records = result.AsContainer<std::vector<dto::Courier>>();
-    auto couriers = records | std::ranges::views::transform(FromRecord);
-    return userver::utils::AsContainer<std::vector<Courier>>(couriers);
+    auto couriers = std::vector<Courier>{};
+    couriers.reserve(records.size());
+    for (auto&& record : records) {
+      couriers.push_back(dto::Convert(record));
+    }
+
+    return couriers;
   }
 
   const userver::storages::postgres::ClusterPtr cluster_;
