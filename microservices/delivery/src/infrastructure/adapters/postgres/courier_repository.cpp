@@ -23,25 +23,16 @@ core::domain::courier::Courier FromRecord(dto::Courier const& record) {
   return core::domain::courier::Courier::Hydrate(
       core::domain::courier::CourierId{record.id},
       core::domain::courier::CourierName{record.name},
-      dto::Convert(record.transport),
-      core::domain::shared_kernel::Location::Create(
-          core::domain::shared_kernel::X{record.current_location.x},
-          core::domain::shared_kernel::Y{record.current_location.y}),
+      dto::Convert(record.transport), dto::Convert(record.current_location),
       core::domain::courier::FromString(record.status));
 }
 
 dto::Courier ToRecord(core::domain::courier::Courier const& courier) {
-  return {
-      .id = courier.GetId().GetUnderlying(),
-      .name = courier.GetName().GetUnderlying(),
-      .status = ToString(courier.GetStatus()),
-      .transport = dto::Convert(courier.GetTransport()),
-      .current_location =
-          {
-              .x = courier.GetCurrentLocation().GetX().GetUnderlying(),
-              .y = courier.GetCurrentLocation().GetY().GetUnderlying(),
-          },
-  };
+  return {.id = courier.GetId().GetUnderlying(),
+          .name = courier.GetName().GetUnderlying(),
+          .status = ToString(courier.GetStatus()),
+          .transport = dto::Convert(courier.GetTransport()),
+          .current_location = dto::Convert(courier.GetCurrentLocation())};
 }
 
 }  // namespace

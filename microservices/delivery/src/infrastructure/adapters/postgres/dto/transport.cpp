@@ -5,7 +5,7 @@
 namespace delivery::infrastructure::adapters::postgres::dto {
 
 auto Convert(core::domain::courier::Transport const& transport) -> Transport {
-  return Transport{
+  return {
       .id = transport.GetId().GetUnderlying(),
       .name = transport.GetName().GetUnderlying(),
       .speed = transport.GetSpeed().GetUnderlying(),
