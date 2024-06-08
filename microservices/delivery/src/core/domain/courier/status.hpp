@@ -1,18 +1,28 @@
 #pragma once
 
-#include <string>
+#include <string_view>
 
 namespace delivery::core::domain::courier {
 
-// TODO (dymons) Use smart enum
+class CourierStatus {
+ public:
+  enum class Status {
+    NotAvailable,
+    Ready,
+    Busy,
+  };
 
-enum class Status {
-  NotAvailable,
-  Ready,
-  Busy,
+  explicit CourierStatus(Status status);
+
+  static auto FromString(std::string_view status) -> CourierStatus;
+  auto ToString() const -> std::string;
+
+  auto IsNotAvailable() const noexcept -> bool;
+  auto IsReady() const noexcept -> bool;
+  auto IsBusy() const noexcept -> bool;
+
+ private:
+  Status status_;
 };
-
-[[nodiscard]] auto ToString(Status status) -> std::string;
-[[nodiscard]] auto FromString(std::string_view status) -> Status;
 
 }  // namespace delivery::core::domain::courier

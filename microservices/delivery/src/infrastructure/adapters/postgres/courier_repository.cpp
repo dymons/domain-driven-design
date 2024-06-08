@@ -67,22 +67,24 @@ class CourierRepository final : public core::ports::ICourierRepository {
   }
 
   auto GetByReadyStatus() const -> std::vector<Courier> final {
-    return GetByStatus(core::domain::courier::Status::Ready);
+    return GetByStatus(core::domain::courier::CourierStatus{
+        core::domain::courier::CourierStatus::Status::Ready});
   }
 
   auto GetByBusyStatus() const -> std::vector<Courier> final {
-    return GetByStatus(core::domain::courier::Status::Busy);
+    return GetByStatus(core::domain::courier::CourierStatus{
+        core::domain::courier::CourierStatus::Status::Busy});
   }
 
  private:
-  auto GetByStatus(core::domain::courier::Status status) const
+  auto GetByStatus(core::domain::courier::CourierStatus status) const
       -> std::vector<Courier> {
     auto const result =
         cluster_->Execute(userver::storages::postgres::ClusterHostType::kMaster,
                           "SELECT id, name, transport, current_location, status"
                           "FROM delivery.couriers"
                           "WHERE status = $1",
-                          ToString(status));
+                          status.ToString());
 
     auto const records = result.AsContainer<std::vector<dto::Courier>>();
     auto couriers = std::vector<Courier>{};

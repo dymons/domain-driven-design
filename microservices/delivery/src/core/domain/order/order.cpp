@@ -35,7 +35,7 @@ auto Order::IsCourierAssigned() const noexcept -> bool {
 }
 
 auto Order::AssignCourier(courier::Courier& courier) -> void {
-  if (courier.GetStatus() == courier::Status::Busy) {
+  if (courier.GetStatus().IsBusy()) {
     userver::utils::LogErrorAndThrow<CantAssignOrderToBusyCourier>(
         "Courier is busy, can't assign courier to the order");
   }

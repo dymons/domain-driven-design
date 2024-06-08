@@ -14,12 +14,13 @@ auto Courier::Create(CourierName name, Transport transport) -> Courier {
 
   return {CourierId{userver::utils::generators::GenerateUuidV7()},
           std::move(name), std::move(transport),
-          shared_kernel::Location::kMinLocation, Status::NotAvailable};
+          shared_kernel::Location::kMinLocation,
+          CourierStatus{CourierStatus::Status::NotAvailable}};
 }
 
 auto Courier::Hydrate(CourierId id, CourierName name, Transport transport,
                       shared_kernel::Location current_location,
-                      Status status) -> Courier {
+                      CourierStatus status) -> Courier {
   return {std::move(id), std::move(name), std::move(transport),
           current_location, status};
 }
@@ -34,7 +35,7 @@ auto Courier::GetCurrentLocation() const noexcept -> shared_kernel::Location {
   return current_location_;
 }
 
-auto Courier::GetStatus() const noexcept -> Status { return status_; }
+auto Courier::GetStatus() const noexcept -> CourierStatus { return status_; }
 
 auto Courier::MoveTo(shared_kernel::Location const to_location) -> void {
   if (current_location_ == to_location) {
@@ -61,43 +62,43 @@ auto Courier::MoveTo(shared_kernel::Location const to_location) -> void {
 
   auto reached_location = shared_kernel::Location::Create(new_x, new_y);
 
-  if (status_ == Status::Busy && reached_location == to_location) {
-    status_ = Status::Ready;
+  if (status_.IsBusy() && reached_location == to_location) {
+    status_ = CourierStatus{CourierStatus::Status::Ready};
   }
 
   current_location_ = reached_location;
 }
 
 auto Courier::StartWork() -> void {
-  if (status_ == Status::Busy) {
+  if (status_.IsBusy()) {
     userver::utils::LogErrorAndThrow<TryStartWorkingWhenAlreadyStarted>(
         "You cannot start work if it has already been started earlier");
   }
 
-  status_ = Status::Ready;
+  status_ = CourierStatus{CourierStatus::Status::Ready};
 }
 
 auto Courier::StopWork() -> void {
-  if (status_ == Status::Busy) {
+  if (status_.IsBusy()) {
     userver::utils::LogErrorAndThrow<TryStopWorkingWithIncompleteDelivery>(
         "You cannot stop working if there is an incomplete delivery");
   }
 
-  status_ = Status::NotAvailable;
+  status_ = CourierStatus{CourierStatus::Status::NotAvailable};
 }
 
 auto Courier::InWork() -> void {
-  if (status_ == Status::NotAvailable) {
+  if (status_.IsNotAvailable()) {
     userver::utils::LogErrorAndThrow<TryAssignOrderWhenNotAvailable>(
         "You cannot take an order to work if the courier has not started the "
         "working day");
   }
-  if (status_ == Status::Busy) {
+  if (status_.IsBusy()) {
     userver::utils::LogErrorAndThrow<TryAssignOrderWhenCourierHasAlreadyBusy>(
         "You can't take an order to work if the courier is already busy");
   }
 
-  status_ = Status::Busy;
+  status_ = CourierStatus{CourierStatus::Status::Busy};
 }
 
 auto Courier::CalculateTimeToPoint(
