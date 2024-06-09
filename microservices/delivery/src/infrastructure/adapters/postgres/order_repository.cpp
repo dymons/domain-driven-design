@@ -11,16 +11,13 @@
 namespace delivery::infrastructure::adapters::postgres {
 
 class OrderRepository final : public core::ports::IOrderRepository {
-  using core::ports::IOrderRepository::Order;
-  using core::ports::IOrderRepository::OrderId;
-
  public:
   ~OrderRepository() final = default;
 
   explicit OrderRepository(userver::storages::postgres::ClusterPtr cluster)
       : cluster_(std::move(cluster)) {}
 
-  auto Add(Order const& order) const -> void final {
+  auto Add(core::domain::order::Order const& order) const -> void final {
     auto const record = dto::Convert(order);
     auto const result =
         cluster_->Execute(userver::storages::postgres::ClusterHostType::kMaster,
@@ -36,7 +33,7 @@ class OrderRepository final : public core::ports::IOrderRepository {
     }
   }
 
-  auto Update(Order const& order) const -> void final {
+  auto Update(core::domain::order::Order const& order) const -> void final {
     auto const record = dto::Convert(order);
     auto const result = cluster_->Execute(
         userver::storages::postgres::ClusterHostType::kMaster,
@@ -52,7 +49,8 @@ class OrderRepository final : public core::ports::IOrderRepository {
     }
   }
 
-  auto GetById(OrderId const& order_id) const -> Order final try {
+  auto GetById(core::domain::order::OrderId const& order_id) const
+      -> core::domain::order::Order final try {
     auto const result = cluster_->Execute(
         userver::storages::postgres::ClusterHostType::kMaster,
         "SELECT id, status, courier_id, delivery_location, weight"
@@ -66,7 +64,7 @@ class OrderRepository final : public core::ports::IOrderRepository {
     userver::utils::LogErrorAndThrow<core::ports::OrderNotFound>(ex.what());
   }
 
-  auto GetNotAssigned() const -> std::vector<Order> final {
+  auto GetNotAssigned() const -> std::vector<core::domain::order::Order> final {
     auto const result = cluster_->Execute(
         userver::storages::postgres::ClusterHostType::kMaster,
         "SELECT id, status, courier_id, delivery_location, weight"
@@ -75,7 +73,7 @@ class OrderRepository final : public core::ports::IOrderRepository {
         core::domain::order::OrderStatus::kAssigned.ToString());
 
     auto const records = result.AsContainer<std::vector<dto::Order>>();
-    auto orders = std::vector<Order>{};
+    auto orders = std::vector<core::domain::order::Order>{};
     orders.reserve(records.size());
     for (auto const& record : records) {
       orders.push_back(dto::Convert(record));
@@ -84,7 +82,7 @@ class OrderRepository final : public core::ports::IOrderRepository {
     return orders;
   }
 
-  auto GetAssigned() const -> std::vector<Order> final {
+  auto GetAssigned() const -> std::vector<core::domain::order::Order> final {
     auto const result = cluster_->Execute(
         userver::storages::postgres::ClusterHostType::kMaster,
         "SELECT id, status, courier_id, delivery_location, weight"
@@ -93,7 +91,7 @@ class OrderRepository final : public core::ports::IOrderRepository {
         core::domain::order::OrderStatus::kAssigned.ToString());
 
     auto const records = result.AsContainer<std::vector<dto::Order>>();
-    auto orders = std::vector<Order>{};
+    auto orders = std::vector<core::domain::order::Order>{};
     orders.reserve(records.size());
     for (auto const& record : records) {
       orders.push_back(dto::Convert(record));

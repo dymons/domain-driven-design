@@ -11,10 +11,6 @@ class Courier;
 namespace delivery::core::ports {
 
 class ICourierRepository {
- protected:
-  using Courier = domain::courier::Courier;
-  using CourierId = domain::courier::CourierId;
-
  public:
   virtual ~ICourierRepository() = default;
 
@@ -24,11 +20,14 @@ class ICourierRepository {
   ICourierRepository& operator=(ICourierRepository const&) = delete;
   ICourierRepository& operator=(ICourierRepository&&) = delete;
 
-  virtual auto Add(Courier const&) const -> void = 0;
-  virtual auto Update(Courier const&) const -> void = 0;
-  virtual auto GetById(CourierId const&) const -> Courier = 0;
-  virtual auto GetByReadyStatus() const -> std::vector<Courier> = 0;
-  virtual auto GetByBusyStatus() const -> std::vector<Courier> = 0;
+  virtual auto Add(domain::courier::Courier const&) const -> void = 0;
+  virtual auto Update(domain::courier::Courier const&) const -> void = 0;
+  virtual auto GetById(domain::courier::CourierId const&) const
+      -> domain::courier::Courier = 0;
+  virtual auto GetByReadyStatus() const
+      -> std::vector<domain::courier::Courier> = 0;
+  virtual auto GetByBusyStatus() const
+      -> std::vector<domain::courier::Courier> = 0;
 };
 
 }  // namespace delivery::core::ports

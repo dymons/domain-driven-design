@@ -11,16 +11,13 @@
 namespace delivery::infrastructure::adapters::postgres {
 
 class CourierRepository final : public core::ports::ICourierRepository {
-  using core::ports::ICourierRepository::Courier;
-  using core::ports::ICourierRepository::CourierId;
-
  public:
   ~CourierRepository() final = default;
 
   explicit CourierRepository(userver::storages::postgres::ClusterPtr cluster)
       : cluster_(std::move(cluster)) {}
 
-  auto Add(Courier const& courier) const -> void final {
+  auto Add(core::domain::courier::Courier const& courier) const -> void final {
     auto const record = dto::Convert(courier);
     auto const result =
         cluster_->Execute(userver::storages::postgres::ClusterHostType::kMaster,
@@ -36,7 +33,8 @@ class CourierRepository final : public core::ports::ICourierRepository {
     }
   }
 
-  auto Update(Courier const& courier) const -> void final {
+  auto Update(core::domain::courier::Courier const& courier) const
+      -> void final {
     auto const record = dto::Convert(courier);
     auto const result = cluster_->Execute(
         userver::storages::postgres::ClusterHostType::kMaster,
@@ -52,7 +50,8 @@ class CourierRepository final : public core::ports::ICourierRepository {
     }
   }
 
-  auto GetById(CourierId const& courier_id) const -> Courier final try {
+  auto GetById(core::domain::courier::CourierId const& courier_id) const
+      -> core::domain::courier::Courier final try {
     auto const result =
         cluster_->Execute(userver::storages::postgres::ClusterHostType::kMaster,
                           "SELECT id, name, transport, current_location, status"
@@ -66,17 +65,19 @@ class CourierRepository final : public core::ports::ICourierRepository {
     userver::utils::LogErrorAndThrow<core::ports::CourierNotFound>(ex.what());
   }
 
-  auto GetByReadyStatus() const -> std::vector<Courier> final {
+  auto GetByReadyStatus() const
+      -> std::vector<core::domain::courier::Courier> final {
     return GetByStatus(core::domain::courier::CourierStatus::kReady);
   }
 
-  auto GetByBusyStatus() const -> std::vector<Courier> final {
+  auto GetByBusyStatus() const
+      -> std::vector<core::domain::courier::Courier> final {
     return GetByStatus(core::domain::courier::CourierStatus::kBusy);
   }
 
  private:
   auto GetByStatus(core::domain::courier::CourierStatus status) const
-      -> std::vector<Courier> {
+      -> std::vector<core::domain::courier::Courier> {
     auto const result =
         cluster_->Execute(userver::storages::postgres::ClusterHostType::kMaster,
                           "SELECT id, name, transport, current_location, status"
@@ -85,7 +86,7 @@ class CourierRepository final : public core::ports::ICourierRepository {
                           status.ToString());
 
     auto const records = result.AsContainer<std::vector<dto::Courier>>();
-    auto couriers = std::vector<Courier>{};
+    auto couriers = std::vector<core::domain::courier::Courier>{};
     couriers.reserve(records.size());
     for (auto const& record : records) {
       couriers.push_back(dto::Convert(record));
