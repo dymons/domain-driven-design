@@ -75,9 +75,9 @@ class OrderRepository final : public core::ports::IOrderRepository {
     auto const records = result.AsContainer<std::vector<dto::Order>>();
     auto orders = std::vector<core::domain::order::Order>{};
     orders.reserve(records.size());
-    for (auto const& record : records) {
-      orders.push_back(dto::Convert(record));
-    }
+    std::ranges::transform(
+        records, std::back_inserter(orders),
+        [](auto const& record) { return dto::Convert(record); });
 
     return orders;
   }
@@ -93,9 +93,9 @@ class OrderRepository final : public core::ports::IOrderRepository {
     auto const records = result.AsContainer<std::vector<dto::Order>>();
     auto orders = std::vector<core::domain::order::Order>{};
     orders.reserve(records.size());
-    for (auto const& record : records) {
-      orders.push_back(dto::Convert(record));
-    }
+    std::ranges::transform(
+        records, std::back_inserter(orders),
+        [](auto const& record) { return dto::Convert(record); });
 
     return orders;
   }
