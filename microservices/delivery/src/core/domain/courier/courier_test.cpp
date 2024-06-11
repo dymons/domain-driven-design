@@ -40,10 +40,10 @@ UTEST(CourierShould, MoveToLocation) {
   auto courier = Courier::Create(MockCourierName(), Transport::kBicycle);
 
   // Act
-  courier.MoveTo(Location::Create(X{5}, Y{5}));
+  courier.MoveTo(Location{X{5}, Y{5}});
 
   // Assert
-  ASSERT_EQ(courier.GetCurrentLocation(), Location::Create(X{3}, Y{1}));
+  ASSERT_EQ(courier.GetCurrentLocation(), (Location{X{3}, Y{1}}));
 }
 
 UTEST(CourierShould, CanStartWork) {

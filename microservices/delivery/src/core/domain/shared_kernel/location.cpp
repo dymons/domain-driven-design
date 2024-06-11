@@ -8,23 +8,26 @@
 
 namespace delivery::core::domain {
 
-const Location Location::kMinLocation = Location{X{1}, Y{1}};
-const Location Location::kMaxLocation = Location{X{10}, Y{10}};
+const auto kMinX = X{1};
+const auto kMaxX = X{10};
+const auto kMinY = Y{1};
+const auto kMaxY = Y{10};
 
-auto Location::Create(X const x, Y const y) -> Location {
-  if (x < kMinLocation.GetX() || x > kMaxLocation.GetX()) {
-    throw ArgumentException{
-        fmt::format("The coordinate x should be in range from {} to {}",
-                    kMinLocation.GetX().GetUnderlying(),
-                    kMaxLocation.GetX().GetUnderlying())};
+const Location Location::kMinLocation = Location{kMinX, kMinY};
+const Location Location::kMaxLocation = Location{kMaxX, kMaxY};
+
+Location::Location(X x, Y y) {
+  if (x < kMinX || x > kMaxX) {
+    throw ArgumentException{fmt::format(
+        "The coordinate x should be in range from {} to {}", kMinX, kMaxX)};
   }
-  if (y < kMinLocation.GetY() || y > kMaxLocation.GetY()) {
-    throw ArgumentException{
-        fmt::format("The coordinate y should be in range from {} to {}",
-                    kMinLocation.GetY().GetUnderlying(),
-                    kMaxLocation.GetY().GetUnderlying())};
+  if (y < kMinY || y > kMaxY) {
+    throw ArgumentException{fmt::format(
+        "The coordinate y should be in range from {} to {}", kMinY, kMaxY)};
   }
-  return Location{x, y};
+
+  x_ = x.GetUnderlying();
+  y_ = y.GetUnderlying();
 }
 
 auto Location::GetX() const noexcept -> X { return X{x_}; }

@@ -18,8 +18,8 @@ auto Courier::Create(CourierName name, Transport transport) -> Courier {
 }
 
 auto Courier::Hydrate(CourierId id, CourierName name, Transport transport,
-                      Location current_location, CourierStatus status)
-    -> Courier {
+                      Location current_location,
+                      CourierStatus status) -> Courier {
   return {std::move(id), std::move(name), std::move(transport),
           current_location, status};
 }
@@ -57,8 +57,7 @@ auto Courier::MoveTo(Location const to_location) -> void {
                        to_location.GetY().GetUnderlying())};
   }
 
-  auto reached_location = Location::Create(new_x, new_y);
-
+  auto reached_location = Location{new_x, new_y};
   if (status_.IsBusy() && reached_location == to_location) {
     status_ = CourierStatus::kReady;
   }

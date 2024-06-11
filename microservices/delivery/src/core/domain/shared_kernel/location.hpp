@@ -14,15 +14,13 @@ class Location {
   int x_;
   int y_;
 
-  // Constructors
-
-  Location(X x, Y y) : x_(x.GetUnderlying()), y_(y.GetUnderlying()) {}
-
  public:
   static const Location kMinLocation;
   static const Location kMaxLocation;
 
-  [[nodiscard]] static auto Create(X, Y) -> Location;
+  // Constructors
+
+  Location(X, Y);
 
   // Observers
 

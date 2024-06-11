@@ -15,7 +15,7 @@ auto MockBasketId() -> BasketId {
   return BasketId{kBasketId};
 }
 
-auto MockDeliveryLocation() -> Location { return Location::Create(X{5}, Y{5}); }
+auto MockDeliveryLocation() -> Location { return Location{X{5}, Y{5}}; }
 
 auto MockWeight() -> Weight { return Weight{10}; }
 
