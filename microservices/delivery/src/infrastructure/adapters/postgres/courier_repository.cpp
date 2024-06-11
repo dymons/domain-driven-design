@@ -10,6 +10,8 @@
 
 namespace delivery::infrastructure::adapters::postgres {
 
+namespace {
+
 class CourierRepository final : public core::ports::ICourierRepository {
  public:
   ~CourierRepository() final = default;
@@ -97,6 +99,8 @@ class CourierRepository final : public core::ports::ICourierRepository {
 
   const userver::storages::postgres::ClusterPtr cluster_;
 };
+
+}  // namespace
 
 auto MakeCourierRepository(userver::storages::postgres::ClusterPtr cluster)
     -> userver::utils::SharedRef<const core::ports::ICourierRepository> {

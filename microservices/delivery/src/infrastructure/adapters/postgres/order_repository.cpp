@@ -10,6 +10,8 @@
 
 namespace delivery::infrastructure::adapters::postgres {
 
+namespace {
+
 class OrderRepository final : public core::ports::IOrderRepository {
  public:
   ~OrderRepository() final = default;
@@ -103,6 +105,8 @@ class OrderRepository final : public core::ports::IOrderRepository {
  private:
   const userver::storages::postgres::ClusterPtr cluster_;
 };
+
+}  // namespace
 
 auto MakeOrderRepository(userver::storages::postgres::ClusterPtr cluster)
     -> userver::utils::SharedRef<const core::ports::IOrderRepository> {
