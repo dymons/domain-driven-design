@@ -10,6 +10,14 @@ class Courier;
 
 namespace delivery::core::ports {
 
+struct CourierNotFound : std::runtime_error {
+  using std::runtime_error::runtime_error;
+};
+
+struct CourierAlreadyExists : std::runtime_error {
+  using std::runtime_error::runtime_error;
+};
+
 class ICourierRepository {
  public:
   virtual ~ICourierRepository() = default;
