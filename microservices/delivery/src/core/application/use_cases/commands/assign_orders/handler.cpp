@@ -8,7 +8,7 @@
 
 namespace delivery::application::use_cases::commands::assign_orders {
 
-Handler::Handler(
+AssignOrdersHandler::AssignOrdersHandler(
     SharedRef<core::ports::ICourierRepository> courier_repository,
     SharedRef<core::ports::IOrderRepository> order_repository,
     SharedRef<core::domain_services::IDispatchService> dispatch_service)
@@ -16,7 +16,7 @@ Handler::Handler(
       order_repository_(std::move(order_repository)),
       dispatch_service_(std::move(dispatch_service)) {}
 
-auto Handler::Handle(Command) -> void {
+auto AssignOrdersHandler::Handle(AssignOrdersCommand&&) -> void {
   auto const couriers = courier_repository_->GetByReadyStatus();
   auto const orders = order_repository_->GetNotAssigned();
 

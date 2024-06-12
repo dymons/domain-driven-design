@@ -4,10 +4,11 @@
 
 namespace delivery::application::use_cases::commands::create_order {
 
-Handler::Handler(SharedRef<core::ports::IOrderRepository> order_repository)
+CreateOrderHandler::CreateOrderHandler(
+    SharedRef<core::ports::IOrderRepository> order_repository)
     : order_repository_(std::move(order_repository)) {}
 
-auto Handler::Handle(Command&& command) -> void {
+auto CreateOrderHandler::Handle(CreateOrderCommand&& command) -> void {
   auto const order = core::domain::order::Order::Create(
       core::domain::order::BasketId{command.basket_id.GetUnderlying()},
       core::domain::Location::kMinLocation,

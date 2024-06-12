@@ -12,7 +12,7 @@ using BacketId = RefinementType<struct BacketIdTag, std::string, NotEmpty>;
 using Address = RefinementType<struct AddressTag, std::string, NotEmpty>;
 using Weight = RefinementType<struct WeightTag, int, ShouldBePositive>;
 
-struct Command final {
+struct CreateOrderCommand final {
   BacketId basket_id;
   std::string address;
   Weight weight;

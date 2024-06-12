@@ -7,13 +7,13 @@
 
 namespace delivery::application::use_cases::commands::create_order {
 
-class Handler {
+class CreateOrderHandler final {
   SharedRef<core::ports::IOrderRepository> order_repository_;
 
  public:
-  explicit Handler(SharedRef<core::ports::IOrderRepository>);
+  explicit CreateOrderHandler(SharedRef<core::ports::IOrderRepository>);
 
-  auto Handle(Command&&) -> void;
+  auto Handle(CreateOrderCommand&&) -> void;
 };
 
 }  // namespace delivery::application::use_cases::commands::create_order

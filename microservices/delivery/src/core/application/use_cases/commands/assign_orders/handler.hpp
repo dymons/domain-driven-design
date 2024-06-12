@@ -11,17 +11,17 @@
 
 namespace delivery::application::use_cases::commands::assign_orders {
 
-class Handler {
+class AssignOrdersHandler {
   SharedRef<core::ports::ICourierRepository> courier_repository_;
   SharedRef<core::ports::IOrderRepository> order_repository_;
   SharedRef<core::domain_services::IDispatchService> dispatch_service_;
 
  public:
-  Handler(SharedRef<core::ports::ICourierRepository>,
-          SharedRef<core::ports::IOrderRepository>,
-          SharedRef<core::domain_services::IDispatchService>);
+  AssignOrdersHandler(SharedRef<core::ports::ICourierRepository>,
+                      SharedRef<core::ports::IOrderRepository>,
+                      SharedRef<core::domain_services::IDispatchService>);
 
-  auto Handle(Command) -> void;
+  auto Handle(AssignOrdersCommand&&) -> void;
 };
 
 }  // namespace delivery::application::use_cases::commands::assign_orders
