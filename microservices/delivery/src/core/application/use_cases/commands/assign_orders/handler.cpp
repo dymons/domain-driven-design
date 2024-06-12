@@ -23,10 +23,12 @@ auto Handler::Handle(Command) -> void {
   auto orders_view =
       orders | std::ranges::views::take(1) |
       std::ranges::views::transform([&couriers, this](auto order) {
-        return dispatch_service_->Dispatch(std::move(order), couriers);
+        return this->dispatch_service_->Dispatch(std::move(order), couriers);
       });
 
-  std::ranges::for_each(orders_view, [](auto) {});
+  std::ranges::for_each(orders_view, [this](auto const& order) {
+    this->order_repository_->Update(order);
+  });
 }
 
 }  // namespace delivery::application::use_cases::commands::assign_orders
