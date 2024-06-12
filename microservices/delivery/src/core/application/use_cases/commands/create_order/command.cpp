@@ -1,5 +1,7 @@
 #include "command.hpp"
 
+#include <userver/utils/exception.hpp>
+
 #include <core/application/exceptions.hpp>
 
 namespace delivery::application::use_cases::commands::create_order {
@@ -7,15 +9,16 @@ namespace delivery::application::use_cases::commands::create_order {
 CreateOrderCommand::CreateOrderCommand(std::string basket_id,
                                        std::string address, int weight) {
   if (basket_id.empty()) {
-    throw ArgumentException{"basket_id is empty"};
+    userver::utils::LogErrorAndThrow<ArgumentException>("basket_id is empty");
   }
 
   if (address.empty()) {
-    throw ArgumentException{"address is empty"};
+    userver::utils::LogErrorAndThrow<ArgumentException>("address is empty");
   }
 
   if (weight < 0) {
-    throw ArgumentException{"weight should be positive"};
+    userver::utils::LogErrorAndThrow<ArgumentException>(
+        "weight should be positive");
   }
 
   basket_id_ = std::move(basket_id);
