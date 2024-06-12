@@ -26,6 +26,26 @@ UTEST(RefinementTypeShould, BeConstructableWithRefinements) {
   [[maybe_unused]] auto value = Address{"Address"};
 }
 
+UTEST(RefinementTypeShould, BeCopyable) {
+  using Address = RefinementType<struct AddressTag, std::string>;
+  auto const address = Address{"Address"};
+
+  // NOLINTNEXTLINE(*-unnecessary-copy-initialization)
+  auto const copy_address = address;
+
+  ASSERT_EQ(address, copy_address);
+}
+
+UTEST(RefinementTypeShould, BeMovable) {
+  using Address = RefinementType<struct AddressTag, std::string>;
+  auto address = Address{"Address"};
+
+  // NOLINTNEXTLINE(*-unnecessary-copy-initialization)
+  auto const move_address = std::move(address);
+
+  ASSERT_TRUE(address != move_address);  // NOLINT(*-use-after-move)
+}
+
 }  // namespace
 
 }  // namespace delivery
