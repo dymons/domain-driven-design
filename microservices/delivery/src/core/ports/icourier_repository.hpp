@@ -10,11 +10,11 @@ class Courier;
 
 namespace delivery::core::ports {
 
-struct CourierNotFound : std::runtime_error {
+struct CourierNotFound final : std::runtime_error {
   using std::runtime_error::runtime_error;
 };
 
-struct CourierAlreadyExists : std::runtime_error {
+struct CourierAlreadyExists final : std::runtime_error {
   using std::runtime_error::runtime_error;
 };
 

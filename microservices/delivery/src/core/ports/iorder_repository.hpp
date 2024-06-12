@@ -10,11 +10,11 @@ class Order;
 
 namespace delivery::core::ports {
 
-struct OrderNotFound : std::runtime_error {
+struct OrderNotFound final : std::runtime_error {
   using std::runtime_error::runtime_error;
 };
 
-struct OrderAlreadyExists : std::runtime_error {
+struct OrderAlreadyExists final : std::runtime_error {
   using std::runtime_error::runtime_error;
 };
 
