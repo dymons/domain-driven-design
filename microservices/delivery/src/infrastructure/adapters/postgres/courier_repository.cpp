@@ -4,6 +4,7 @@
 #include <userver/utils/exception.hpp>
 
 #include <core/domain/courier/courier.hpp>
+#include <core/ports/icourier_repository.hpp>
 
 #include "dto/courier.hpp"
 

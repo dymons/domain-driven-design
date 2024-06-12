@@ -4,6 +4,7 @@
 #include <userver/utils/exception.hpp>
 
 #include <core/domain/order/order.hpp>
+#include <core/ports/iorder_repository.hpp>
 
 #include "dto/order.hpp"
 

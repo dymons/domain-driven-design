@@ -3,7 +3,9 @@
 #include <userver/storages/postgres/postgres_fwd.hpp>
 #include <userver/utils/not_null.hpp>
 
-#include <core/ports/iorder_repository.hpp>
+namespace delivery::core::ports {
+class IOrderRepository;
+}  // namespace delivery::core::ports
 
 namespace delivery::infrastructure::adapters::postgres {
 
