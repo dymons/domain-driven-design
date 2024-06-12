@@ -28,7 +28,7 @@ UTEST(DispatchServiceShould, NotDispatchWhenNotReadyCouriers) {
   // Arrange
   auto const dispatcher = MakeDispatchService();
   auto order = domain::order::MockOrder();
-  auto couriers = std::vector<domain::courier::Courier>{};
+  auto couriers = std::unordered_set<domain::courier::Courier>{};
 
   // Act
   order = dispatcher->Dispatch(std::move(order), couriers);
