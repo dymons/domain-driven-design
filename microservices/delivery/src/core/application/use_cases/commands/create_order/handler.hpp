@@ -13,7 +13,7 @@ class Handler {
   SharedRef<core::ports::IOrderRepository> order_repository_;
 
  public:
-  Handler(SharedRef<core::ports::IOrderRepository>);
+  explicit Handler(SharedRef<core::ports::IOrderRepository>);
 
   auto Handle(Command&&) -> void;
 };
