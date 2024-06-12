@@ -26,22 +26,32 @@ struct Score {
   }
 };
 
+class DispatchService final : public IDispatchService {
+ public:
+  ~DispatchService() final = default;
+
+  auto Dispatch(domain::order::Order&& order,
+                std::vector<domain::courier::Courier> const& couriers)
+      -> domain::order::Order final {
+    auto scores = std::set<Score>{};
+    std::ranges::transform(
+        couriers, std::inserter(scores, scores.begin()),
+        [&](auto const& courier) { return Score::Estimate(courier, order); });
+
+    if (not scores.empty()) {
+      auto const courier_id = scores.begin()->courier_id;
+      order.AssignCourier(domain::order::CourierId{courier_id.GetUnderlying()});
+    }
+
+    return order;
+  }
+};
+
 }  // namespace
 
-auto DispatchService::Dispatch(domain::order::Order&& order,
-                               std::vector<domain::courier::Courier> const&
-                                   couriers) -> domain::order::Order {
-  auto scores = std::set<Score>{};
-  std::ranges::transform(
-      couriers, std::inserter(scores, scores.begin()),
-      [&](auto const& courier) { return Score::Estimate(courier, order); });
-
-  if (not scores.empty()) {
-    auto const courier_id = scores.begin()->courier_id;
-    order.AssignCourier(domain::order::CourierId{courier_id.GetUnderlying()});
-  }
-
-  return order;
+[[nodiscard]] auto MakeDispatchService()
+    -> userver::utils::SharedRef<const IDispatchService> {
+  return userver::utils::MakeSharedRef<const DispatchService>();
 }
 
 }  // namespace delivery::core::domain_services

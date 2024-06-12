@@ -1,16 +1,12 @@
 #pragma once
 
+#include <userver/utils/not_null.hpp>
+
 #include "idispatch_service.hpp"
 
 namespace delivery::core::domain_services {
 
-class DispatchService final : public IDispatchService {
- public:
-  ~DispatchService() final = default;
-
-  auto Dispatch(domain::order::Order&&,
-                std::vector<domain::courier::Courier> const&)
-      -> domain::order::Order final;
-};
+[[nodiscard]] auto MakeDispatchService()
+    -> userver::utils::SharedRef<const IDispatchService>;
 
 }  // namespace delivery::core::domain_services
