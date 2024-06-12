@@ -14,7 +14,7 @@ CreateOrderCommand::CreateOrderCommand(std::string basket_id,
     throw ArgumentException{"address is empty"};
   }
 
-  if (weight >= 0) {
+  if (weight < 0) {
     throw ArgumentException{"weight should be positive"};
   }
 
