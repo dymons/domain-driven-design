@@ -9,6 +9,21 @@ namespace delivery::core::domain_services {
 
 namespace {
 
+UTEST(DispatchServiceShould, DispatchCourier) {
+  // Arrange
+  auto const dispatcher = MakeDispatchService();
+  auto order = domain::order::MockOrder();
+  auto const courier = domain::courier::MockCourier();
+
+  // Act
+  order = dispatcher->Dispatch(std::move(order), {courier});
+
+  // Assert
+  ASSERT_TRUE(order.IsCourierAssigned());
+  ASSERT_EQ(order.GetCourierId(),
+            domain::order::CourierId{courier.GetId().GetUnderlying()});
+}
+
 UTEST(DispatchServiceShould, NotDispatchWhenNotReadyCouriers) {
   // Arrange
   auto const dispatcher = MakeDispatchService();
