@@ -103,7 +103,7 @@ class CourierRepository final : public core::ports::ICourierRepository {
 }  // namespace
 
 auto MakeCourierRepository(userver::storages::postgres::ClusterPtr cluster)
-    -> userver::utils::SharedRef<const core::ports::ICourierRepository> {
+    -> SharedRef<core::ports::ICourierRepository> {
   return userver::utils::MakeSharedRef<const CourierRepository>(
       std::move(cluster));
 }

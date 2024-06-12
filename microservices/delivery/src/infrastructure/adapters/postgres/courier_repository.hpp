@@ -1,7 +1,8 @@
 #pragma once
 
 #include <userver/storages/postgres/postgres_fwd.hpp>
-#include <userver/utils/not_null.hpp>
+
+#include <utils/memory.hpp>
 
 namespace delivery::core::ports {
 class ICourierRepository;
@@ -11,6 +12,6 @@ namespace delivery::infrastructure::adapters::postgres {
 
 [[nodiscard]] auto MakeCourierRepository(
     userver::storages::postgres::ClusterPtr)
-    -> userver::utils::SharedRef<const core::ports::ICourierRepository>;
+    -> SharedRef<core::ports::ICourierRepository>;
 
 }  // namespace delivery::infrastructure::adapters::postgres
