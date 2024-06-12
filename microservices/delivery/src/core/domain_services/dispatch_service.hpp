@@ -1,12 +1,11 @@
 #pragma once
 
-#include <userver/utils/not_null.hpp>
+#include <utils/memory.hpp>
 
 namespace delivery::core::domain_services {
 
 class IDispatchService;
 
-[[nodiscard]] auto MakeDispatchService()
-    -> userver::utils::SharedRef<const IDispatchService>;
+[[nodiscard]] auto MakeDispatchService() -> SharedRef<IDispatchService>;
 
 }  // namespace delivery::core::domain_services

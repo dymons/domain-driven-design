@@ -50,8 +50,7 @@ class DispatchService final : public IDispatchService {
 
 }  // namespace
 
-auto MakeDispatchService()
-    -> userver::utils::SharedRef<const IDispatchService> {
+auto MakeDispatchService() -> SharedRef<IDispatchService> {
   return userver::utils::MakeSharedRef<const DispatchService>();
 }
 
