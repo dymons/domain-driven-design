@@ -1,41 +1,23 @@
 #include <userver/utest/utest.hpp>
 
-#include "courier.hpp"
+#include "courier_mock_test.hpp"
 
 namespace delivery::core::domain::courier {
 
 namespace {
-
-auto MockCourierName() -> CourierName {
-  return CourierName{"some_courier_name"};
-}
-
-auto MockTransport() -> Transport { return Transport::kPedestrian; }
-
-UTEST(CourierShould, BeConstructibleWithRequiredProperties) {
-  // Arrange
-
-  // Act
-  auto const courier = Courier::Create(MockCourierName(), MockTransport());
-
-  // Assert
-  ASSERT_TRUE(courier.GetStatus().IsNotAvailable());
-  ASSERT_EQ(courier.GetName(), MockCourierName());
-  ASSERT_EQ(courier.GetCurrentLocation(), Location::kMinLocation);
-}
 
 UTEST(CourierShould, ThrowWhenCreateCourierWithEmptyName) {
   // Arrange
   auto courier_name = CourierName{""};
 
   // Act & Assert
-  ASSERT_THROW(auto const _ = Courier::Create(courier_name, MockTransport()),
+  ASSERT_THROW(auto const _ = MockCourier({.name = courier_name}),
                ArgumentException);
 }
 
 UTEST(CourierShould, MoveToLocation) {
   // Arrange
-  auto courier = Courier::Create(MockCourierName(), Transport::kBicycle);
+  auto courier = MockCourier({.transport = Transport::kBicycle});
 
   // Act
   courier.MoveTo(Location{X{5}, Y{5}});
@@ -46,7 +28,7 @@ UTEST(CourierShould, MoveToLocation) {
 
 UTEST(CourierShould, CanStartWork) {
   // Arrange
-  auto courier = Courier::Create(MockCourierName(), MockTransport());
+  auto courier = MockCourier();
 
   // Act
   courier.StartWork();
@@ -57,7 +39,7 @@ UTEST(CourierShould, CanStartWork) {
 
 UTEST(CourierShould, CanStopWork) {
   // Arrange
-  auto courier = Courier::Create(MockCourierName(), MockTransport());
+  auto courier = MockCourier();
   courier.StartWork();
 
   // Act
@@ -69,7 +51,7 @@ UTEST(CourierShould, CanStopWork) {
 
 UTEST(CourierShould, CanCalculateTimeToLocation) {
   // Arrange
-  auto courier = Courier::Create(MockCourierName(), MockTransport());
+  auto courier = MockCourier();
 
   // Act
   auto const time = courier.CalculateTimeToPoint(Location::kMaxLocation);

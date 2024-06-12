@@ -5,6 +5,6 @@
 
 namespace delivery::core::domain::order {
 
-auto MockOrder() -> Order;
+[[nodiscard]] auto MockOrder() -> Order;
 
 } // namespace delivery::core::domain::order
