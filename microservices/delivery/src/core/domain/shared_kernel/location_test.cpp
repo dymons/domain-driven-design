@@ -7,6 +7,8 @@
 
 namespace delivery::core::domain {
 
+namespace {
+
 UTEST(LocationShould, BeCorrectWhenParamsIsCorrectOnCreated) {
   // Arrange
 
@@ -109,5 +111,7 @@ UTEST(LocationShould, DistanceToNotDependOrderArguments) {
   // Assert
   ASSERT_EQ(distance1, distance2);
 }
+
+}  // namespace
 
 }  // namespace delivery::core::domain

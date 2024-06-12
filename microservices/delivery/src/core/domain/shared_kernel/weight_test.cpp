@@ -5,6 +5,8 @@
 
 namespace delivery::core::domain {
 
+namespace {
+
 UTEST(WeightShould, BeCorrectWhenParamsIsCorrectOnCreated) {
   // Arrange
 
@@ -71,5 +73,7 @@ UTEST(WeightShould, CanCompareLessThen) {
   // Assert
   ASSERT_FALSE(result);
 }
+
+}  // namespace
 
 }  // namespace delivery::core::domain

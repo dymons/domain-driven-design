@@ -31,8 +31,6 @@ auto MockOrder() -> Order {
   return Order::Create(MockBasketId(), MockDeliveryLocation(), MockWeight());
 }
 
-}  // namespace
-
 UTEST(OrderShould, BeConstructibleWithRequiredProperties) {
   // Arrange
 
@@ -95,5 +93,7 @@ UTEST(OrderShould, DoNothingWhenCompleteOrderWithStatusCompleted) {
   // Assert
   ASSERT_TRUE(order.GetStatus().IsCompleted());
 }
+
+}  // namespace
 
 }  // namespace delivery::core::domain::order

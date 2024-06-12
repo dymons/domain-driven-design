@@ -12,8 +12,6 @@ auto MockCourierName() -> CourierName {
 
 auto MockTransport() -> Transport { return Transport::kPedestrian; }
 
-}  // namespace
-
 UTEST(CourierShould, BeConstructibleWithRequiredProperties) {
   // Arrange
 
@@ -79,5 +77,7 @@ UTEST(CourierShould, CanCalculateTimeToLocation) {
   // Assert
   ASSERT_EQ(time, Time{18});
 }
+
+}  // namespace
 
 }  // namespace delivery::core::domain::courier
