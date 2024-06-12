@@ -19,11 +19,14 @@ Handler::Handler(
 auto Handler::Handle(Command) -> void {
   auto orders = order_repository_->GetNotAssigned();
 
-  orders | std::ranges::views::take(1) |
+  auto orders_view =
+      orders | std::ranges::views::take(1) |
       std::ranges::views::transform([this](auto order) {
         auto const couriers = courier_repository_->GetByReadyStatus();
         return dispatch_service_->Dispatch(std::move(order), couriers);
       });
+
+  std::ranges::for_each(orders_view, [](auto) {});
 }
 
 }  // namespace delivery::application::use_cases::commands::assign_orders
