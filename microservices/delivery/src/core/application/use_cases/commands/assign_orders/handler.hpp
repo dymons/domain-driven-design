@@ -11,7 +11,7 @@
 
 namespace delivery::application::use_cases::commands::assign_orders {
 
-class AssignOrdersHandler {
+class AssignOrdersHandler final {
   SharedRef<core::ports::ICourierRepository> courier_repository_;
   SharedRef<core::ports::IOrderRepository> order_repository_;
   SharedRef<core::domain_services::IDispatchService> dispatch_service_;
