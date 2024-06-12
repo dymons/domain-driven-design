@@ -17,8 +17,8 @@ Handler::Handler(
       dispatch_service_(std::move(dispatch_service)) {}
 
 auto Handler::Handle(Command) -> void {
-  auto orders = order_repository_->GetNotAssigned();
   auto const couriers = courier_repository_->GetByReadyStatus();
+  auto const orders = order_repository_->GetNotAssigned();
 
   auto orders_view =
       orders | std::ranges::views::take(1) |
