@@ -68,18 +68,18 @@ class CourierRepository final : public core::ports::ICourierRepository {
   }
 
   auto GetByReadyStatus() const
-      -> std::vector<core::domain::courier::Courier> final {
+      -> std::unordered_set<core::domain::courier::Courier> final {
     return GetByStatus(core::domain::courier::CourierStatus::kReady);
   }
 
   auto GetByBusyStatus() const
-      -> std::vector<core::domain::courier::Courier> final {
+      -> std::unordered_set<core::domain::courier::Courier> final {
     return GetByStatus(core::domain::courier::CourierStatus::kBusy);
   }
 
  private:
   auto GetByStatus(core::domain::courier::CourierStatus status) const
-      -> std::vector<core::domain::courier::Courier> {
+      -> std::unordered_set<core::domain::courier::Courier> {
     auto const result =
         cluster_->Execute(userver::storages::postgres::ClusterHostType::kMaster,
                           "SELECT id, name, transport, current_location, status"
@@ -88,10 +88,10 @@ class CourierRepository final : public core::ports::ICourierRepository {
                           status.ToString());
 
     auto const records = result.AsContainer<std::vector<dto::Courier>>();
-    auto couriers = std::vector<core::domain::courier::Courier>{};
+    auto couriers = std::unordered_set<core::domain::courier::Courier>{};
     couriers.reserve(records.size());
     for (auto const& record : records) {
-      couriers.push_back(dto::Convert(record));
+      couriers.insert(dto::Convert(record));
     }
 
     return couriers;

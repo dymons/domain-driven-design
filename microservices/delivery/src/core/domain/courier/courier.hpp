@@ -40,6 +40,8 @@ class Courier {
   [[nodiscard]] auto GetCurrentLocation() const noexcept -> Location;
   [[nodiscard]] auto CalculateTimeToPoint(Location) const noexcept -> Time;
 
+  [[nodiscard]] auto operator==(const Courier&) const -> bool;
+
   // Modifiers
 
   auto MoveTo(Location location) -> void;
@@ -49,3 +51,11 @@ class Courier {
 };
 
 }  // namespace delivery::core::domain::courier
+
+template <>
+struct std::hash<delivery::core::domain::courier::Courier> {
+  std::size_t operator()(
+      const delivery::core::domain::courier::Courier& c) const {
+    return std::hash<std::string>{}(c.GetId().GetUnderlying());
+  }
+};

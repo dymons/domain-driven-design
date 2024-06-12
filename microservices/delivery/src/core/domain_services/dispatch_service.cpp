@@ -33,7 +33,7 @@ class DispatchService final : public IDispatchService {
 
   [[nodiscard]] auto Dispatch(
       domain::order::Order&& order,
-      std::vector<domain::courier::Courier> const& couriers) const
+      std::unordered_set<domain::courier::Courier> const& couriers) const
       -> domain::order::Order final {
     auto scores = std::set<Score>{};
     std::ranges::transform(

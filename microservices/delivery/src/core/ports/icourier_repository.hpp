@@ -1,6 +1,6 @@
 #pragma once
 
-#include <vector>
+#include <unordered_set>
 
 #include <core/domain/courier/strong_typedefs.hpp>
 
@@ -33,9 +33,9 @@ class ICourierRepository {
   virtual auto GetById(domain::courier::CourierId const&) const
       -> domain::courier::Courier = 0;
   virtual auto GetByReadyStatus() const
-      -> std::vector<domain::courier::Courier> = 0;
+      -> std::unordered_set<domain::courier::Courier> = 0;
   virtual auto GetByBusyStatus() const
-      -> std::vector<domain::courier::Courier> = 0;
+      -> std::unordered_set<domain::courier::Courier> = 0;
 };
 
 }  // namespace delivery::core::ports

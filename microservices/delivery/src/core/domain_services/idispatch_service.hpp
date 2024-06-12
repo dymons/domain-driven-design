@@ -1,6 +1,6 @@
 #pragma once
 
-#include <vector>
+#include <unordered_set>
 
 namespace delivery::core::domain::courier {
 class Courier;
@@ -24,7 +24,7 @@ class IDispatchService {
 
   [[nodiscard]] virtual auto Dispatch(
       domain::order::Order&& order,
-      std::vector<domain::courier::Courier> const& couriers) const
+      std::unordered_set<domain::courier::Courier> const& couriers) const
       -> domain::order::Order = 0;
 };
 

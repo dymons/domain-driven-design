@@ -36,6 +36,10 @@ auto Courier::GetCurrentLocation() const noexcept -> Location {
 
 auto Courier::GetStatus() const noexcept -> CourierStatus { return status_; }
 
+auto Courier::operator==(const Courier& that) const -> bool {
+  return this->GetId() == that.GetId();
+}
+
 auto Courier::MoveTo(Location const to_location) -> void {
   if (current_location_ == to_location) {
     return;
