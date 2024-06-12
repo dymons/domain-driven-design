@@ -2,6 +2,6 @@
 
 namespace delivery::application::use_cases::commands::assign_orders {
 
-struct AssignOrdersCommand final {};
+class AssignOrdersCommand final {};
 
 }  // namespace delivery::application::use_cases::commands::assign_orders
