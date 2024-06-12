@@ -22,9 +22,10 @@ class IDispatchService {
   IDispatchService& operator=(IDispatchService const&) = delete;
   IDispatchService& operator=(IDispatchService&&) = delete;
 
-  virtual auto Dispatch(domain::order::Order&& order,
-                        std::vector<domain::courier::Courier> const& couriers)
-      const -> domain::order::Order = 0;
+  [[nodiscard]] virtual auto Dispatch(
+      domain::order::Order&& order,
+      std::vector<domain::courier::Courier> const& couriers) const
+      -> domain::order::Order = 0;
 };
 
 }  // namespace delivery::core::domain_services
