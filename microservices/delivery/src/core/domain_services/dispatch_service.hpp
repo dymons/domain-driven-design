@@ -2,9 +2,9 @@
 
 #include <userver/utils/not_null.hpp>
 
-#include "idispatch_service.hpp"
-
 namespace delivery::core::domain_services {
+
+class IDispatchService;
 
 [[nodiscard]] auto MakeDispatchService()
     -> userver::utils::SharedRef<const IDispatchService>;

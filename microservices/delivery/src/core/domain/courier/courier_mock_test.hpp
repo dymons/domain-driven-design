@@ -6,7 +6,7 @@
 namespace delivery::core::domain::courier {
 
 struct MockCourierParams final {
-  CourierName name = CourierName{"some_courier_name"};
+  CourierName name = CourierName{"CourierName"};
   Transport transport = Transport::kPedestrian;
 };
 

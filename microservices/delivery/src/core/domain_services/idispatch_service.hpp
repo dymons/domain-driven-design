@@ -24,7 +24,7 @@ class IDispatchService {
 
   virtual auto Dispatch(domain::order::Order&& order,
                         std::vector<domain::courier::Courier> const& couriers)
-      -> domain::order::Order = 0;
+      const -> domain::order::Order = 0;
 };
 
 }  // namespace delivery::core::domain_services

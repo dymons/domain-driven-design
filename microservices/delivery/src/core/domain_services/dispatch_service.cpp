@@ -5,6 +5,7 @@
 
 #include <core/domain/courier/courier.hpp>
 #include <core/domain/order/order.hpp>
+#include "idispatch_service.hpp"
 
 namespace delivery::core::domain_services {
 
@@ -31,7 +32,7 @@ class DispatchService final : public IDispatchService {
   ~DispatchService() final = default;
 
   auto Dispatch(domain::order::Order&& order,
-                std::vector<domain::courier::Courier> const& couriers)
+                std::vector<domain::courier::Courier> const& couriers) const
       -> domain::order::Order final {
     auto scores = std::set<Score>{};
     std::ranges::transform(
