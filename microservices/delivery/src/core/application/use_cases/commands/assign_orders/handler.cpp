@@ -5,7 +5,6 @@
 
 #include <core/domain/courier/courier.hpp>
 #include <core/domain/order/order.hpp>
-#include <utils/optional.hpp>
 
 namespace delivery::application::use_cases::commands::assign_orders {
 
