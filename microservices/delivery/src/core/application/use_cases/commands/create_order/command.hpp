@@ -14,7 +14,7 @@ using Weight = RefinementType<struct WeightTag, int, ShouldBePositive>;
 
 struct CreateOrderCommand final {
   BacketId basket_id;
-  std::string address;
+  Address address;
   Weight weight;
 };
 
