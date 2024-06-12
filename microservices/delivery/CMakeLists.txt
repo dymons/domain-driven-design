@@ -24,7 +24,7 @@ set(CMAKE_CXX_STANDARD 23)
 
 # Common sources
 file(GLOB_RECURSE ${PROJECT_NAME}_SOURCES "src/*.hpp" "src/*.cpp")
-list(FILTER ${PROJECT_NAME}_SOURCES EXCLUDE REGEX ".*_test\\.cpp$")
+list(FILTER ${PROJECT_NAME}_SOURCES EXCLUDE REGEX ".*_test\\.cpp|hpp$")
 list(FILTER ${PROJECT_NAME}_SOURCES EXCLUDE REGEX ".*main\\.cpp$")
 add_library(${PROJECT_NAME}_objs OBJECT ${${PROJECT_NAME}_SOURCES})
 target_include_directories(${PROJECT_NAME}_objs PUBLIC src)
