@@ -37,13 +37,20 @@ UTEST(RefinementTypeShould, BeCopyable) {
 }
 
 UTEST(RefinementTypeShould, BeMovable) {
-  using Address = RefinementType<struct AddressTag, std::string>;
+  struct NotEmpty final {
+    auto operator()(std::string const& value) noexcept -> bool {
+      return not value.empty();
+    };
+  };
+
+  using Address = RefinementType<struct AddressTag, std::string, NotEmpty>;
   auto address = Address{"Address"};
 
   // NOLINTNEXTLINE(*-unnecessary-copy-initialization)
   auto const move_address = std::move(address);
 
-  ASSERT_TRUE(address != move_address);  // NOLINT(*-use-after-move)
+  ASSERT_TRUE(address.empty());  // NOLINT(*-use-after-move)
+  ASSERT_EQ(move_address, Address{"Address"});
 }
 
 }  // namespace
