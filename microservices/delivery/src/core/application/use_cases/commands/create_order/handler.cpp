@@ -10,9 +10,9 @@ CreateOrderHandler::CreateOrderHandler(
 
 auto CreateOrderHandler::Handle(CreateOrderCommand&& command) -> void {
   auto const order = core::domain::order::Order::Create(
-      core::domain::order::BasketId{command.basket_id.GetUnderlying()},
+      core::domain::order::BasketId{command.GetBasketId()},
       core::domain::Location::kMinLocation,
-      core::domain::Weight{command.weight.GetUnderlying()});
+      core::domain::Weight{command.GetWeight()});
 
   try {
     order_repository_->Add(order);
