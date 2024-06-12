@@ -18,11 +18,11 @@ Handler::Handler(
 
 auto Handler::Handle(Command) -> void {
   auto orders = order_repository_->GetNotAssigned();
+  auto const couriers = courier_repository_->GetByReadyStatus();
 
   auto orders_view =
       orders | std::ranges::views::take(1) |
-      std::ranges::views::transform([this](auto order) {
-        auto const couriers = courier_repository_->GetByReadyStatus();
+      std::ranges::views::transform([&couriers, this](auto order) {
         return dispatch_service_->Dispatch(std::move(order), couriers);
       });
 
