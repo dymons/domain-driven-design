@@ -1,26 +1,17 @@
 #include <userver/utest/utest.hpp>
 
-#include <userver/utils/uuid7.hpp>
-
-#include <core/domain/courier/courier.hpp>
+#include <core/domain/courier/courier_mock_test.hpp>
 #include "order_mock_test.hpp"
 
 namespace delivery::core::domain::order {
 
 namespace {
 
-auto MockCourier(
-    courier::CourierStatus status = courier::CourierStatus::kNotAvailable)
-    -> courier::Courier {
-  return courier::Courier::Hydrate(
-      courier::CourierId{"CourierId"}, courier::CourierName{"CourierName"},
-      courier::Transport::kPedestrian, Location::kMinLocation, status);
-}
-
 UTEST(OrderShould, AssignCourier) {
   // Arrange
   auto order = MockOrder();
-  auto courier = MockCourier(courier::CourierStatus::kReady);
+  auto courier = courier::MockCourier();
+  courier.StartWork();
 
   // Act
   order.AssignCourier(CourierId{courier.GetId().GetUnderlying()});
@@ -32,7 +23,7 @@ UTEST(OrderShould, AssignCourier) {
 UTEST(OrderShould, CompleteOrderWhenOrderIsAssigned) {
   // Arrange
   auto order = MockOrder();
-  auto courier = MockCourier();
+  auto courier = courier::MockCourier();
   courier.StartWork();
   order.AssignCourier(CourierId{courier.GetId().GetUnderlying()});
 
@@ -55,7 +46,8 @@ UTEST(OrderShould, ThrowWhenCompleteOrderWithStatusCreated) {
 UTEST(OrderShould, DoNothingWhenCompleteOrderWithStatusCompleted) {
   // Arrange
   auto order = MockOrder();
-  auto courier = MockCourier(courier::CourierStatus::kReady);
+  auto courier = courier::MockCourier();
+  courier.StartWork();
   order.AssignCourier(CourierId{courier.GetId().GetUnderlying()});
   order.Complete();
 
