@@ -3,6 +3,7 @@
 #include <string>
 
 #include "refinement_type.hpp"
+#include "not_empty.hpp"
 
 namespace delivery {
 
@@ -14,12 +15,6 @@ UTEST(RefinementTypeShould, BeConstructable) {
 }
 
 UTEST(RefinementTypeShould, BeConstructableWithRefinements) {
-  struct NotEmpty final {
-    auto operator()(std::string const& value) noexcept -> bool {
-      return not value.empty();
-    };
-  };
-
   using Address = RefinementType<struct AddressTag, std::string, NotEmpty>;
   ASSERT_THROW(Address{""}, RuntimeRefinementError);
 
@@ -37,12 +32,6 @@ UTEST(RefinementTypeShould, BeCopyable) {
 }
 
 UTEST(RefinementTypeShould, BeMovable) {
-  struct NotEmpty final {
-    auto operator()(std::string const& value) noexcept -> bool {
-      return not value.empty();
-    };
-  };
-
   using Address = RefinementType<struct AddressTag, std::string, NotEmpty>;
   auto address = Address{"Address"};
 

@@ -15,7 +15,7 @@ class Handler {
  public:
   Handler(SharedRef<core::ports::IOrderRepository>);
 
-  auto Handle(Command) -> void;
+  auto Handle(Command&&) -> void;
 };
 
 }  // namespace delivery::application::use_cases::commands::create_order

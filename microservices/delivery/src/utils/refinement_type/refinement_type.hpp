@@ -11,7 +11,7 @@ class RuntimeRefinementError final : public std::exception {
   }
 };
 
-template <class Tag, class T, typename... Refinement>
+template <class Tag, class T, template <typename> typename... Refinement>
 class RefinementType final : public userver::utils::StrongTypedef<Tag, T> {
   using Base = userver::utils::StrongTypedef<Tag, T>;
 
@@ -21,7 +21,8 @@ class RefinementType final : public userver::utils::StrongTypedef<Tag, T> {
   explicit constexpr RefinementType(Args&&... args) noexcept(
       noexcept(T(std::forward<Args>(args)...)))
       : Base(std::forward<Args>(args)...) {
-    const auto is_refinementable = (... && Refinement{}(Base::GetUnderlying()));
+    const auto is_refinementable =
+        (... && Refinement<T>{}(Base::GetUnderlying()));
     if (not is_refinementable) {
       throw RuntimeRefinementError{};
     }
