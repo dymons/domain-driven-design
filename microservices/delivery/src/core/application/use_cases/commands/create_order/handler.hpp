@@ -1,7 +1,5 @@
 #pragma once
 
-#include <optional>
-
 #include <core/ports/iorder_repository.hpp>
 #include <utils/memory.hpp>
 
