@@ -7,7 +7,7 @@ namespace delivery::optional {
 template <typename T, typename F>
 auto map(T&& v, F&& f) -> void {
   if (v.has_value()) {
-    f(std::forward<T>(v).value());
+    std::forward<F>(f)(std::forward<T>(v).value());
   }
 }
 
