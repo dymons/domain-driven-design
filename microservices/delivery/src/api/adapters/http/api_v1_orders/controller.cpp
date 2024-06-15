@@ -26,8 +26,6 @@ class Controller final : public userver::server::handlers::HttpHandlerBase {
 
   static constexpr std::string_view kName = "handler-api-v1-orders";
 
-  using HttpHandlerBase::HttpHandlerBase;
-
   std::string HandleRequestThrow(
       const userver::server::http::HttpRequest& request,
       userver::server::request::RequestContext&) const final {
