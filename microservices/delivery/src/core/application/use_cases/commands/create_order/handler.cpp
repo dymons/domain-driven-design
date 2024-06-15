@@ -20,4 +20,4 @@ auto CreateOrderHandler::Handle(CreateOrderCommand&& command) -> void {
   }
 }
 
-}  // namespace delivery::application::use_cases::commands::create_order
+}  // namespace delivery::application::use_cases::commands::api_v1_orders

@@ -6,6 +6,8 @@
 #include <userver/testsuite/testsuite_support.hpp>
 #include <userver/utils/daemon_run.hpp>
 
+#include <api/adapters/http/api_v1_orders/controller.hpp>
+
 #include "hello.hpp"
 
 int main(int argc, char* argv[]) {
@@ -17,6 +19,8 @@ int main(int argc, char* argv[]) {
                             .Append<userver::server::handlers::TestsControl>();
 
   service_template::AppendHello(component_list);
+
+  delivery::api::api_v1_orders::AppendController(component_list);
 
   return userver::utils::DaemonMain(argc, argv, component_list);
 }

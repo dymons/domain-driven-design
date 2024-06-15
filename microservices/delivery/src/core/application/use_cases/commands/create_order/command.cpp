@@ -36,4 +36,4 @@ auto CreateOrderCommand::GetAddress() const noexcept -> std::string {
 
 auto CreateOrderCommand::GetWeight() const noexcept -> int { return weight_; }
 
-}  // namespace delivery::application::use_cases::commands::create_order
+}  // namespace delivery::application::use_cases::commands::api_v1_orders
