@@ -5,6 +5,6 @@
 
 namespace delivery::core::domain::order {
 
-[[nodiscard]] auto MockOrder() -> Order;
+[[nodiscard]] auto MockOrder() -> MutableSharedRef<Order>;
 
 } // namespace delivery::core::domain::order

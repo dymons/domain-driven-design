@@ -19,7 +19,8 @@ class OrderRepository final : public core::ports::IOrderRepository {
   explicit OrderRepository(userver::storages::postgres::ClusterPtr cluster)
       : cluster_(std::move(cluster)) {}
 
-  auto Add(core::domain::order::Order const& order) const -> void final {
+  auto Add(SharedRef<core::domain::order::Order> const& order) const
+      -> void final {
     auto const record = dto::Convert(order);
     auto const result =
         cluster_->Execute(userver::storages::postgres::ClusterHostType::kMaster,
@@ -31,11 +32,12 @@ class OrderRepository final : public core::ports::IOrderRepository {
 
     if (result.IsEmpty()) {
       userver::utils::LogErrorAndThrow<core::ports::OrderAlreadyExists>(
-          fmt::format("Order with id={} already exists", order.GetId()));
+          fmt::format("Order with id={} already exists", order->GetId()));
     }
   }
 
-  auto Update(core::domain::order::Order const& order) const -> void final {
+  auto Update(SharedRef<core::domain::order::Order> const& order) const
+      -> void final {
     auto const record = dto::Convert(order);
     auto const result = cluster_->Execute(
         userver::storages::postgres::ClusterHostType::kMaster,
@@ -47,12 +49,12 @@ class OrderRepository final : public core::ports::IOrderRepository {
 
     if (result.IsEmpty()) {
       userver::utils::LogErrorAndThrow<core::ports::OrderNotFound>(
-          fmt::format("Not found order by id={}", order.GetId()));
+          fmt::format("Not found order by id={}", order->GetId()));
     }
   }
 
   auto GetById(core::domain::order::OrderId const& order_id) const
-      -> core::domain::order::Order final try {
+      -> MutableSharedRef<core::domain::order::Order> final try {
     auto const result = cluster_->Execute(
         userver::storages::postgres::ClusterHostType::kMaster,
         "SELECT id, status, courier_id, delivery_location, weight"
@@ -66,7 +68,8 @@ class OrderRepository final : public core::ports::IOrderRepository {
     userver::utils::LogErrorAndThrow<core::ports::OrderNotFound>(ex.what());
   }
 
-  auto GetNotAssigned() const -> std::vector<core::domain::order::Order> final {
+  auto GetNotAssigned() const
+      -> std::vector<MutableSharedRef<core::domain::order::Order>> final {
     auto const result = cluster_->Execute(
         userver::storages::postgres::ClusterHostType::kMaster,
         "SELECT id, status, courier_id, delivery_location, weight"
@@ -75,7 +78,7 @@ class OrderRepository final : public core::ports::IOrderRepository {
         core::domain::order::OrderStatus::kAssigned.ToString());
 
     auto const records = result.AsContainer<std::vector<dto::Order>>();
-    auto orders = std::vector<core::domain::order::Order>{};
+    auto orders = std::vector<MutableSharedRef<core::domain::order::Order>>{};
     orders.reserve(records.size());
     std::ranges::transform(
         records, std::back_inserter(orders),
@@ -84,7 +87,8 @@ class OrderRepository final : public core::ports::IOrderRepository {
     return orders;
   }
 
-  auto GetAssigned() const -> std::vector<core::domain::order::Order> final {
+  auto GetAssigned() const
+      -> std::vector<MutableSharedRef<core::domain::order::Order>> final {
     auto const result = cluster_->Execute(
         userver::storages::postgres::ClusterHostType::kMaster,
         "SELECT id, status, courier_id, delivery_location, weight"
@@ -93,7 +97,7 @@ class OrderRepository final : public core::ports::IOrderRepository {
         core::domain::order::OrderStatus::kAssigned.ToString());
 
     auto const records = result.AsContainer<std::vector<dto::Order>>();
-    auto orders = std::vector<core::domain::order::Order>{};
+    auto orders = std::vector<MutableSharedRef<core::domain::order::Order>>{};
     orders.reserve(records.size());
     std::ranges::transform(
         records, std::back_inserter(orders),

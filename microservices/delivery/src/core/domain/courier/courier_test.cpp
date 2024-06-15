@@ -20,10 +20,10 @@ UTEST(CourierShould, MoveToLocation) {
   auto courier = MockCourier({.transport = Transport::kBicycle});
 
   // Act
-  courier.MoveTo(Location{X{5}, Y{5}});
+  courier->MoveTo(Location{X{5}, Y{5}});
 
   // Assert
-  ASSERT_EQ(courier.GetCurrentLocation(), (Location{X{3}, Y{1}}));
+  ASSERT_EQ(courier->GetCurrentLocation(), (Location{X{3}, Y{1}}));
 }
 
 UTEST(CourierShould, CanStartWork) {
@@ -31,22 +31,22 @@ UTEST(CourierShould, CanStartWork) {
   auto courier = MockCourier();
 
   // Act
-  courier.StartWork();
+  courier->StartWork();
 
   // Assert
-  ASSERT_TRUE(courier.GetStatus().IsReady());
+  ASSERT_TRUE(courier->GetStatus().IsReady());
 }
 
 UTEST(CourierShould, CanStopWork) {
   // Arrange
   auto courier = MockCourier();
-  courier.StartWork();
+  courier->StartWork();
 
   // Act
-  courier.StopWork();
+  courier->StopWork();
 
   // Assert
-  ASSERT_TRUE(courier.GetStatus().IsNotAvailable());
+  ASSERT_TRUE(courier->GetStatus().IsNotAvailable());
 }
 
 UTEST(CourierShould, CanCalculateTimeToLocation) {
@@ -54,7 +54,7 @@ UTEST(CourierShould, CanCalculateTimeToLocation) {
   auto courier = MockCourier();
 
   // Act
-  auto const time = courier.CalculateTimeToPoint(Location::kMaxLocation);
+  auto const time = courier->CalculateTimeToPoint(Location::kMaxLocation);
 
   // Assert
   ASSERT_EQ(time, Time{18});

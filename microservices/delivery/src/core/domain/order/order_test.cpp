@@ -11,27 +11,27 @@ UTEST(OrderShould, AssignCourier) {
   // Arrange
   auto order = MockOrder();
   auto courier = courier::MockCourier();
-  courier.StartWork();
+  courier->StartWork();
 
   // Act
-  order.AssignCourier(CourierId{courier.GetId().GetUnderlying()});
+  order->AssignCourier(CourierId{courier->GetId().GetUnderlying()});
 
   // Assert
-  ASSERT_TRUE(order.IsCourierAssigned());
+  ASSERT_TRUE(order->IsCourierAssigned());
 }
 
 UTEST(OrderShould, CompleteOrderWhenOrderIsAssigned) {
   // Arrange
   auto order = MockOrder();
   auto courier = courier::MockCourier();
-  courier.StartWork();
-  order.AssignCourier(CourierId{courier.GetId().GetUnderlying()});
+  courier->StartWork();
+  order->AssignCourier(CourierId{courier->GetId().GetUnderlying()});
 
   // Act
-  order.Complete();
+  order->Complete();
 
   // Assert
-  ASSERT_TRUE(order.GetStatus().IsCompleted());
+  ASSERT_TRUE(order->GetStatus().IsCompleted());
 }
 
 UTEST(OrderShould, ThrowWhenCompleteOrderWithStatusCreated) {
@@ -39,23 +39,23 @@ UTEST(OrderShould, ThrowWhenCompleteOrderWithStatusCreated) {
   auto order = MockOrder();
 
   // Act & Assert
-  ASSERT_TRUE(order.GetStatus().IsCreated());
-  ASSERT_THROW(order.Complete(), CantCompletedNotAssignedOrder);
+  ASSERT_TRUE(order->GetStatus().IsCreated());
+  ASSERT_THROW(order->Complete(), CantCompletedNotAssignedOrder);
 }
 
 UTEST(OrderShould, DoNothingWhenCompleteOrderWithStatusCompleted) {
   // Arrange
   auto order = MockOrder();
   auto courier = courier::MockCourier();
-  courier.StartWork();
-  order.AssignCourier(CourierId{courier.GetId().GetUnderlying()});
-  order.Complete();
+  courier->StartWork();
+  order->AssignCourier(CourierId{courier->GetId().GetUnderlying()});
+  order->Complete();
 
   // Act
-  order.Complete();
+  order->Complete();
 
   // Assert
-  ASSERT_TRUE(order.GetStatus().IsCompleted());
+  ASSERT_TRUE(order->GetStatus().IsCompleted());
 }
 
 }  // namespace

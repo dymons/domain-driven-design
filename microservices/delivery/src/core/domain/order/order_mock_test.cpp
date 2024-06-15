@@ -4,7 +4,7 @@
 
 namespace delivery::core::domain::order {
 
-Order MockOrder() {
+auto MockOrder() -> MutableSharedRef<Order> {
   return Order::Create(BasketId{userver::utils::generators::GenerateUuidV7()},
                        Location{X{5}, Y{5}}, Weight{10});
 }

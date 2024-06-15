@@ -19,7 +19,8 @@ class CourierRepository final : public core::ports::ICourierRepository {
   explicit CourierRepository(userver::storages::postgres::ClusterPtr cluster)
       : cluster_(std::move(cluster)) {}
 
-  auto Add(core::domain::courier::Courier const& courier) const -> void final {
+  auto Add(SharedRef<core::domain::courier::Courier> const& courier) const
+      -> void final {
     auto const record = dto::Convert(courier);
     auto const result =
         cluster_->Execute(userver::storages::postgres::ClusterHostType::kMaster,
@@ -31,11 +32,11 @@ class CourierRepository final : public core::ports::ICourierRepository {
 
     if (result.IsEmpty()) {
       userver::utils::LogErrorAndThrow<core::ports::CourierAlreadyExists>(
-          fmt::format("Courier with id={} already exists", courier.GetId()));
+          fmt::format("Courier with id={} already exists", courier->GetId()));
     }
   }
 
-  auto Update(core::domain::courier::Courier const& courier) const
+  auto Update(SharedRef<core::domain::courier::Courier> const& courier) const
       -> void final {
     auto const record = dto::Convert(courier);
     auto const result = cluster_->Execute(
@@ -48,12 +49,12 @@ class CourierRepository final : public core::ports::ICourierRepository {
 
     if (result.IsEmpty()) {
       userver::utils::LogErrorAndThrow<core::ports::CourierNotFound>(
-          fmt::format("Not found courier by id={}", courier.GetId()));
+          fmt::format("Not found courier by id={}", courier->GetId()));
     }
   }
 
   auto GetById(core::domain::courier::CourierId const& courier_id) const
-      -> core::domain::courier::Courier final try {
+      -> MutableSharedRef<core::domain::courier::Courier> final try {
     auto const result =
         cluster_->Execute(userver::storages::postgres::ClusterHostType::kMaster,
                           "SELECT id, name, transport, current_location, status"
@@ -68,18 +69,20 @@ class CourierRepository final : public core::ports::ICourierRepository {
   }
 
   auto GetByReadyStatus() const
-      -> std::unordered_set<core::domain::courier::Courier> final {
+      -> std::unordered_set<
+          MutableSharedRef<core::domain::courier::Courier>> final {
     return GetByStatus(core::domain::courier::CourierStatus::kReady);
   }
 
   auto GetByBusyStatus() const
-      -> std::unordered_set<core::domain::courier::Courier> final {
+      -> std::unordered_set<
+          MutableSharedRef<core::domain::courier::Courier>> final {
     return GetByStatus(core::domain::courier::CourierStatus::kBusy);
   }
 
  private:
   auto GetByStatus(core::domain::courier::CourierStatus status) const
-      -> std::unordered_set<core::domain::courier::Courier> {
+      -> std::unordered_set<MutableSharedRef<core::domain::courier::Courier>> {
     auto const result =
         cluster_->Execute(userver::storages::postgres::ClusterHostType::kMaster,
                           "SELECT id, name, transport, current_location, status"
@@ -88,7 +91,8 @@ class CourierRepository final : public core::ports::ICourierRepository {
                           status.ToString());
 
     auto const records = result.AsContainer<std::vector<dto::Courier>>();
-    auto couriers = std::unordered_set<core::domain::courier::Courier>{};
+    auto couriers =
+        std::unordered_set<MutableSharedRef<core::domain::courier::Courier>>{};
     couriers.reserve(records.size());
     for (auto const& record : records) {
       couriers.insert(dto::Convert(record));

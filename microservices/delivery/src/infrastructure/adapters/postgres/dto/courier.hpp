@@ -3,6 +3,7 @@
 #include <string>
 
 #include <core/domain/courier/strong_typedefs.hpp>
+#include <utils/memory.hpp>
 
 #include "location.hpp"
 #include "transport.hpp"
@@ -21,7 +22,8 @@ struct Courier final {
   Location current_location{};
 };
 
-auto Convert(core::domain::courier::Courier const&) -> Courier;
-auto Convert(Courier const&) -> core::domain::courier::Courier;
+auto Convert(SharedRef<core::domain::courier::Courier> const&) -> Courier;
+auto Convert(Courier const&)
+    -> MutableSharedRef<core::domain::courier::Courier>;
 
 }  // namespace delivery::infrastructure::adapters::postgres::dto

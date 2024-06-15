@@ -3,6 +3,7 @@
 #include <unordered_set>
 
 #include <core/domain/courier/strong_typedefs.hpp>
+#include <utils/memory.hpp>
 
 namespace delivery::core::domain::courier {
 class Courier;
@@ -28,14 +29,16 @@ class ICourierRepository {
   ICourierRepository& operator=(ICourierRepository const&) = delete;
   ICourierRepository& operator=(ICourierRepository&&) = delete;
 
-  virtual auto Add(domain::courier::Courier const&) const -> void = 0;
-  virtual auto Update(domain::courier::Courier const&) const -> void = 0;
+  virtual auto Add(SharedRef<domain::courier::Courier> const&) const
+      -> void = 0;
+  virtual auto Update(SharedRef<domain::courier::Courier> const&) const
+      -> void = 0;
   virtual auto GetById(domain::courier::CourierId const&) const
-      -> domain::courier::Courier = 0;
+      -> MutableSharedRef<domain::courier::Courier> = 0;
   virtual auto GetByReadyStatus() const
-      -> std::unordered_set<domain::courier::Courier> = 0;
+      -> std::unordered_set<MutableSharedRef<domain::courier::Courier>> = 0;
   virtual auto GetByBusyStatus() const
-      -> std::unordered_set<domain::courier::Courier> = 0;
+      -> std::unordered_set<MutableSharedRef<domain::courier::Courier>> = 0;
 };
 
 }  // namespace delivery::core::ports

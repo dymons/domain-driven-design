@@ -26,13 +26,13 @@ class IDispatchService {
   IDispatchService& operator=(IDispatchService&&) = delete;
 
   struct DispatchResult {
-    SharedRef<domain::order::Order> order;
-    std::optional<SharedRef<domain::courier::Courier>> courier;
+    MutableSharedRef<domain::order::Order> order;
+    std::optional<MutableSharedRef<domain::courier::Courier>> courier;
   };
 
   [[nodiscard]] virtual auto Dispatch(
-      domain::order::Order&& order,
-      std::unordered_set<domain::courier::Courier>&& couriers) const
+      MutableSharedRef<domain::order::Order>&&,
+      std::unordered_set<MutableSharedRef<domain::courier::Courier>>&&) const
       -> DispatchResult = 0;
 };
 

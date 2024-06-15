@@ -4,6 +4,7 @@
 
 #include <core/domain/shared_kernel/location.hpp>
 #include <core/domain/shared_kernel/weight.hpp>
+#include <utils/memory.hpp>
 #include "status.hpp"
 #include "strong_typedefs.hpp"
 
@@ -18,8 +19,7 @@ class Order {
 
   // Constructors
 
-  Order(OrderId id, OrderStatus status,
-        std::optional<CourierId> courier_id,
+  Order(OrderId id, OrderStatus status, std::optional<CourierId> courier_id,
         Location delivery_location, Weight weight)
       : id_(std::move(id)),
         status_(status),
@@ -28,11 +28,12 @@ class Order {
         weight_(weight) {}
 
  public:
-  [[nodiscard]] static auto Create(BasketId, Location, Weight) -> Order;
+  [[nodiscard]] static auto Create(BasketId, Location,
+                                   Weight) -> MutableSharedRef<Order>;
 
   [[nodiscard]] static auto Hydrate(OrderId, OrderStatus,
                                     std::optional<CourierId>, Location,
-                                    Weight) -> Order;
+                                    Weight) -> MutableSharedRef<Order>;
 
   // Observers
 

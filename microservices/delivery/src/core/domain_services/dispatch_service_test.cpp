@@ -21,14 +21,15 @@ UTEST(DispatchServiceShould, DispatchCourier) {
   // Assert
   ASSERT_TRUE(result.order->IsCourierAssigned());
   ASSERT_EQ(result.order->GetCourierId(),
-            domain::order::CourierId{courier.GetId().GetUnderlying()});
+            domain::order::CourierId{courier->GetId().GetUnderlying()});
 }
 
 UTEST(DispatchServiceShould, NotDispatchWhenNotReadyCouriers) {
   // Arrange
   auto const dispatcher = MakeDispatchService();
   auto order = domain::order::MockOrder();
-  auto couriers = std::unordered_set<domain::courier::Courier>{};
+  auto couriers =
+      std::unordered_set<MutableSharedRef<domain::courier::Courier>>{};
 
   // Act
   auto result = dispatcher->Dispatch(std::move(order), std::move(couriers));

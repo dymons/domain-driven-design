@@ -10,6 +10,7 @@ struct MockCourierParams final {
   Transport transport = Transport::kPedestrian;
 };
 
-[[nodiscard]] auto MockCourier(MockCourierParams params = {}) -> Courier;
+[[nodiscard]] auto MockCourier(MockCourierParams params = {})
+    -> MutableSharedRef<Courier>;
 
 }  // namespace delivery::core::domain::courier

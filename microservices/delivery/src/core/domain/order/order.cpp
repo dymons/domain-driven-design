@@ -7,16 +7,18 @@
 namespace delivery::core::domain::order {
 
 auto Order::Create(BasketId basket_id, Location delivery_location,
-                   Weight weight) -> Order {
-  return {OrderId{std::move(basket_id).GetUnderlying()}, OrderStatus::kCreated,
-          std::nullopt, delivery_location, weight};
+                   Weight weight) -> MutableSharedRef<Order> {
+  return MakeMutableSharedRef<Order>(
+      Order{OrderId{std::move(basket_id).GetUnderlying()},
+            OrderStatus::kCreated, std::nullopt, delivery_location, weight});
 }
 
 auto Order::Hydrate(OrderId id, OrderStatus status,
                     std::optional<CourierId> courier_id,
-                    Location delivery_location, Weight weight) -> Order {
-  return {std::move(id), status, std::move(courier_id), delivery_location,
-          weight};
+                    Location delivery_location,
+                    Weight weight) -> MutableSharedRef<Order> {
+  return MakeMutableSharedRef<Order>(Order{
+      std::move(id), status, std::move(courier_id), delivery_location, weight});
 }
 
 auto Order::GetId() const noexcept -> OrderId { return id_; }

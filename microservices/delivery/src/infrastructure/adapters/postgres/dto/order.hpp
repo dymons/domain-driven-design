@@ -3,6 +3,7 @@
 #include <string>
 
 #include <core/domain/order/strong_typedefs.hpp>
+#include <utils/memory.hpp>
 
 #include "location.hpp"
 #include "weight.hpp"
@@ -21,7 +22,7 @@ struct Order final {
   Weight weight{};
 };
 
-auto Convert(core::domain::order::Order const&) -> Order;
-auto Convert(Order const&) -> core::domain::order::Order;
+auto Convert(SharedRef<core::domain::order::Order> const&) -> Order;
+auto Convert(Order const&) -> MutableSharedRef<core::domain::order::Order>;
 
 }  // namespace delivery::infrastructure::adapters::postgres::dto

@@ -7,21 +7,24 @@
 
 namespace delivery::core::domain::courier {
 
-auto Courier::Create(CourierName name, Transport transport) -> Courier {
+auto Courier::Create(CourierName name,
+                     Transport transport) -> MutableSharedRef<Courier> {
   if (name.GetUnderlying().empty()) {
     throw ArgumentException{"Courier name should not be empty"};
   }
 
-  return {CourierId{userver::utils::generators::GenerateUuidV7()},
-          std::move(name), std::move(transport), Location::kMinLocation,
-          CourierStatus::kNotAvailable};
+  return MakeMutableSharedRef<Courier>(
+      Courier{CourierId{userver::utils::generators::GenerateUuidV7()},
+              std::move(name), std::move(transport), Location::kMinLocation,
+              CourierStatus::kNotAvailable});
 }
 
 auto Courier::Hydrate(CourierId id, CourierName name, Transport transport,
                       Location current_location,
-                      CourierStatus status) -> Courier {
-  return {std::move(id), std::move(name), std::move(transport),
-          current_location, status};
+                      CourierStatus status) -> MutableSharedRef<Courier> {
+  return MakeMutableSharedRef<Courier>(Courier{std::move(id), std::move(name),
+                                               std::move(transport),
+                                               current_location, status});
 }
 
 auto Courier::GetId() const noexcept -> CourierId { return id_; }

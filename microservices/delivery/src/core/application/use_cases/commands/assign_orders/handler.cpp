@@ -31,9 +31,9 @@ auto AssignOrdersHandler::Handle(AssignOrdersCommand&&) -> void {
   std::ranges::for_each(dispatch_view, [this](auto const& dispatch) {
     // TODO (dymons) Use UnitOfWork
     // TODO (dymons) Use SharedRef for domain models
-    this->order_repository_->Update(*dispatch.order);
-    optional::map(dispatch.courier, [this](const auto& courier){
-      this->courier_repository_->Update(*courier);
+    this->order_repository_->Update(dispatch.order);
+    optional::map(dispatch.courier, [this](const auto& courier) {
+      this->courier_repository_->Update(courier);
     });
   });
 }
