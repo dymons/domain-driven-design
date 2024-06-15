@@ -28,6 +28,7 @@ auto AssignOrdersHandler::Handle(AssignOrdersCommand&&) -> void {
           });
 
   optional::map(dispatch_view, [this](auto const& dispatch) {
+    // TODO (dymons) Use UnitOfWork
     this->order_repository_->Update(dispatch.order);
     optional::map(dispatch.courier, [this](const auto& courier) {
       this->courier_repository_->Update(courier);
