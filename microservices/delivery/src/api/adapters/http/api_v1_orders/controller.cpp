@@ -8,6 +8,8 @@ namespace {
 
 class Controller final : public userver::server::handlers::HttpHandlerBase {
  public:
+  ~Controller() final = default;
+
   static constexpr std::string_view kName = "/api/v1/orders";
 
   using HttpHandlerBase::HttpHandlerBase;
