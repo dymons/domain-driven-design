@@ -1,0 +1,54 @@
+openapi: "3.0.0"
+info:
+  version: 1.0.0
+  title: Swagger Delivery
+  description: Отвечает за учет курьеров, деспетчеризацию доставкуов, доставку
+paths:
+  /api/v1/orders:
+    post:
+      summary: Создать заказ
+      description: Позволяет создать заказ с целью тестирования
+      operationId: CreateOrder
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ApiV1OrdersRequest'
+      responses:
+        '201':
+          description: Успешный ответ
+        default:
+          description: Ошибка
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+components:
+  schemas:
+    ApiV1OrdersRequest:
+      type: object
+      required:
+        - basket_id
+        - address
+        - weight
+      properties:
+        basket_id:
+          type: string
+        address:
+          type: string
+        weight:
+          type: integer
+
+    Error:
+      required:
+        - code
+        - message
+      properties:
+        code:
+          type: integer
+          format: int32
+          description: Код ошибки
+        message:
+          type: string
+          description: Текст ошибки
