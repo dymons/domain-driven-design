@@ -1,6 +1,9 @@
 #pragma once
 
+#include <optional>
 #include <unordered_set>
+
+#include <utils/memory.hpp>
 
 namespace delivery::core::domain::courier {
 class Courier;
@@ -22,10 +25,15 @@ class IDispatchService {
   IDispatchService& operator=(IDispatchService const&) = delete;
   IDispatchService& operator=(IDispatchService&&) = delete;
 
+  struct DispatchResult {
+    SharedRef<domain::order::Order> order;
+    std::optional<SharedRef<domain::courier::Courier>> courier;
+  };
+
   [[nodiscard]] virtual auto Dispatch(
       domain::order::Order&& order,
-      std::unordered_set<domain::courier::Courier> const& couriers) const
-      -> domain::order::Order = 0;
+      std::unordered_set<domain::courier::Courier>&& couriers) const
+      -> DispatchResult = 0;
 };
 
 }  // namespace delivery::core::domain_services

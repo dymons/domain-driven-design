@@ -16,11 +16,11 @@ UTEST(DispatchServiceShould, DispatchCourier) {
   auto const courier = domain::courier::MockCourier();
 
   // Act
-  order = dispatcher->Dispatch(std::move(order), {courier});
+  auto result = dispatcher->Dispatch(std::move(order), {courier});
 
   // Assert
-  ASSERT_TRUE(order.IsCourierAssigned());
-  ASSERT_EQ(order.GetCourierId(),
+  ASSERT_TRUE(result.order->IsCourierAssigned());
+  ASSERT_EQ(result.order->GetCourierId(),
             domain::order::CourierId{courier.GetId().GetUnderlying()});
 }
 
@@ -31,10 +31,10 @@ UTEST(DispatchServiceShould, NotDispatchWhenNotReadyCouriers) {
   auto couriers = std::unordered_set<domain::courier::Courier>{};
 
   // Act
-  order = dispatcher->Dispatch(std::move(order), couriers);
+  auto result = dispatcher->Dispatch(std::move(order), std::move(couriers));
 
   // Assert
-  ASSERT_FALSE(order.IsCourierAssigned());
+  ASSERT_FALSE(result.order->IsCourierAssigned());
 }
 
 }  // namespace
