@@ -5,6 +5,7 @@
 
 #include <core/domain/courier/courier.hpp>
 #include <core/domain/order/order.hpp>
+#include <utils/optional.hpp>
 
 namespace delivery::application::use_cases::commands::assign_orders {
 
@@ -29,12 +30,11 @@ auto AssignOrdersHandler::Handle(AssignOrdersCommand&&) -> void {
 
   std::ranges::for_each(dispatch_view, [this](auto const& dispatch) {
     // TODO (dymons) Use UnitOfWork
-    // TODO (dymons) Use Monadic Optional
     // TODO (dymons) Use SharedRef for domain models
     this->order_repository_->Update(*dispatch.order);
-    if (dispatch.courier) {
-      this->courier_repository_->Update(**dispatch.courier);
-    }
+    optional::map(dispatch.courier, [this](const auto& courier){
+      this->courier_repository_->Update(*courier);
+    });
   });
 }
 
