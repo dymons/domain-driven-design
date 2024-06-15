@@ -1,8 +1,5 @@
 #include "handler.hpp"
 
-#include <algorithm>
-#include <ranges>
-
 #include <core/domain/courier/courier.hpp>
 #include <core/domain/order/order.hpp>
 #include <utils/container.hpp>
