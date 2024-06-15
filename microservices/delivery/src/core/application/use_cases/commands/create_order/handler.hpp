@@ -13,7 +13,7 @@ class CreateOrderHandler final {
  public:
   explicit CreateOrderHandler(SharedRef<core::ports::IOrderRepository>);
 
-  auto Handle(CreateOrderCommand&&) -> void;
+  auto Handle(CreateOrderCommand&&) const -> void;
 };
 
 }  // namespace delivery::application::use_cases::commands::api_v1_orders
