@@ -21,7 +21,7 @@ AssignOrdersHandler::AssignOrdersHandler(
 auto AssignOrdersHandler::Handle(AssignOrdersCommand&&) -> void {
   auto const dispatch_view =
       container::FirstOrNullopt(order_repository_->GetNotAssigned())
-          .transform([this](auto&& order) mutable {
+          .transform([this](auto&& order) {
             auto couriers = courier_repository_->GetByReadyStatus();
             return this->dispatch_service_->Dispatch(
                 std::forward<decltype(order)>(order), std::move(couriers));
