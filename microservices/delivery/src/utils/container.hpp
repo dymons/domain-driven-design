@@ -8,7 +8,7 @@ template <typename Container>
 auto FirstOrNullopt(Container&& c)
     -> std::optional<typename Container::value_type> {
   if (not c.empty()) {
-    return c.front();
+    return std::forward<Container>(c).front();
   }
 
   return std::nullopt;
