@@ -9,7 +9,7 @@
 
 #include "command.hpp"
 
-namespace delivery::application::use_cases::commands::assign_orders {
+namespace delivery::core::application::use_cases::commands::assign_orders {
 
 class AssignOrdersHandler final {
   SharedRef<core::ports::ICourierRepository> courier_repository_;
@@ -24,4 +24,4 @@ class AssignOrdersHandler final {
   auto Handle(AssignOrdersCommand&&) -> void;
 };
 
-}  // namespace delivery::application::use_cases::commands::assign_orders
+}  // namespace delivery::core::application::use_cases::commands::assign_orders

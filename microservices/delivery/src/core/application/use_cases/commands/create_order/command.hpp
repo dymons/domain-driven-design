@@ -2,7 +2,7 @@
 
 #include <string>
 
-namespace delivery::application::use_cases::commands::create_order {
+namespace delivery::core::application::use_cases::commands::create_order {
 
 class CreateOrderCommand final {
   std::string basket_id_;
@@ -17,4 +17,4 @@ class CreateOrderCommand final {
   [[nodiscard]] auto GetWeight() const noexcept -> int;
 };
 
-}  // namespace delivery::application::use_cases::commands::api_v1_orders
+}  // namespace delivery::core::application::use_cases::commands::api_v1_orders

@@ -2,7 +2,7 @@
 
 #include <core/domain/order/order.hpp>
 
-namespace delivery::application::use_cases::commands::create_order {
+namespace delivery::core::application::use_cases::commands::create_order {
 
 CreateOrderHandler::CreateOrderHandler(
     SharedRef<core::ports::IOrderRepository> order_repository)
@@ -20,4 +20,4 @@ auto CreateOrderHandler::Handle(CreateOrderCommand&& command) const -> void {
   }
 }
 
-}  // namespace delivery::application::use_cases::commands::create_order
+}  // namespace delivery::core::application::use_cases::commands::create_order

@@ -5,7 +5,7 @@
 
 #include "command.hpp"
 
-namespace delivery::application::use_cases::commands::create_order {
+namespace delivery::core::application::use_cases::commands::create_order {
 
 class CreateOrderHandler final {
   SharedRef<core::ports::IOrderRepository> order_repository_;
@@ -16,4 +16,4 @@ class CreateOrderHandler final {
   auto Handle(CreateOrderCommand&&) const -> void;
 };
 
-}  // namespace delivery::application::use_cases::commands::api_v1_orders
+}  // namespace delivery::core::application::use_cases::commands::api_v1_orders

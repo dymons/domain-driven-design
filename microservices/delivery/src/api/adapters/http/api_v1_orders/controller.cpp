@@ -70,19 +70,17 @@ class Controller final : public userver::server::handlers::HttpHandlerJsonBase {
       -> userver::formats::json::Value final try {
     auto request = request_json.As<Request>();
 
-    auto command =
-        application::use_cases::commands::create_order::CreateOrderCommand{
-            std::move(request.basket_id), std::move(request.address),
-            request.weight};
+    auto command = core::application::use_cases::commands::create_order::
+        CreateOrderCommand{std::move(request.basket_id),
+                           std::move(request.address), request.weight};
 
-    auto const create_order_handler =
-        application::use_cases::commands::create_order::CreateOrderHandler{
-            order_repository_};
+    auto const create_order_handler = core::application::use_cases::commands::
+        create_order::CreateOrderHandler{order_repository_};
 
     create_order_handler.Handle(std::move(command));
 
     return {};
-  } catch (const delivery::ArgumentException& ex) {
+  } catch (const core::application::ArgumentException& ex) {
     throw userver::server::handlers::ClientError(
         userver::server::handlers::ExternalBody{ex.what()});
   }

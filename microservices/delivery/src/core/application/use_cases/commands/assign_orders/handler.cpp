@@ -5,7 +5,7 @@
 #include <utils/container.hpp>
 #include <utils/optional.hpp>
 
-namespace delivery::application::use_cases::commands::assign_orders {
+namespace delivery::core::application::use_cases::commands::assign_orders {
 
 AssignOrdersHandler::AssignOrdersHandler(
     SharedRef<core::ports::ICourierRepository> courier_repository,
@@ -33,4 +33,4 @@ auto AssignOrdersHandler::Handle(AssignOrdersCommand&&) -> void {
   });
 }
 
-}  // namespace delivery::application::use_cases::commands::assign_orders
+}  // namespace delivery::core::application::use_cases::commands::assign_orders

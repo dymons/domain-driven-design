@@ -4,7 +4,7 @@
 
 #include <core/application/exceptions.hpp>
 
-namespace delivery::application::use_cases::commands::create_order {
+namespace delivery::core::application::use_cases::commands::create_order {
 
 CreateOrderCommand::CreateOrderCommand(std::string basket_id,
                                        std::string address, int weight) {
@@ -36,4 +36,4 @@ auto CreateOrderCommand::GetAddress() const noexcept -> std::string {
 
 auto CreateOrderCommand::GetWeight() const noexcept -> int { return weight_; }
 
-}  // namespace delivery::application::use_cases::commands::api_v1_orders
+}  // namespace delivery::core::application::use_cases::commands::api_v1_orders
