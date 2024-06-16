@@ -13,6 +13,40 @@ namespace delivery::api::api_v1_orders {
 
 namespace {
 
+struct Request final {
+  std::string basket_id;
+  std::string address;
+  int weight;
+};
+
+auto Parse(const userver::formats::json::Value& request_json,
+           userver::formats::parse::To<Request>) -> Request {
+  auto basket_id = request_json["basket_id"].As<std::optional<std::string>>();
+  if (not basket_id.has_value()) {
+    throw userver::server::handlers::ClientError(
+        userver::server::handlers::ExternalBody{
+            "No 'basket_id' query argument"});
+  }
+
+  auto address = request_json["address"].As<std::optional<std::string>>();
+  if (not address.has_value()) {
+    throw userver::server::handlers::ClientError(
+        userver::server::handlers::ExternalBody{"No 'address' query argument"});
+  }
+
+  const auto weight = request_json["weight"].As<std::optional<int>>();
+  if (not weight.has_value()) {
+    throw userver::server::handlers::ClientError(
+        userver::server::handlers::ExternalBody{"No 'weight' query argument"});
+  }
+
+  return {
+      .basket_id = std::move(basket_id).value(),
+      .address = std::move(address).value(),
+      .weight = weight.value(),
+  };
+}
+
 class Controller final : public userver::server::handlers::HttpHandlerJsonBase {
  public:
   ~Controller() final = default;
@@ -27,29 +61,17 @@ class Controller final : public userver::server::handlers::HttpHandlerJsonBase {
 
   static constexpr std::string_view kName = "handler-api-v1-orders";
 
-  userver::formats::json::Value HandleRequestJsonThrow(
+  [[nodiscard]] auto HandleRequestJsonThrow(
       const userver::server::http::HttpRequest&,
       const userver::formats::json::Value& request_json,
-      userver::server::request::RequestContext&) const final {
-    const auto basket_id = request_json["basket_id"].As<std::string>();
-    if (basket_id.empty()) {
-      throw userver::server::handlers::ClientError(
-          userver::server::handlers::ExternalBody{
-              "No 'basket_id' query argument"});
-    }
-
-    const auto address = request_json["address"].As<std::string>();
-    if (address.empty()) {
-      throw userver::server::handlers::ClientError(
-          userver::server::handlers::ExternalBody{
-              "No 'address' query argument"});
-    }
-
-    const auto weight = request_json["weight"].As<int>();
+      userver::server::request::RequestContext&) const
+      -> userver::formats::json::Value final {
+    auto request = request_json.As<Request>();
 
     auto command =
         application::use_cases::commands::create_order::CreateOrderCommand{
-            basket_id, address, weight};
+            std::move(request.basket_id), std::move(request.address),
+            request.weight};
 
     auto const create_order_handler =
         application::use_cases::commands::create_order::CreateOrderHandler{
