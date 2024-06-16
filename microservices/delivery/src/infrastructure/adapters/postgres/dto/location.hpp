@@ -21,5 +21,5 @@ auto Convert(Location const&) -> core::domain::Location;
 template <>
 struct ::userver::storages::postgres::io::CppToUserPg<
     ::delivery::infrastructure::adapters::postgres::dto::Location> {
-  static constexpr DBTypeName postgres_name = "location";
+  static constexpr DBTypeName postgres_name{"delivery", "location"};
 };
