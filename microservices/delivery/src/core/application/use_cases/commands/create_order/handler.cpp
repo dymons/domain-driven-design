@@ -14,10 +14,10 @@ auto CreateOrderHandler::Handle(CreateOrderCommand&& command) const -> void {
       core::domain::Location::kMinLocation,
       core::domain::Weight{command.GetWeight()});
 
-  try {
+//  try {
     order_repository_->Add(order);
-  } catch (core::ports::OrderAlreadyExists const&) {
-  }
+//  } catch (core::ports::OrderAlreadyExists const&) {
+//  }
 }
 
 }  // namespace delivery::application::use_cases::commands::api_v1_orders

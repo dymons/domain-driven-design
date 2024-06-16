@@ -1,3 +1,8 @@
-async def test_basic(service_client):
-    response = await service_client.post('/api/v1/orders', json={'name': 'Tester'})
-    # assert response.status == 200
+async def test_basic(delivery_service):
+    response = await delivery_service.post('/api/v1/orders',
+                                           json={
+                                               'basket_id': 'basket_id1',
+                                               'address': 'address',
+                                               'weight': 1
+                                           })
+    assert response.status == 200

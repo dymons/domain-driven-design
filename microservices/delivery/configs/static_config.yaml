@@ -64,3 +64,5 @@ components_manager:
             dbconnection: $delivery-database-connection
             blocking_task_processor: fs-task-processor
             dns_resolver: async
+            sync-start: false
+            connlimit_mode: manual

@@ -1,7 +1,7 @@
 #include "controller.hpp"
 
 #include <userver/components/component_context.hpp>
-#include <userver/server/handlers/http_handler_base.hpp>
+#include <userver/server/handlers/http_handler_json_base.hpp>
 #include <userver/storages/postgres/cluster.hpp>
 #include <userver/storages/postgres/component.hpp>
 
@@ -13,13 +13,13 @@ namespace delivery::api::api_v1_orders {
 
 namespace {
 
-class Controller final : public userver::server::handlers::HttpHandlerBase {
+class Controller final : public userver::server::handlers::HttpHandlerJsonBase {
  public:
   ~Controller() final = default;
 
   Controller(const userver::components::ComponentConfig& config,
              const userver::components::ComponentContext& context)
-      : HttpHandlerBase(config, context),
+      : HttpHandlerJsonBase(config, context),
         pg_cluster_{context
                         .FindComponent<userver::components::Postgres>(
                             "delivery-database")
@@ -27,13 +27,29 @@ class Controller final : public userver::server::handlers::HttpHandlerBase {
 
   static constexpr std::string_view kName = "handler-api-v1-orders";
 
-  std::string HandleRequestThrow(
-      const userver::server::http::HttpRequest& request,
+  userver::formats::json::Value HandleRequestJsonThrow(
+      const userver::server::http::HttpRequest&,
+      const userver::formats::json::Value& request_json,
       userver::server::request::RequestContext&) const final {
+    const auto basket_id = request_json["basket_id"].As<std::string>();
+    if (basket_id.empty()) {
+      throw userver::server::handlers::ClientError(
+          userver::server::handlers::ExternalBody{
+              "No 'basket_id' query argument"});
+    }
+
+    const auto address = request_json["address"].As<std::string>();
+    if (address.empty()) {
+      throw userver::server::handlers::ClientError(
+          userver::server::handlers::ExternalBody{
+              "No 'address' query argument"});
+    }
+
+    const auto weight = request_json["weight"].As<int>();
+
     auto command =
         application::use_cases::commands::create_order::CreateOrderCommand{
-            request.GetArg("basket_id"), request.GetArg("address"),
-            std::stoi(request.GetArg("weight"))};
+            basket_id, address, weight};
 
     auto const create_order_handler =
         application::use_cases::commands::create_order::CreateOrderHandler{

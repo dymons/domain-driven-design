@@ -25,10 +25,11 @@ class OrderRepository final : public core::ports::IOrderRepository {
     auto const result =
         cluster_->Execute(userver::storages::postgres::ClusterHostType::kMaster,
                           "INSERT INTO delivery.orders"
-                          "(id, status, courier_id, delivery_location, weight)"
-                          "VALUES ($1, $2, $3, $4, $5)",
-                          record.id, record.status, record.courier_id,
-                          record.delivery_location, record.weight);
+                          "(id, status)"
+                          "VALUES ($1, $2)"
+                          "ON CONFLICT (id) DO NOTHING "
+                          "RETURNING id",
+                          record.id, record.status);
 
     if (result.IsEmpty()) {
       userver::utils::LogErrorAndThrow<core::ports::OrderAlreadyExists>(

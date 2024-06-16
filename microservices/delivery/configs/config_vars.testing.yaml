@@ -6,4 +6,4 @@ is_testing: true
 
 server-port: 8080
 
-delivery-database-connection: 'postgresql://testsuite:password@localhost:5432/delivery'
+delivery-database-connection: 'postgresql://postgres:1@localhost:5432/delivery'
