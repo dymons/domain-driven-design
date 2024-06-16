@@ -2,7 +2,6 @@
 
 #include <userver/components/component_context.hpp>
 #include <userver/server/handlers/http_handler_json_base.hpp>
-#include <userver/storages/postgres/cluster.hpp>
 #include <userver/storages/postgres/component.hpp>
 
 #include <core/application/exceptions.hpp>
@@ -54,11 +53,13 @@ class Controller final : public userver::server::handlers::HttpHandlerJsonBase {
 
   Controller(const userver::components::ComponentConfig& config,
              const userver::components::ComponentContext& context)
-      : HttpHandlerJsonBase(config, context),
-        pg_cluster_{context
-                        .FindComponent<userver::components::Postgres>(
-                            "delivery-database")
-                        .GetCluster()} {}
+      : HttpHandlerJsonBase{config, context},
+        order_repository_{
+            infrastructure::adapters::postgres::MakeOrderRepository(
+                context
+                    .FindComponent<userver::components::Postgres>(
+                        "delivery-database")
+                    .GetCluster())} {}
 
   static constexpr std::string_view kName = "handler-api-v1-orders";
 
@@ -76,8 +77,7 @@ class Controller final : public userver::server::handlers::HttpHandlerJsonBase {
 
     auto const create_order_handler =
         application::use_cases::commands::create_order::CreateOrderHandler{
-            infrastructure::adapters::postgres::MakeOrderRepository(
-                pg_cluster_)};
+            order_repository_};
 
     create_order_handler.Handle(std::move(command));
 
@@ -88,7 +88,7 @@ class Controller final : public userver::server::handlers::HttpHandlerJsonBase {
   }
 
  private:
-  userver::storages::postgres::ClusterPtr pg_cluster_;
+  SharedRef<core::ports::IOrderRepository> order_repository_;
 };
 
 }  // namespace
