@@ -2,6 +2,7 @@
 -- +goose StatementBegin
 CREATE SCHEMA IF NOT EXISTS delivery;
 
+DROP TYPE IF EXISTS transport;
 CREATE TYPE transport AS
 (
     id       INTEGER,
@@ -10,12 +11,14 @@ CREATE TYPE transport AS
     capacity INTEGER
 );
 
+DROP TYPE IF EXISTS location;
 CREATE TYPE location AS
 (
     x INTEGER,
     y INTEGER
 );
 
+DROP TYPE IF EXISTS weight;
 CREATE TYPE weight AS
 (
     value INTEGER
@@ -49,6 +52,7 @@ CREATE INDEX IF NOT EXISTS idx_couriers_status ON delivery.couriers USING btree 
 
 -- +goose Down
 -- +goose StatementBegin
+-- TODO (dymons) Does not work
 -- DROP INDEX IF EXISTS idx_couriers_status;
 -- DROP INDEX IF EXISTS idx_orders_status;
 -- DROP TABLE IF EXISTS delivery.couriers;
