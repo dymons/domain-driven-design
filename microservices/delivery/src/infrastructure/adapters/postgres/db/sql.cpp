@@ -1,4 +1,4 @@
-#include "queries.hpp"
+#include "sql.hpp"
 
 namespace delivery::infrastructure::adapters::postgres::sql {
 

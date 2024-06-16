@@ -6,7 +6,7 @@
 #include <core/domain/order/order.hpp>
 #include <core/ports/iorder_repository.hpp>
 
-#include "db/queries.hpp"
+#include "db/sql.hpp"
 #include "dto/order.hpp"
 
 namespace delivery::infrastructure::adapters::postgres {
