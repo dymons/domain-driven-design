@@ -59,9 +59,8 @@ class Controller final : public userver::server::handlers::HttpHandlerJsonBase {
 
 }  // namespace
 
-auto AppendController(userver::components::ComponentList& component_list)
-    -> void {
-  component_list.Append<Controller>();
+auto AppendController(userver::components::ComponentList& components) -> void {
+  components.Append<Controller>();
 }
 
 }  // namespace delivery::api::adapters::http::api_v1_orders
