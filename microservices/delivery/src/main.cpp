@@ -9,8 +9,6 @@
 
 #include <api/adapters/http/api_v1_orders/controller.hpp>
 
-#include "hello.hpp"
-
 int main(int argc, char* argv[]) {
   auto component_list =
       userver::components::MinimalServerComponentList()
@@ -20,8 +18,6 @@ int main(int argc, char* argv[]) {
           .Append<userver::clients::dns::Component>()
           .Append<userver::server::handlers::TestsControl>()
           .Append<userver::components::Postgres>("delivery-database");
-
-  service_template::AppendHello(component_list);
 
   delivery::api::api_v1_orders::AppendController(component_list);
 
