@@ -27,5 +27,5 @@ auto Convert(Transport const&) -> core::domain::courier::Transport;
 template <>
 struct ::userver::storages::postgres::io::CppToUserPg<
     ::delivery::infrastructure::adapters::postgres::dto::Transport> {
-  static constexpr DBTypeName postgres_name = "transport";
+  static constexpr DBTypeName postgres_name{"delivery", "transport"};
 };

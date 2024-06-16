@@ -20,5 +20,5 @@ auto Convert(Weight const&) -> core::domain::Weight;
 template <>
 struct ::userver::storages::postgres::io::CppToUserPg<
     ::delivery::infrastructure::adapters::postgres::dto::Weight> {
-  static constexpr DBTypeName postgres_name = "weight";
+  static constexpr DBTypeName postgres_name{"delivery", "weight"};
 };
