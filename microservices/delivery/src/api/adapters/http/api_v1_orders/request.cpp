@@ -6,9 +6,9 @@
 #include <userver/formats/parse/common_containers.hpp>
 #include <userver/server/handlers/exceptions.hpp>
 
-namespace delivery::api::api_v1_orders {
+namespace delivery::api::adapters::http::api_v1_orders {
 
-auto Parse(const userver::formats::json::Value& request_json,
+auto Parse(userver::formats::json::Value const& request_json,
            userver::formats::parse::To<Request>) -> Request {
   auto basket_id = request_json["basket_id"].As<std::optional<std::string>>();
   if (not basket_id.has_value()) {
@@ -36,4 +36,4 @@ auto Parse(const userver::formats::json::Value& request_json,
   };
 }
 
-}  // namespace delivery::api::api_v1_orders
+}  // namespace delivery::api::adapters::http::api_v1_orders

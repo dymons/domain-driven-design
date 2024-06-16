@@ -11,7 +11,7 @@
 
 #include "request.hpp"
 
-namespace delivery::api::api_v1_orders {
+namespace delivery::api::adapters::http::api_v1_orders {
 
 namespace {
 
@@ -19,8 +19,8 @@ class Controller final : public userver::server::handlers::HttpHandlerJsonBase {
  public:
   ~Controller() final = default;
 
-  Controller(const userver::components::ComponentConfig& config,
-             const userver::components::ComponentContext& context)
+  Controller(userver::components::ComponentConfig const& config,
+             userver::components::ComponentContext const& context)
       : HttpHandlerJsonBase{config, context},
         order_repository_{
             infrastructure::adapters::postgres::MakeOrderRepository(
@@ -32,8 +32,8 @@ class Controller final : public userver::server::handlers::HttpHandlerJsonBase {
   static constexpr std::string_view kName = "handler-api-v1-orders";
 
   [[nodiscard]] auto HandleRequestJsonThrow(
-      const userver::server::http::HttpRequest&,
-      const userver::formats::json::Value& request_json,
+      userver::server::http::HttpRequest const&,
+      userver::formats::json::Value const& request_json,
       userver::server::request::RequestContext&) const
       -> userver::formats::json::Value final try {
     auto request = request_json.As<Request>();
@@ -48,7 +48,7 @@ class Controller final : public userver::server::handlers::HttpHandlerJsonBase {
     create_order_handler.Handle(std::move(command));
 
     return {};
-  } catch (const core::application::ArgumentException& ex) {
+  } catch (core::application::ArgumentException const& ex) {
     throw userver::server::handlers::ClientError(
         userver::server::handlers::ExternalBody{ex.what()});
   }
@@ -59,8 +59,9 @@ class Controller final : public userver::server::handlers::HttpHandlerJsonBase {
 
 }  // namespace
 
-void AppendController(userver::components::ComponentList& component_list) {
+auto AppendController(userver::components::ComponentList& component_list)
+    -> void {
   component_list.Append<Controller>();
 }
 
-}  // namespace delivery::api::api_v1_orders
+}  // namespace delivery::api::adapters::http::api_v1_orders

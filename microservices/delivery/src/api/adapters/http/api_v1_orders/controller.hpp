@@ -2,8 +2,8 @@
 
 #include <userver/components/component_list.hpp>
 
-namespace delivery::api::api_v1_orders {
+namespace delivery::api::adapters::http::api_v1_orders {
 
-void AppendController(userver::components::ComponentList&);
+auto AppendController(userver::components::ComponentList&) -> void;
 
-} // namespace delivery::api::api_v1_orders
+}  // namespace delivery::api::adapters::http::api_v1_orders

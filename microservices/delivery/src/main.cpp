@@ -9,7 +9,7 @@
 
 #include <api/adapters/http/api_v1_orders/controller.hpp>
 
-int main(int argc, char* argv[]) {
+auto main(int argc, char* argv[]) -> int {
   auto component_list =
       userver::components::MinimalServerComponentList()
           .Append<userver::server::handlers::Ping>()
@@ -19,7 +19,8 @@ int main(int argc, char* argv[]) {
           .Append<userver::server::handlers::TestsControl>()
           .Append<userver::components::Postgres>("delivery-database");
 
-  delivery::api::api_v1_orders::AppendController(component_list);
+  delivery::api::adapters::http::api_v1_orders::AppendController(
+      component_list);
 
   return userver::utils::DaemonMain(argc, argv, component_list);
 }
