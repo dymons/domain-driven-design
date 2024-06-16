@@ -9,43 +9,11 @@
 #include <core/application/use_cases/commands/create_order/handler.hpp>
 #include <infrastructure/adapters/postgres/order_repository.hpp>
 
+#include "request.hpp"
+
 namespace delivery::api::api_v1_orders {
 
 namespace {
-
-struct Request final {
-  std::string basket_id;
-  std::string address;
-  int weight;
-};
-
-auto Parse(const userver::formats::json::Value& request_json,
-           userver::formats::parse::To<Request>) -> Request {
-  auto basket_id = request_json["basket_id"].As<std::optional<std::string>>();
-  if (not basket_id.has_value()) {
-    throw userver::server::handlers::ClientError(
-        userver::server::handlers::ExternalBody{
-            "No 'basket_id' query argument"});
-  }
-
-  auto address = request_json["address"].As<std::optional<std::string>>();
-  if (not address.has_value()) {
-    throw userver::server::handlers::ClientError(
-        userver::server::handlers::ExternalBody{"No 'address' query argument"});
-  }
-
-  const auto weight = request_json["weight"].As<std::optional<int>>();
-  if (not weight.has_value()) {
-    throw userver::server::handlers::ClientError(
-        userver::server::handlers::ExternalBody{"No 'weight' query argument"});
-  }
-
-  return {
-      .basket_id = std::move(basket_id).value(),
-      .address = std::move(address).value(),
-      .weight = weight.value(),
-  };
-}
 
 class Controller final : public userver::server::handlers::HttpHandlerJsonBase {
  public:
