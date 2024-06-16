@@ -1,6 +1,6 @@
 #include "queries.hpp"
 
-namespace delivery::infrastructure::adapters::postgres::queries {
+namespace delivery::infrastructure::adapters::postgres::sql {
 
 const std::string kAddOrder = R"~(
   INSERT INTO delivery.orders
@@ -23,4 +23,4 @@ const std::string kAddOrder = R"~(
   RETURNING id
 )~";
 
-}  // namespace delivery::infrastructure::adapters::postgres::queries
+}  // namespace delivery::infrastructure::adapters::postgres::sql

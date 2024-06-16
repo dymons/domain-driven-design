@@ -23,11 +23,10 @@ class OrderRepository final : public core::ports::IOrderRepository {
   auto Add(SharedRef<core::domain::order::Order> const& order) const
       -> void final {
     auto const record = dto::Convert(order);
-    auto const result =
-        cluster_->Execute(userver::storages::postgres::ClusterHostType::kMaster,
-                          queries::kAddOrder, record.id, record.status,
-                          record.courier_id, record.delivery_location.x,
-                          record.delivery_location.y, record.weight.value);
+    auto const result = cluster_->Execute(
+        userver::storages::postgres::ClusterHostType::kMaster, sql::kAddOrder,
+        record.id, record.status, record.courier_id, record.delivery_location.x,
+        record.delivery_location.y, record.weight.value);
 
     if (result.IsEmpty()) {
       userver::utils::LogErrorAndThrow<core::ports::OrderAlreadyExists>(
