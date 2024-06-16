@@ -60,12 +60,4 @@ CREATE INDEX IF NOT EXISTS idx_couriers_status ON delivery.couriers USING btree 
 
 -- +goose Down
 -- +goose StatementBegin
--- DROP INDEX IF EXISTS idx_couriers_status;
--- DROP INDEX IF EXISTS idx_orders_status;
--- DROP TABLE IF EXISTS delivery.couriers;
--- DROP TABLE IF EXISTS delivery.orders;
--- DROP TYPE IF EXISTS delivery.weight;
--- DROP TYPE IF EXISTS delivery.location;
--- DROP TYPE IF EXISTS delivery.transport;
--- DROP SCHEMA IF EXISTS delivery CASCADE;
 -- +goose StatementEnd
