@@ -23,7 +23,7 @@ auto Parse(userver::formats::json::Value const& request_json,
         userver::server::handlers::ExternalBody{"No 'address' query argument"});
   }
 
-  const auto weight = request_json["weight"].As<std::optional<int>>();
+  auto const weight = request_json["weight"].As<std::optional<int>>();
   if (not weight.has_value()) {
     throw userver::server::handlers::ClientError(
         userver::server::handlers::ExternalBody{"No 'weight' query argument"});
