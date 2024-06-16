@@ -20,9 +20,10 @@ class Controller final : public userver::server::handlers::HttpHandlerBase {
   Controller(const userver::components::ComponentConfig& config,
              const userver::components::ComponentContext& context)
       : HttpHandlerBase(config, context),
-        pg_cluster_{
-            context.FindComponent<userver::components::Postgres>("delivery")
-                .GetCluster()} {}
+        pg_cluster_{context
+                        .FindComponent<userver::components::Postgres>(
+                            "delivery-database")
+                        .GetCluster()} {}
 
   static constexpr std::string_view kName = "handler-api-v1-orders";
 
