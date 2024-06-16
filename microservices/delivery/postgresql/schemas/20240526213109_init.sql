@@ -24,12 +24,20 @@ CREATE TYPE delivery.location AS
 --     value INTEGER
 -- );
 
+DROP TYPE IF EXISTS delivery.order;
+CREATE TYPE delivery.order AS
+(
+    id         TEXT,
+    status     TEXT,
+    courier_id TEXT
+);
+
 CREATE TABLE IF NOT EXISTS delivery.orders
 (
-    id                TEXT     NOT NULL,
-    status            TEXT     NOT NULL,
+    id                TEXT              NOT NULL,
+    status            TEXT              NOT NULL,
     courier_id        TEXT,
---     delivery_location location NOT NULL,
+    delivery_location delivery.location NOT NULL,
 --     weight            weight   NOT NULL,
 
     PRIMARY KEY (id)
