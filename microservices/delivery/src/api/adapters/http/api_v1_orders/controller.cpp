@@ -5,6 +5,7 @@
 #include <userver/storages/postgres/cluster.hpp>
 #include <userver/storages/postgres/component.hpp>
 
+#include <core/application/exceptions.hpp>
 #include <core/application/use_cases/commands/create_order/command.hpp>
 #include <core/application/use_cases/commands/create_order/handler.hpp>
 #include <infrastructure/adapters/postgres/order_repository.hpp>
@@ -65,7 +66,7 @@ class Controller final : public userver::server::handlers::HttpHandlerJsonBase {
       const userver::server::http::HttpRequest&,
       const userver::formats::json::Value& request_json,
       userver::server::request::RequestContext&) const
-      -> userver::formats::json::Value final {
+      -> userver::formats::json::Value final try {
     auto request = request_json.As<Request>();
 
     auto command =
@@ -81,6 +82,9 @@ class Controller final : public userver::server::handlers::HttpHandlerJsonBase {
     create_order_handler.Handle(std::move(command));
 
     return {};
+  } catch (const delivery::ArgumentException& ex) {
+    throw userver::server::handlers::ClientError(
+        userver::server::handlers::ExternalBody{ex.what()});
   }
 
  private:
