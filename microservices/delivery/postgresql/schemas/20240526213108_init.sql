@@ -28,7 +28,7 @@ CREATE TABLE IF NOT EXISTS delivery.orders
 (
     id                TEXT     NOT NULL,
     status            TEXT     NOT NULL,
---     courier_id        TEXT,
+    courier_id        TEXT,
 --     delivery_location location NOT NULL,
 --     weight            weight   NOT NULL,
 
