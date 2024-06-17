@@ -18,16 +18,14 @@ class CreateOrderHandler final : public ICreateOrderHandler {
       : order_repository_{std::move(order_repository)} {}
 
   auto Handle(CreateOrderCommand&& command) const -> void final {
-    {
-      auto const order = core::domain::order::Order::Create(
-          core::domain::order::BasketId{command.GetBasketId()},
-          core::domain::Location::kMinLocation,
-          core::domain::Weight{command.GetWeight()});
+    auto const order = core::domain::order::Order::Create(
+        core::domain::order::BasketId{command.GetBasketId()},
+        core::domain::Location::kMinLocation,
+        core::domain::Weight{command.GetWeight()});
 
-      try {
-        order_repository_->Add(order);
-      } catch (core::ports::OrderAlreadyExists const&) {
-      }
+    try {
+      order_repository_->Add(order);
+    } catch (core::ports::OrderAlreadyExists const&) {
     }
   }
 
