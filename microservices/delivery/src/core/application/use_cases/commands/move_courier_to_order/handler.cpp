@@ -29,6 +29,10 @@ class MoveCourierToOrderHandler final : public IMoveCourierToOrderHandler {
         return this->courier_repository_->GetById(courier_id);
       });
 
+      if (not courier.has_value()) {
+        // TODO (dymons) Inconsistency State
+      }
+
       optional::map(std::move(courier), [&, this](auto&& courier) {
         courier->MoveTo(order->GetDeliveryLocation());
 
