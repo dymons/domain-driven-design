@@ -4,6 +4,7 @@
 
 #include <core/domain/order/strong_typedefs.hpp>
 #include <utils/memory.hpp>
+#include <utils/non_copyable_and_moveable.hpp>
 
 namespace delivery::core::domain::order {
 class Order;
@@ -19,15 +20,9 @@ struct OrderAlreadyExists final : std::runtime_error {
   using std::runtime_error::runtime_error;
 };
 
-class IOrderRepository {
+class IOrderRepository : private NonCopyableAndMoveable {
  public:
   virtual ~IOrderRepository() = default;
-
-  IOrderRepository() = default;
-  IOrderRepository(IOrderRepository const&) = delete;
-  IOrderRepository(IOrderRepository&&) = delete;
-  IOrderRepository& operator=(IOrderRepository const&) = delete;
-  IOrderRepository& operator=(IOrderRepository&&) = delete;
 
   virtual auto Add(SharedRef<core::domain::order::Order> const&) const
       -> void = 0;

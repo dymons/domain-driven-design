@@ -4,6 +4,7 @@
 
 #include <core/domain/courier/strong_typedefs.hpp>
 #include <utils/memory.hpp>
+#include <utils/non_copyable_and_moveable.hpp>
 
 namespace delivery::core::domain::courier {
 class Courier;
@@ -19,15 +20,9 @@ struct CourierAlreadyExists final : std::runtime_error {
   using std::runtime_error::runtime_error;
 };
 
-class ICourierRepository {
+class ICourierRepository : private NonCopyableAndMoveable {
  public:
   virtual ~ICourierRepository() = default;
-
-  ICourierRepository() = default;
-  ICourierRepository(ICourierRepository const&) = delete;
-  ICourierRepository(ICourierRepository&&) = delete;
-  ICourierRepository& operator=(ICourierRepository const&) = delete;
-  ICourierRepository& operator=(ICourierRepository&&) = delete;
 
   virtual auto Add(SharedRef<domain::courier::Courier> const&) const
       -> void = 0;

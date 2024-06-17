@@ -4,6 +4,7 @@
 #include <unordered_set>
 
 #include <utils/memory.hpp>
+#include <utils/non_copyable_and_moveable.hpp>
 
 namespace delivery::core::domain::courier {
 class Courier;
@@ -15,17 +16,11 @@ class Order;
 
 namespace delivery::core::domain_services {
 
-class IDispatchService {
+class IDispatchService : private NonCopyableAndMoveable {
  public:
   virtual ~IDispatchService() = default;
 
-  IDispatchService() = default;
-  IDispatchService(IDispatchService const&) = delete;
-  IDispatchService(IDispatchService&&) = delete;
-  IDispatchService& operator=(IDispatchService const&) = delete;
-  IDispatchService& operator=(IDispatchService&&) = delete;
-
-  struct DispatchResult {
+  struct DispatchResult final {
     MutableSharedRef<domain::order::Order> order;
     std::optional<MutableSharedRef<domain::courier::Courier>> courier;
   };
