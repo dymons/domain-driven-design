@@ -26,11 +26,12 @@ class MoveCourierToOrderHandler final : public IMoveCourierToOrderHandler {
     auto order = container::FirstOrNullopt(order_repository_->GetAssigned());
     optional::map(std::move(order), [this](auto&& order) {
       auto courier = order->GetCourierId().transform([this](auto courier_id) {
-        return courier_repository_->GetById(courier_id);
+        return this->courier_repository_->GetById(courier_id);
       });
 
       optional::map(std::move(courier), [&, this](auto&& courier) {
         courier->MoveTo(order->GetDeliveryLocation());
+
         if (order->GetDeliveryLocation() == courier->GetCurrentLocation()) {
           order->Complete();
           courier->CompleteOrder();
