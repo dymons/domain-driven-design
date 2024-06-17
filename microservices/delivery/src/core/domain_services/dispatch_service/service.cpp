@@ -5,13 +5,14 @@
 
 #include <core/domain/courier/courier.hpp>
 #include <core/domain/order/order.hpp>
+
 #include "iservice.hpp"
 
 namespace delivery::core::domain_services {
 
 namespace {
 
-struct Score {
+struct Score final {
   domain::courier::Time time_to_delivery_location;
   MutableSharedRef<domain::courier::Courier> courier;
 
