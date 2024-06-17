@@ -30,7 +30,7 @@ class CreateOrderHandler final : public ICreateOrderHandler {
   }
 
  private:
-  SharedRef<core::ports::IOrderRepository> order_repository_;
+  SharedRef<core::ports::IOrderRepository> const order_repository_;
 };
 
 }  // namespace

@@ -43,9 +43,9 @@ class AssignOrdersHandler final : public IAssignOrdersHandler {
   }
 
  private:
-  SharedRef<core::ports::ICourierRepository> courier_repository_;
-  SharedRef<core::ports::IOrderRepository> order_repository_;
-  SharedRef<core::domain_services::IDispatchService> dispatch_service_;
+  SharedRef<core::ports::ICourierRepository> const courier_repository_;
+  SharedRef<core::ports::IOrderRepository> const order_repository_;
+  SharedRef<core::domain_services::IDispatchService> const dispatch_service_;
 };
 
 }  // namespace
