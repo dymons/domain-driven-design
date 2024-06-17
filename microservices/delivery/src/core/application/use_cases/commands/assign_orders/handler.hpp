@@ -2,7 +2,7 @@
 
 #include <optional>
 
-#include <core/domain_services/idispatch_service.hpp>
+#include <core/domain_services/dispatch_service/idispatch_service.hpp>
 #include <core/ports/icourier_repository.hpp>
 #include <core/ports/iorder_repository.hpp>
 #include <utils/memory.hpp>
