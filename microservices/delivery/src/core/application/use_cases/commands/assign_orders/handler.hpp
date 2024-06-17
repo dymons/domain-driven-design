@@ -1,27 +1,27 @@
 #pragma once
 
-#include <optional>
-
-#include <core/domain_services/dispatch_service/iservice.hpp>
-#include <core/ports/icourier_repository.hpp>
-#include <core/ports/iorder_repository.hpp>
 #include <utils/memory.hpp>
 
-#include "command.hpp"
+#include "ihandler.hpp"
+
+namespace delivery::core::ports {
+class IOrderRepository;
+}  // namespace delivery::core::ports
+
+namespace delivery::core::ports {
+class ICourierRepository;
+}  // namespace delivery::core::ports
+
+namespace delivery::core::domain_services {
+class IDispatchService;
+}  // namespace delivery::core::domain_services
 
 namespace delivery::core::application::use_cases::commands::assign_orders {
 
-class AssignOrdersHandler final {
-  SharedRef<core::ports::ICourierRepository> courier_repository_;
-  SharedRef<core::ports::IOrderRepository> order_repository_;
-  SharedRef<core::domain_services::IDispatchService> dispatch_service_;
-
- public:
-  AssignOrdersHandler(SharedRef<core::ports::ICourierRepository>,
-                      SharedRef<core::ports::IOrderRepository>,
-                      SharedRef<core::domain_services::IDispatchService>);
-
-  auto Handle(AssignOrdersCommand&&) -> void;
-};
+[[nodiscard]] auto MakeAssignOrdersHandler(
+    SharedRef<core::ports::ICourierRepository>,
+    SharedRef<core::ports::IOrderRepository>,
+    SharedRef<core::domain_services::IDispatchService>)
+    -> SharedRef<IAssignOrdersHandler>;
 
 }  // namespace delivery::core::application::use_cases::commands::assign_orders
