@@ -51,6 +51,7 @@ class Courier {
   auto StartWork() -> void;
   auto StopWork() -> void;
   auto InWork() -> void;
+  auto CompleteOrder() -> void;
 };
 
 }  // namespace delivery::core::domain::courier

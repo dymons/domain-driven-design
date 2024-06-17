@@ -68,6 +68,12 @@ class CourierRepository final : public core::ports::ICourierRepository {
     userver::utils::LogErrorAndThrow<core::ports::CourierNotFound>(ex.what());
   }
 
+  auto GetById(core::domain::order::CourierId const& courier_id) const
+      -> MutableSharedRef<core::domain::courier::Courier> final {
+    return GetById(
+        core::domain::courier::CourierId{courier_id.GetUnderlying()});
+  }
+
   auto GetByReadyStatus() const
       -> std::unordered_set<
           MutableSharedRef<core::domain::courier::Courier>> final {

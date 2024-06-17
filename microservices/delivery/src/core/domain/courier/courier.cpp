@@ -104,6 +104,8 @@ auto Courier::InWork() -> void {
   status_ = CourierStatus::kBusy;
 }
 
+auto Courier::CompleteOrder() -> void { status_ = CourierStatus::kReady; }
+
 auto Courier::CalculateTimeToPoint(Location location) const noexcept -> Time {
   auto const distance = current_location_.DistanceTo(location);
   return Time{static_cast<double>(distance.GetUnderlying()) /
