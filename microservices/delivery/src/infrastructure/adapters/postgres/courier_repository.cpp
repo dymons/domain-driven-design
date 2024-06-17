@@ -101,7 +101,7 @@ class CourierRepository final : public core::ports::ICourierRepository {
     return couriers;
   }
 
-  const userver::storages::postgres::ClusterPtr cluster_;
+  userver::storages::postgres::ClusterPtr const cluster_;
 };
 
 }  // namespace

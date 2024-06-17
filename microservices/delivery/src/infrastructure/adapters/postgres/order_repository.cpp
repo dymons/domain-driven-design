@@ -105,7 +105,7 @@ class OrderRepository final : public core::ports::IOrderRepository {
   }
 
  private:
-  const userver::storages::postgres::ClusterPtr cluster_;
+  userver::storages::postgres::ClusterPtr const cluster_;
 };
 
 }  // namespace
