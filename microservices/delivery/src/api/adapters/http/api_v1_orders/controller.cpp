@@ -43,9 +43,9 @@ class Controller final : public userver::server::handlers::HttpHandlerJsonBase {
                            std::move(request.address), request.weight};
 
     auto const create_order_handler = core::application::use_cases::commands::
-        create_order::CreateOrderHandler{order_repository_};
+        create_order::MakeCreateOrderHandler(order_repository_);
 
-    create_order_handler.Handle(std::move(command));
+    create_order_handler->Handle(std::move(command));
 
     return {};
   } catch (core::application::ArgumentException const& ex) {

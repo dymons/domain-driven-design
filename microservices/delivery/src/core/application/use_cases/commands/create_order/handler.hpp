@@ -1,19 +1,16 @@
 #pragma once
 
-#include <core/ports/iorder_repository.hpp>
 #include <utils/memory.hpp>
 
-#include "command.hpp"
+#include "ihandler.hpp"
+
+namespace delivery::core::ports {
+class IOrderRepository;
+}  // namespace delivery::core::ports
 
 namespace delivery::core::application::use_cases::commands::create_order {
 
-class CreateOrderHandler final {
-  SharedRef<core::ports::IOrderRepository> order_repository_;
+[[nodiscard]] auto MakeCreateOrderHandler(
+    SharedRef<core::ports::IOrderRepository>) -> SharedRef<ICreateOrderHandler>;
 
- public:
-  explicit CreateOrderHandler(SharedRef<core::ports::IOrderRepository>);
-
-  auto Handle(CreateOrderCommand&&) const -> void;
-};
-
-}  // namespace delivery::core::application::use_cases::commands::api_v1_orders
+}  // namespace delivery::core::application::use_cases::commands::create_order
