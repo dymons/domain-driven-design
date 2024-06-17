@@ -2,8 +2,9 @@
 
 #include <core/domain/courier/courier_mock_test.hpp>
 #include <core/domain/order/order_mock_test.hpp>
-#include "dispatch_service.hpp"
-#include "idispatch_service.hpp"
+
+#include "iservice.hpp"
+#include "service.hpp"
 
 namespace delivery::core::domain_services {
 

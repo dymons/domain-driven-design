@@ -1,11 +1,11 @@
-#include "dispatch_service.hpp"
+#include "service.hpp"
 
 #include <algorithm>
 #include <set>
 
 #include <core/domain/courier/courier.hpp>
 #include <core/domain/order/order.hpp>
-#include "idispatch_service.hpp"
+#include "iservice.hpp"
 
 namespace delivery::core::domain_services {
 
