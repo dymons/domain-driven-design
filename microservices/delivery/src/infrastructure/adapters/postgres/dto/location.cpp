@@ -1,6 +1,6 @@
 #include "location.hpp"
 
-#include <core/domain/shared_kernel/location.hpp>
+#include <core/domain/shared_kernel/location/location.hpp>
 
 namespace delivery::infrastructure::adapters::postgres::dto {
 

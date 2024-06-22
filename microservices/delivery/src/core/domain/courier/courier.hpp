@@ -1,7 +1,7 @@
 #pragma once
 
-#include <core/domain/shared_kernel/location.hpp>
 #include <utils/memory.hpp>
+#include <core/domain/shared_kernel/location/location.hpp>
 
 #include "exceptions.hpp"
 #include "status.hpp"

@@ -1,6 +1,6 @@
 #include <userver/utest/utest.hpp>
 
-#include "exceptions.hpp"
+#include <core/domain/shared_kernel/exceptions.hpp>
 #include "weight.hpp"
 
 namespace delivery::core::domain {

@@ -1,6 +1,6 @@
 #include "weight.hpp"
 
-#include <core/domain/shared_kernel/weight.hpp>
+#include <core/domain/shared_kernel/weight/weight.hpp>
 
 namespace delivery::infrastructure::adapters::postgres::dto {
 

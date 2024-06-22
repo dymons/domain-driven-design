@@ -2,9 +2,9 @@
 
 #include <optional>
 
-#include <core/domain/shared_kernel/location.hpp>
-#include <core/domain/shared_kernel/weight.hpp>
 #include <utils/memory.hpp>
+#include <core/domain/shared_kernel/location/location.hpp>
+#include <core/domain/shared_kernel/weight/weight.hpp>
 #include "status.hpp"
 #include "strong_typedefs.hpp"
 
