@@ -4,7 +4,7 @@
 
 namespace delivery::core::ports {
 
-[[nodiscard]] auto MakeCourierRepository(
+[[nodiscard]] auto MockCourierRepository(
     std::unordered_set<MutableSharedRef<domain::courier::Courier>> = {})
     -> SharedRef<ICourierRepository>;
 
