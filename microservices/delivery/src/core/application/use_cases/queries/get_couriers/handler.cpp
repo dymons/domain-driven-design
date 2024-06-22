@@ -23,10 +23,8 @@ class GetCouriersHandler final : public IGetCouriersHandler {
     for (auto&& courier : couriers) {
       response.couriers.emplace_back(
           courier->GetId().GetUnderlying(), courier->GetName().GetUnderlying(),
-          Location{
-              .x = courier->GetCurrentLocation().GetX().GetUnderlying(),
-              .y = courier->GetCurrentLocation().GetY().GetUnderlying(),
-          });
+          Location{courier->GetCurrentLocation().GetX().GetUnderlying(),
+                   courier->GetCurrentLocation().GetY().GetUnderlying()});
     }
 
     return std::move(response);

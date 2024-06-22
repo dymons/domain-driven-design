@@ -6,9 +6,15 @@
 
 namespace delivery::core::application::use_cases::queries::get_couriers {
 
-struct Location final {
-  int x{};
-  int y{};
+class Location final {
+  int x_;
+  int y_;
+
+ public:
+  Location(int x, int y);
+
+  [[nodiscard]] auto GetX() const noexcept -> int;
+  [[nodiscard]] auto GetY() const noexcept -> int;
 };
 
 class Courier final {

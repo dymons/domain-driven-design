@@ -34,6 +34,8 @@ class IOrderRepository : private NonCopyableAndMoveable {
       -> std::vector<MutableSharedRef<core::domain::order::Order>> = 0;
   virtual auto GetAssigned() const
       -> std::vector<MutableSharedRef<core::domain::order::Order>> = 0;
+  virtual auto GetOrders() const
+      -> std::vector<MutableSharedRef<core::domain::order::Order>> = 0;
 };
 
 }  // namespace delivery::core::ports

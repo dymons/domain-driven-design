@@ -104,6 +104,23 @@ class OrderRepository final : public core::ports::IOrderRepository {
     return orders;
   }
 
+  auto GetOrders() const
+      -> std::vector<MutableSharedRef<core::domain::order::Order>> final {
+    auto const result = cluster_->Execute(
+        userver::storages::postgres::ClusterHostType::kMaster,
+        "SELECT id, status, courier_id, delivery_location, weight"
+        "FROM delivery.orders");
+
+    auto const records = result.AsContainer<std::vector<dto::Order>>();
+    auto orders = std::vector<MutableSharedRef<core::domain::order::Order>>{};
+    orders.reserve(records.size());
+    std::ranges::transform(
+        records, std::back_inserter(orders),
+        [](auto const& record) { return dto::Convert(record); });
+
+    return orders;
+  };
+
  private:
   userver::storages::postgres::ClusterPtr const cluster_;
 };
