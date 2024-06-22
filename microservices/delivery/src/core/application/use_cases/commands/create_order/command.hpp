@@ -17,4 +17,4 @@ class CreateOrderCommand final {
   [[nodiscard]] auto GetWeight() const noexcept -> int;
 };
 
-}  // namespace delivery::core::application::use_cases::commands::api_v1_orders
+}  // namespace delivery::core::application::use_cases::commands::create_order
