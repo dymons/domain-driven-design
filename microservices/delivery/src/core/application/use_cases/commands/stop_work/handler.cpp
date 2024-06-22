@@ -36,7 +36,7 @@ class StartWorkHandler final : public IStopWorkHandler {
 
 }  // namespace
 
-auto MakeStartWorkHandler(
+auto MakeStopWorkHandler(
     SharedRef<core::ports::ICourierRepository> courier_repository)
     -> SharedRef<IStopWorkHandler> {
   return userver::utils::MakeSharedRef<const StartWorkHandler>(

@@ -10,7 +10,7 @@ class ICourierRepository;
 
 namespace delivery::core::application::use_cases::commands::stop_work {
 
-[[nodiscard]] auto MakeStartWorkHandler(
+[[nodiscard]] auto MakeStopWorkHandler(
     SharedRef<core::ports::ICourierRepository>) -> SharedRef<IStopWorkHandler>;
 
 }  // namespace delivery::core::application::use_cases::commands::stop_work
