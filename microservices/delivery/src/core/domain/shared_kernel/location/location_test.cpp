@@ -2,7 +2,7 @@
 
 #include <vector>
 
-#include "exceptions.hpp"
+#include <core/domain/shared_kernel/exceptions.hpp>
 #include "location.hpp"
 
 namespace delivery::core::domain {

@@ -4,7 +4,7 @@
 
 #include <fmt/format.h>
 
-#include "exceptions.hpp"
+#include <core/domain/shared_kernel/exceptions.hpp>
 
 namespace delivery::core::domain {
 
