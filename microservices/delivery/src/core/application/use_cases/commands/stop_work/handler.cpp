@@ -21,7 +21,7 @@ class StartWorkHandler final : public IStopWorkHandler {
 
     try {
       courier->StopWork();
-    } catch (domain::courier::TryStartWorkingWhenAlreadyStarted const&) {
+    } catch (domain::courier::TryStopWorkingWithIncompleteDelivery const&) {
       // TODO (dymons) Return 200/202
     }
 
