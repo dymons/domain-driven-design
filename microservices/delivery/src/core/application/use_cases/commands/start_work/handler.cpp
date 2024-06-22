@@ -19,13 +19,15 @@ class StartWorkHandler final : public IStartWorkHandler {
     auto courier = courier_repository_->GetById(
         domain::courier::CourierId{command.GetCourierId()});
 
-    courier->StartWork();
+    try {
+      courier->StartWork();
+    } catch (domain::courier::TryStartWorkingWhenAlreadyStarted&) {
+      // TODO (dymons) Return 200/202
+    }
 
     courier_repository_->Update(courier);
   } catch (ports::CourierNotFound const&) {
     // TODO (dymons) Return 404
-  } catch (domain::courier::TryStartWorkingWhenAlreadyStarted&) {
-    // TODO (dymons) Return 200/202
   }
 
  private:
