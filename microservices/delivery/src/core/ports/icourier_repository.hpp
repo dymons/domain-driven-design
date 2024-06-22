@@ -37,6 +37,8 @@ class ICourierRepository : private NonCopyableAndMoveable {
       -> std::unordered_set<MutableSharedRef<domain::courier::Courier>> = 0;
   virtual auto GetByBusyStatus() const
       -> std::unordered_set<MutableSharedRef<domain::courier::Courier>> = 0;
+  virtual auto GetCouriers() const
+      -> std::unordered_set<MutableSharedRef<domain::courier::Courier>> = 0;
 };
 
 }  // namespace delivery::core::ports

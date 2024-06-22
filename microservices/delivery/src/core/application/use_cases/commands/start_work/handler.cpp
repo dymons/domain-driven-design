@@ -11,7 +11,7 @@ class StartWorkHandler final : public IStartWorkHandler {
  public:
   ~StartWorkHandler() final = default;
 
-  StartWorkHandler(
+  explicit StartWorkHandler(
       SharedRef<core::ports::ICourierRepository> courier_repository)
       : courier_repository_(std::move(courier_repository)) {}
 
