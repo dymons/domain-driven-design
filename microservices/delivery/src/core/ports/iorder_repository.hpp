@@ -24,18 +24,21 @@ class IOrderRepository : private NonCopyableAndMoveable {
  public:
   virtual ~IOrderRepository() = default;
 
-  virtual auto Add(SharedRef<core::domain::order::Order> const&) const
-      -> void = 0;
-  virtual auto Update(SharedRef<core::domain::order::Order> const&) const
-      -> void = 0;
-  virtual auto GetById(core::domain::order::OrderId const&) const
-      -> MutableSharedRef<core::domain::order::Order> = 0;
-  virtual auto GetNotAssigned() const
-      -> std::vector<MutableSharedRef<core::domain::order::Order>> = 0;
-  virtual auto GetAssigned() const
-      -> std::vector<MutableSharedRef<core::domain::order::Order>> = 0;
-  virtual auto GetOrders() const
-      -> std::vector<MutableSharedRef<core::domain::order::Order>> = 0;
+  // Modifiers
+
+  // clang-format off
+  virtual auto Add(SharedRef<core::domain::order::Order> const&) const -> void = 0;
+  virtual auto Update(SharedRef<core::domain::order::Order> const&) const -> void = 0;
+  // clang-format on
+
+  // Observers
+
+  // clang-format off
+  virtual auto GetById(core::domain::order::OrderId const&) const -> MutableSharedRef<core::domain::order::Order> = 0;
+  virtual auto GetNotAssigned() const -> std::vector<MutableSharedRef<core::domain::order::Order>> = 0;
+  virtual auto GetAssigned() const -> std::vector<MutableSharedRef<core::domain::order::Order>> = 0;
+  virtual auto GetOrders() const -> std::vector<MutableSharedRef<core::domain::order::Order>> = 0;
+  // clang-format on
 };
 
 }  // namespace delivery::core::ports

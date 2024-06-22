@@ -25,20 +25,22 @@ class ICourierRepository : private NonCopyableAndMoveable {
  public:
   virtual ~ICourierRepository() = default;
 
-  virtual auto Add(SharedRef<domain::courier::Courier> const&) const
-      -> void = 0;
-  virtual auto Update(SharedRef<domain::courier::Courier> const&) const
-      -> void = 0;
-  virtual auto GetById(domain::courier::CourierId const&) const
-      -> MutableSharedRef<domain::courier::Courier> = 0;
-  virtual auto GetById(domain::order::CourierId const&) const
-      -> MutableSharedRef<domain::courier::Courier> = 0;
-  virtual auto GetByReadyStatus() const
-      -> std::unordered_set<MutableSharedRef<domain::courier::Courier>> = 0;
-  virtual auto GetByBusyStatus() const
-      -> std::unordered_set<MutableSharedRef<domain::courier::Courier>> = 0;
-  virtual auto GetCouriers() const
-      -> std::unordered_set<MutableSharedRef<domain::courier::Courier>> = 0;
+  // Modifiers
+
+  // clang-format off
+  virtual auto Add(SharedRef<domain::courier::Courier> const&) const -> void = 0;
+  virtual auto Update(SharedRef<domain::courier::Courier> const&) const -> void = 0;
+  // clang-format on
+
+  // Observers
+
+  // clang-format off
+  virtual auto GetById(domain::courier::CourierId const&) const -> MutableSharedRef<domain::courier::Courier> = 0;
+  virtual auto GetById(domain::order::CourierId const&) const -> MutableSharedRef<domain::courier::Courier> = 0;
+  virtual auto GetByReadyStatus() const -> std::unordered_set<MutableSharedRef<domain::courier::Courier>> = 0;
+  virtual auto GetByBusyStatus() const -> std::unordered_set<MutableSharedRef<domain::courier::Courier>> = 0;
+  virtual auto GetCouriers() const -> std::unordered_set<MutableSharedRef<domain::courier::Courier>> = 0;
+  // clang-format on
 };
 
 }  // namespace delivery::core::ports
