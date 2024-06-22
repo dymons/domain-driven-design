@@ -1,7 +1,7 @@
 #include "handler.hpp"
 
 #include <core/domain/courier/courier.hpp>
-#include <core/ports/icourier_repository.hpp>
+#include <core/ports/courier_repository/irepository.hpp>
 
 namespace delivery::core::application::use_cases::commands::stop_work {
 

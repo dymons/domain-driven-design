@@ -1,7 +1,7 @@
 #include "handler.hpp"
 
 #include <core/domain/order/order.hpp>
-#include <core/ports/iorder_repository.hpp>
+#include <core/ports/order_repository/irepository.hpp>
 
 namespace delivery::core::application::use_cases::queries::get_orders {
 
