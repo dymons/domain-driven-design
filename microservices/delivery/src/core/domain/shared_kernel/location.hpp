@@ -10,7 +10,7 @@ using X = userver::utils::StrongTypedef<struct XTag, int>;
 using Y = userver::utils::StrongTypedef<struct YTag, int>;
 using Distance = userver::utils::StrongTypedef<struct DistanceTag, int>;
 
-class Location {
+class Location final {
   int x_;
   int y_;
 

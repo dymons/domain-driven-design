@@ -4,11 +4,15 @@
 
 namespace delivery::core::domain {
 
-class Weight {
+class Weight final {
   int value_;
 
  public:
+  // Constructors
+
   Weight(int value);
+
+  // Observers
 
   [[nodiscard]] auto GetWeight() const noexcept -> int;
 
