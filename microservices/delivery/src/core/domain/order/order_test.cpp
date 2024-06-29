@@ -1,7 +1,9 @@
 #include <userver/utest/utest.hpp>
 
 #include <core/domain/courier/courier_mock_test.hpp>
+
 #include "order_mock_test.hpp"
+#include "exceptions.hpp"
 
 namespace delivery::core::domain::order {
 

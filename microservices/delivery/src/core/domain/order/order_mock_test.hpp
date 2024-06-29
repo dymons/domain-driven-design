@@ -10,7 +10,7 @@
 namespace delivery::core::domain::order {
 
 struct MockCourierParams final {
-  std::optional<std::string> basket_id;
+  std::optional<std::string> basket_id = std::nullopt;
   Location delivery_location = MockLocation();
   Weight weight = MockWeight();
 };
