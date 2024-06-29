@@ -19,7 +19,7 @@ class CourierRepository final : public ICourierRepository {
     auto [_, success] = couriers_.insert(
         MakeMutableSharedRef<domain::courier::Courier>(*courier));
 
-    if (!success) {
+    if (not success) {
       throw CourierAlreadyExists{""};
     }
   }
