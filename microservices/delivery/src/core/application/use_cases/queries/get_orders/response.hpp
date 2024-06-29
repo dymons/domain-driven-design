@@ -28,6 +28,8 @@ class Order final {
 
   [[nodiscard]] auto GetId() const noexcept -> std::string;
   [[nodiscard]] auto GetLocation() const noexcept -> Location;
+
+  auto operator<=>(Order const&) const -> std::strong_ordering = default;
 };
 
 struct Response200 {
