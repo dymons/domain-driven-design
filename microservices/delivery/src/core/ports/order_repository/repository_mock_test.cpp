@@ -22,7 +22,7 @@ class OrderRepository final : public IOrderRepository {
         MakeMutableSharedRef<core::domain::order::Order>(*order));
 
     if (not success) {
-      userver::utils::LogErrorAndThrow<core::ports::OrderAlreadyExists>("");
+      userver::utils::LogErrorAndThrow<OrderAlreadyExists>("");
     }
   }
 
@@ -30,7 +30,7 @@ class OrderRepository final : public IOrderRepository {
       -> void final {
     auto raw_order = MakeMutableSharedRef<domain::order::Order>(*order);
     if (not orders_.contains(raw_order)) {
-      userver::utils::LogErrorAndThrow<core::ports::OrderNotFound>("");
+      userver::utils::LogErrorAndThrow<OrderNotFound>("");
     }
 
     orders_.erase(raw_order);

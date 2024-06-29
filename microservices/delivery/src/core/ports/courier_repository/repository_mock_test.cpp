@@ -1,5 +1,7 @@
 #include "repository_mock_test.hpp"
 
+#include <userver/utils/exception.hpp>
+
 #include <core/domain/courier/courier.hpp>
 
 namespace delivery::core::ports {
@@ -20,7 +22,7 @@ class CourierRepository final : public ICourierRepository {
         MakeMutableSharedRef<domain::courier::Courier>(*courier));
 
     if (not success) {
-      throw CourierAlreadyExists{""};
+      userver::utils::LogErrorAndThrow<CourierAlreadyExists>("");
     }
   }
 
@@ -28,7 +30,7 @@ class CourierRepository final : public ICourierRepository {
       -> void final {
     auto raw_courier = MakeMutableSharedRef<domain::courier::Courier>(*courier);
     if (not couriers_.contains(raw_courier)) {
-      throw CourierNotFound{""};
+      userver::utils::LogErrorAndThrow<CourierNotFound>("");
     }
 
     couriers_.erase(raw_courier);
