@@ -15,12 +15,12 @@ auto const kWeight = int{5};
 
 class CreateOrderHandlerShould : public ::testing::Test {
  private:
-  SharedRef<core::ports::IOrderRepository> order_repository_ =
+  SharedRef<core::ports::IOrderRepository> mock_order_repository_ =
       core::ports::MockOrderRepository();
 
  protected:
   SharedRef<ICreateOrderHandler> handler_ =
-      MakeCreateOrderHandler(order_repository_);
+      MakeCreateOrderHandler(mock_order_repository_);
 };
 
 UTEST_F(CreateOrderHandlerShould, CreateOrder) {
