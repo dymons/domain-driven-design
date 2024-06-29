@@ -15,6 +15,8 @@ class Location final {
 
   [[nodiscard]] auto GetX() const noexcept -> int;
   [[nodiscard]] auto GetY() const noexcept -> int;
+
+  auto operator<=>(Location const&) const -> std::strong_ordering = default;
 };
 
 class Order final {

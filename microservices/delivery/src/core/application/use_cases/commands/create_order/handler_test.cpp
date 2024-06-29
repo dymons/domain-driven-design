@@ -41,6 +41,10 @@ UTEST_F(CreateOrderHandlerShould, CreateOrder) {
   // Assert
   auto const orders = GetOrders();
   ASSERT_EQ(orders.size(), 1);
+
+  auto const& order = orders.front();
+  ASSERT_EQ(order.GetId(), kBasketId);
+  ASSERT_EQ(order.GetLocation(), (queries::get_orders::Location{1, 1}));
 }
 
 UTEST_F(CreateOrderHandlerShould, IdempotencyCreateOrder) {
