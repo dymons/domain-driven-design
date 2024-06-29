@@ -1,10 +1,21 @@
 #pragma once
 
+#include <optional>
+
+#include <core/domain/shared_kernel/location/location_mock_test.hpp>
+#include <core/domain/shared_kernel/weight/weight_mock_test.hpp>
+
 #include "order.hpp"
-#include "exceptions.hpp"
 
 namespace delivery::core::domain::order {
 
-[[nodiscard]] auto MockOrder() -> MutableSharedRef<Order>;
+struct MockCourierParams final {
+  std::optional<std::string> basket_id;
+  Location delivery_location = MockLocation();
+  Weight weight = MockWeight();
+};
 
-} // namespace delivery::core::domain::order
+[[nodiscard]] auto MockOrder(MockCourierParams params = {})
+    -> MutableSharedRef<Order>;
+
+}  // namespace delivery::core::domain::order
