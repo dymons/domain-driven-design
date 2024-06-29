@@ -1,6 +1,8 @@
 #include <userver/utest/utest.hpp>
 
+#include <core/domain/order/order.hpp>
 #include <core/ports/order_repository/repository_mock_test.hpp>
+
 #include "handler.hpp"
 
 namespace delivery::core::application::use_cases::commands::create_order {
@@ -24,11 +26,20 @@ UTEST_F(CreateOrderHandlerShould, CreateOrder) {
   auto command = CreateOrderCommand{kBasketId, kAddress, kWeight};
 
   // Act
-  EXPECT_NO_THROW(handler_->Handle(std::move(command)));
+  ASSERT_NO_THROW(handler_->Handle(std::move(command)));
 
   // Assert
-  EXPECT_NO_THROW(
+  ASSERT_NO_THROW(
       order_repository_->GetById(core::domain::order::OrderId{kBasketId}));
+
+  auto const order =
+      order_repository_->GetById(core::domain::order::OrderId{kBasketId});
+  ASSERT_EQ(order->GetId(), core::domain::order::OrderId{kBasketId});
+  ASSERT_EQ(order->GetStatus(), core::domain::order::OrderStatus::kCreated);
+  ASSERT_EQ(order->GetCourierId(), std::nullopt);
+  ASSERT_EQ(order->GetDeliveryLocation(), core::domain::Location::kMinLocation);
+  ASSERT_EQ(order->GetWeight(), core::domain::Weight{kWeight});
+  ASSERT_FALSE(order->IsCourierAssigned());
 }
 
 }  // namespace
