@@ -19,7 +19,7 @@ class CreateOrderHandlerShould : public ::testing::Test {
       core::ports::MockOrderRepository();
 
  protected:
-  SharedRef<ICreateOrderHandler> handler_ =
+  SharedRef<ICreateOrderHandler> create_order_handler_ =
       MakeCreateOrderHandler(mock_order_repository_);
 };
 
@@ -28,7 +28,7 @@ UTEST_F(CreateOrderHandlerShould, CreateOrder) {
   auto command = CreateOrderCommand{kBasketId, kAddress, kWeight};
 
   // Act & Assert
-  ASSERT_NO_THROW(handler_->Handle(std::move(command)));
+  ASSERT_NO_THROW(create_order_handler_->Handle(std::move(command)));
 }
 
 UTEST_F(CreateOrderHandlerShould, IdempotencyCreateOrder) {
@@ -36,8 +36,8 @@ UTEST_F(CreateOrderHandlerShould, IdempotencyCreateOrder) {
   auto const command = CreateOrderCommand{kBasketId, kAddress, kWeight};
 
   // Act & Assert
-  ASSERT_NO_THROW(handler_->Handle(CreateOrderCommand{command}));
-  ASSERT_NO_THROW(handler_->Handle(CreateOrderCommand{command}));
+  ASSERT_NO_THROW(create_order_handler_->Handle(CreateOrderCommand{command}));
+  ASSERT_NO_THROW(create_order_handler_->Handle(CreateOrderCommand{command}));
 }
 
 }  // namespace
