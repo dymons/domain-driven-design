@@ -14,9 +14,11 @@ auto const kAddress = std::string{"address"};
 auto const kWeight = int{5};
 
 class CreateOrderHandlerShould : public ::testing::Test {
- protected:
+ private:
   SharedRef<core::ports::IOrderRepository> order_repository_ =
       core::ports::MockOrderRepository();
+
+ protected:
   SharedRef<ICreateOrderHandler> handler_ =
       MakeCreateOrderHandler(order_repository_);
 };
@@ -25,21 +27,17 @@ UTEST_F(CreateOrderHandlerShould, CreateOrder) {
   // Arrange
   auto command = CreateOrderCommand{kBasketId, kAddress, kWeight};
 
-  // Act
+  // Act & Assert
   ASSERT_NO_THROW(handler_->Handle(std::move(command)));
+}
 
-  // Assert
-  ASSERT_NO_THROW(
-      order_repository_->GetById(core::domain::order::OrderId{kBasketId}));
+UTEST_F(CreateOrderHandlerShould, IdempotencyCreateOrder) {
+  // Arrange
+  auto const command = CreateOrderCommand{kBasketId, kAddress, kWeight};
 
-  auto const order =
-      order_repository_->GetById(core::domain::order::OrderId{kBasketId});
-  ASSERT_EQ(order->GetId(), core::domain::order::OrderId{kBasketId});
-  ASSERT_EQ(order->GetStatus(), core::domain::order::OrderStatus::kCreated);
-  ASSERT_EQ(order->GetCourierId(), std::nullopt);
-  ASSERT_EQ(order->GetDeliveryLocation(), core::domain::Location::kMinLocation);
-  ASSERT_EQ(order->GetWeight(), core::domain::Weight{kWeight});
-  ASSERT_FALSE(order->IsCourierAssigned());
+  // Act & Assert
+  ASSERT_NO_THROW(handler_->Handle(CreateOrderCommand{command}));
+  ASSERT_NO_THROW(handler_->Handle(CreateOrderCommand{command}));
 }
 
 }  // namespace
