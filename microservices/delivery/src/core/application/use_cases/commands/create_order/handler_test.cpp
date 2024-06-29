@@ -15,6 +15,9 @@ auto const kAddress = std::string{"address"};
 auto const kWeight = int{5};
 
 class CreateOrderHandlerShould : public ::testing::Test {
+ public:
+  ~CreateOrderHandlerShould() override = default;
+  
  private:
   SharedRef<core::ports::IOrderRepository> mock_order_repository_ =
       core::ports::MockOrderRepository();

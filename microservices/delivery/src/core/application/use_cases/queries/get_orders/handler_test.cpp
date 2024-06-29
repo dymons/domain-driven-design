@@ -14,6 +14,9 @@ auto const kBasketIdTwo = std::string{"basket_id-2"};
 auto const kBasketIdThree = std::string{"basket_id-3"};
 
 class GetOrdersHandlerShould : public ::testing::Test {
+ public:
+  ~GetOrdersHandlerShould() override = default;
+
  private:
   SharedRef<core::ports::IOrderRepository> mock_order_repository_ =
       core::ports::MockOrderRepository({
