@@ -2,9 +2,9 @@
 
 #include <optional>
 
-#include <utils/memory.hpp>
 #include <core/domain/shared_kernel/location/location.hpp>
 #include <core/domain/shared_kernel/weight/weight.hpp>
+#include <utils/memory.hpp>
 #include "status.hpp"
 #include "strong_typedefs.hpp"
 
@@ -51,3 +51,10 @@ class Order {
 };
 
 }  // namespace delivery::core::domain::order
+
+template <>
+struct std::hash<delivery::core::domain::order::Order> {
+  std::size_t operator()(const delivery::core::domain::order::Order& c) const {
+    return std::hash<std::string>{}(c.GetId().GetUnderlying());
+  }
+};

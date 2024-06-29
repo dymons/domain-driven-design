@@ -18,12 +18,14 @@ class OrderRepository final : public IOrderRepository {
 
   auto Add(SharedRef<core::domain::order::Order> const& order) const
       -> void final {
-    auto [_, success] = orders_.insert(
-        MakeMutableSharedRef<core::domain::order::Order>(*order));
-
-    if (not success) {
-      userver::utils::LogErrorAndThrow<OrderAlreadyExists>("");
+    auto raw_order = MakeMutableSharedRef<domain::order::Order>(*order);
+    for (const auto& o : orders_) {
+      if (o->GetId() == raw_order->GetId()) {
+        userver::utils::LogErrorAndThrow<OrderAlreadyExists>("");
+      }
     }
+
+    orders_.insert(raw_order);
   }
 
   auto Update(SharedRef<core::domain::order::Order> const& order) const
