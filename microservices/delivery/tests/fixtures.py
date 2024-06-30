@@ -23,7 +23,7 @@ async def api_v1_orders(
 
 
 @pytest.fixture
-async def orders_repository(pgsql):
+async def order_repository(pgsql):
     class Context:
         # noinspection PyMethodMayBeStatic
         def get_orders(self):
