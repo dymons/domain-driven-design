@@ -1,4 +1,4 @@
-from microservices.delivery.tests.fixtures import *
+from microservices.delivery.tests.fixtures import api_v1_orders
 
 
 async def test_basic(api_v1_orders):
