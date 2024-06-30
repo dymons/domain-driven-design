@@ -1,7 +1,7 @@
 import pytest
 
 
-from microservices.delivery.tests.requests import get_api_v1_orders_request
+from microservices.delivery.tests.requests import default_api_v1_orders_request
 
 
 @pytest.fixture
@@ -10,7 +10,7 @@ async def api_v1_orders(
 ):
     class Context:
         def __init__(self):
-            self.request = get_api_v1_orders_request()
+            self.request = default_api_v1_orders_request()
 
         # noinspection PyMethodMayBeStatic
         async def execute(self):

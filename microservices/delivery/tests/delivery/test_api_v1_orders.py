@@ -3,23 +3,23 @@ import pytest
 
 from microservices.delivery.tests.fixtures import api_v1_orders
 from microservices.delivery.tests.fixtures import order_repository
-from microservices.delivery.tests.requests import fake_basket_id
-from microservices.delivery.tests.requests import get_api_v1_orders_request
+from microservices.delivery.tests.requests import default_basket_id
+from microservices.delivery.tests.requests import default_api_v1_orders_request
 
 
 @pytest.mark.parametrize(
     'api_v1_orders_request, api_v1_orders_expected_response',
     [
         (
-            get_api_v1_orders_request(basket_id=''),
+            default_api_v1_orders_request(basket_id=''),
             {'code': '400', 'message': 'basket_id is empty'},
         ),
         (
-            get_api_v1_orders_request(address=''),
+            default_api_v1_orders_request(address=''),
             {'code': '400', 'message': 'address is empty'},
         ),
         (
-            get_api_v1_orders_request(weight=-1),
+            default_api_v1_orders_request(weight=-1),
             {'code': '400', 'message': 'weight should be positive'},
         ),
     ],
@@ -51,7 +51,7 @@ async def test_given_empty_orders_when_create_order_then_order_is_created(
     # Assert
     assert response.status == 200
     assert order_repository.get_orders() == [
-        (fake_basket_id(), 'created', None, '(1,1)', '(1)'),
+        (default_basket_id(), 'created', None, '(1,1)', '(1)'),
     ]
 
 

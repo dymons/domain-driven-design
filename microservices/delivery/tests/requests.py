@@ -1,10 +1,10 @@
 
-def fake_basket_id() -> str:
+def default_basket_id() -> str:
     return 'fake_basket_id'
 
 
-def get_api_v1_orders_request(
-        basket_id: str = fake_basket_id(),
+def default_api_v1_orders_request(
+        basket_id: str = default_basket_id(),
         address: str = 'address',
         weight: int = 1,
 ):
