@@ -1,20 +1,36 @@
+import pytest
+
+
 from microservices.delivery.tests.fixtures import api_v1_orders
 from microservices.delivery.tests.fixtures import order_repository
 from microservices.delivery.tests.requests import fake_basket_id
+from microservices.delivery.tests.requests import get_api_v1_orders_request
 
 
+@pytest.mark.parametrize(
+    'api_v1_orders_request, api_v1_orders_expected_response',
+    [
+        (
+            get_api_v1_orders_request(basket_id=''),
+            {'code': '400', 'message': 'basket_id is empty'}
+        )
+    ],
+)
 async def test_bad_request(
         api_v1_orders,
         order_repository,
+        api_v1_orders_request,
+        api_v1_orders_expected_response,
 ):
     # Arrange
-    api_v1_orders.request = {}
+    api_v1_orders.request = api_v1_orders_request
 
     # Act
     response = await api_v1_orders.execute()
 
     # Assert
     assert response.status == 400
+    assert response.json() == api_v1_orders_expected_response
 
 
 async def test_given_empty_orders_when_create_order_then_order_is_created(
