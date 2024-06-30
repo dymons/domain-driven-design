@@ -12,11 +12,15 @@ from microservices.delivery.tests.requests import get_api_v1_orders_request
     [
         (
             get_api_v1_orders_request(basket_id=''),
-            {'code': '400', 'message': 'basket_id is empty'}
+            {'code': '400', 'message': 'basket_id is empty'},
         ),
         (
             get_api_v1_orders_request(address=''),
-            {'code': '400', 'message': 'address is empty'}
+            {'code': '400', 'message': 'address is empty'},
+        ),
+        (
+            get_api_v1_orders_request(weight=-1),
+            {'code': '400', 'message': 'weight should be positive'},
         ),
     ],
 )
