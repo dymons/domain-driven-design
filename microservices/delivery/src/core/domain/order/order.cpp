@@ -15,8 +15,8 @@ auto Order::Create(BasketId basket_id, Location delivery_location,
 
 auto Order::Hydrate(OrderId id, OrderStatus status,
                     std::optional<CourierId> courier_id,
-                    Location delivery_location,
-                    Weight weight) -> MutableSharedRef<Order> {
+                    Location delivery_location, Weight weight)
+    -> MutableSharedRef<Order> {
   return MakeMutableSharedRef<Order>(Order{
       std::move(id), status, std::move(courier_id), delivery_location, weight});
 }

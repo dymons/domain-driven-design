@@ -1,7 +1,7 @@
 #include "status.hpp"
 
-#include <userver/utils/trivial_map.hpp>
 #include <userver/utils/exception.hpp>
+#include <userver/utils/trivial_map.hpp>
 
 #include "exceptions.hpp"
 

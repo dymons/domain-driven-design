@@ -7,8 +7,8 @@
 #include <userver/testsuite/testsuite_support.hpp>
 #include <userver/utils/daemon_run.hpp>
 
-#include <api/adapters/http/api_v1_orders/controller.hpp>
 #include <api/adapters/http/api_v1_couriers/controller.hpp>
+#include <api/adapters/http/api_v1_orders/controller.hpp>
 #include <api/adapters/http/api_v1_orders_active/controller.hpp>
 
 auto main(int argc, char* argv[]) -> int {

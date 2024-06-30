@@ -7,8 +7,8 @@
 
 namespace delivery::core::domain::courier {
 
-auto Courier::Create(CourierName name,
-                     Transport transport) -> MutableSharedRef<Courier> {
+auto Courier::Create(CourierName name, Transport transport)
+    -> MutableSharedRef<Courier> {
   if (name.GetUnderlying().empty()) {
     userver::utils::LogErrorAndThrow<ArgumentException>(
         "Courier name should not be empty");
@@ -21,8 +21,8 @@ auto Courier::Create(CourierName name,
 }
 
 auto Courier::Hydrate(CourierId id, CourierName name, Transport transport,
-                      Location current_location,
-                      CourierStatus status) -> MutableSharedRef<Courier> {
+                      Location current_location, CourierStatus status)
+    -> MutableSharedRef<Courier> {
   return MakeMutableSharedRef<Courier>(Courier{std::move(id), std::move(name),
                                                std::move(transport),
                                                current_location, status});

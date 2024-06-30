@@ -6,4 +6,4 @@ namespace delivery::core::domain {
 
 [[nodiscard]] auto MockWeight(int value = 5) -> Weight;
 
-} // namespace delivery::core::domain
+}  // namespace delivery::core::domain

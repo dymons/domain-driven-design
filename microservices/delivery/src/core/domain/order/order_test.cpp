@@ -2,8 +2,8 @@
 
 #include <core/domain/courier/courier_mock_test.hpp>
 
-#include "order_mock_test.hpp"
 #include "exceptions.hpp"
+#include "order_mock_test.hpp"
 
 namespace delivery::core::domain::order {
 

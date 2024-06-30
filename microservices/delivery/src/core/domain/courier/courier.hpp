@@ -1,7 +1,7 @@
 #pragma once
 
-#include <utils/memory.hpp>
 #include <core/domain/shared_kernel/location/location.hpp>
+#include <utils/memory.hpp>
 
 #include "exceptions.hpp"
 #include "status.hpp"
@@ -28,8 +28,8 @@ class Courier {
         status_(status) {}
 
  public:
-  [[nodiscard]] static auto Create(CourierName,
-                                   Transport) -> MutableSharedRef<Courier>;
+  [[nodiscard]] static auto Create(CourierName, Transport)
+      -> MutableSharedRef<Courier>;
 
   [[nodiscard]] static auto Hydrate(CourierId, CourierName, Transport, Location,
                                     CourierStatus) -> MutableSharedRef<Courier>;

@@ -28,12 +28,12 @@ class Order {
         weight_(weight) {}
 
  public:
-  [[nodiscard]] static auto Create(BasketId, Location,
-                                   Weight) -> MutableSharedRef<Order>;
+  [[nodiscard]] static auto Create(BasketId, Location, Weight)
+      -> MutableSharedRef<Order>;
 
   [[nodiscard]] static auto Hydrate(OrderId, OrderStatus,
-                                    std::optional<CourierId>, Location,
-                                    Weight) -> MutableSharedRef<Order>;
+                                    std::optional<CourierId>, Location, Weight)
+      -> MutableSharedRef<Order>;
 
   // Observers
 

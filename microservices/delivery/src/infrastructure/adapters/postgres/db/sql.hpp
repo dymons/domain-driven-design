@@ -6,4 +6,4 @@ namespace delivery::infrastructure::adapters::postgres::sql {
 
 extern const std::string kAddOrder;
 
-} // namespace delivery::infrastructure::adapters::postgres::sql
+}  // namespace delivery::infrastructure::adapters::postgres::sql

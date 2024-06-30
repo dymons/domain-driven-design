@@ -2,10 +2,10 @@
 
 #include <core/domain/courier/courier.hpp>
 #include <core/domain/order/order.hpp>
-#include <utils/container.hpp>
-#include <utils/optional.hpp>
 #include <core/ports/courier_repository/irepository.hpp>
 #include <core/ports/order_repository/irepository.hpp>
+#include <utils/container.hpp>
+#include <utils/optional.hpp>
 
 // clang-format off
 namespace delivery::core::application::use_cases::commands::move_courier_to_order {

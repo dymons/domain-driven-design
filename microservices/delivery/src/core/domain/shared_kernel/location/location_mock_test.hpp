@@ -6,4 +6,4 @@ namespace delivery::core::domain {
 
 [[nodiscard]] auto MockLocation(int x = 5, int y = 5) -> Location;
 
-} // namespace delivery::core::domain
+}  // namespace delivery::core::domain

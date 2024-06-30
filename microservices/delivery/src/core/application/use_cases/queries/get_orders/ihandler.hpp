@@ -14,4 +14,4 @@ class IGetOrdersHandler : private NonCopyableAndMoveable {
   virtual auto Handle(GetOrdersQuery&&) const -> Response = 0;
 };
 
-} // namespace delivery::core::application::use_cases::queries::get_orders
+}  // namespace delivery::core::application::use_cases::queries::get_orders
