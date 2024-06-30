@@ -11,6 +11,6 @@ async def test_given_empty_orders_when_create_order_then_order_is_created(
 
     # Assert
     assert response.status == 200
-
-    orders = orders_repository.get_orders()
-    assert orders == [('basket_id', 'created', None, '(1,1)', '(1)')]
+    assert orders_repository.get_orders() == [
+        ('basket_id', 'created', None, '(1,1)', '(1)'),
+    ]
