@@ -1,5 +1,6 @@
 from microservices.delivery.tests.fixtures import api_v1_orders
 from microservices.delivery.tests.fixtures import order_repository
+from microservices.delivery.tests.requests import fake_basket_id
 
 
 async def test_given_empty_orders_when_create_order_then_order_is_created(
@@ -12,5 +13,5 @@ async def test_given_empty_orders_when_create_order_then_order_is_created(
     # Assert
     assert response.status == 200
     assert order_repository.get_orders() == [
-        ('basket_id', 'created', None, '(1,1)', '(1)'),
+        (fake_basket_id(), 'created', None, '(1,1)', '(1)'),
     ]

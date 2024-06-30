@@ -1,5 +1,4 @@
 import pytest
-import psycopg2
 
 
 from microservices.delivery.tests.requests import get_api_v1_orders_request
