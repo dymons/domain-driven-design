@@ -54,7 +54,7 @@ class Controller final : public userver::server::handlers::HttpHandlerJsonBase {
   }
 
  private:
-  SharedRef<core::ports::IOrderRepository> order_repository_;
+  SharedRef<core::ports::IOrderRepository> const order_repository_;
 };
 
 }  // namespace

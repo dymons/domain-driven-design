@@ -1,5 +1,6 @@
 #include "status.hpp"
 
+#include <userver/utils/exception.hpp>
 #include <userver/utils/trivial_map.hpp>
 
 #include "exceptions.hpp"
@@ -32,7 +33,8 @@ CourierStatus::CourierStatus(Status const status) : status_{status} {}
 auto CourierStatus::ToString() const -> std::string {
   auto const status_as_string = kCourierStatusMapping.TryFindBySecond(*this);
   if (not status_as_string.has_value()) {
-    throw ArgumentException{"Cant convert status to std::string"};
+    userver::utils::LogErrorAndThrow<ArgumentException>(
+        "Cant convert status to std::string");
   }
 
   return std::string{status_as_string.value()};
@@ -41,7 +43,8 @@ auto CourierStatus::ToString() const -> std::string {
 auto CourierStatus::FromString(std::string_view const status) -> CourierStatus {
   auto const status_as_enum = kCourierStatusMapping.TryFindByFirst(status);
   if (not status_as_enum.has_value()) {
-    throw ArgumentException{"Cant convert to CourierStatus"};
+    userver::utils::LogErrorAndThrow<ArgumentException>(
+        "Cant convert to CourierStatus");
   }
 
   return CourierStatus{status_as_enum.value()};

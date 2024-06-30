@@ -10,7 +10,8 @@ namespace delivery::core::domain::courier {
 auto Courier::Create(CourierName name,
                      Transport transport) -> MutableSharedRef<Courier> {
   if (name.GetUnderlying().empty()) {
-    throw ArgumentException{"Courier name should not be empty"};
+    userver::utils::LogErrorAndThrow<ArgumentException>(
+        "Courier name should not be empty");
   }
 
   return MakeMutableSharedRef<Courier>(

@@ -1,12 +1,15 @@
 #include "weight.hpp"
 
+#include <userver/utils/exception.hpp>
+
 #include <core/domain/shared_kernel/exceptions.hpp>
 
 namespace delivery::core::domain {
 
 Weight::Weight(int const value) : value_(value) {
   if (value <= 0) {
-    throw ArgumentException{"The weight must be a positive value"};
+    userver::utils::LogErrorAndThrow<ArgumentException>(
+        "The weight must be a positive value");
   }
 }
 

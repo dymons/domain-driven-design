@@ -4,6 +4,8 @@
 
 #include <fmt/format.h>
 
+#include <userver/utils/exception.hpp>
+
 #include <core/domain/shared_kernel/exceptions.hpp>
 
 namespace delivery::core::domain {
@@ -18,12 +20,13 @@ const Location Location::kMaxLocation = Location{kMaxX, kMaxY};
 
 Location::Location(X x, Y y) {
   if (x < kMinX || x > kMaxX) {
-    throw ArgumentException{fmt::format(
-        "The coordinate x should be in range from {} to {}", kMinX, kMaxX)};
+    userver::utils::LogErrorAndThrow<ArgumentException>(fmt::format(
+        "The coordinate x should be in range from {} to {}", kMinX, kMaxX));
   }
+
   if (y < kMinY || y > kMaxY) {
-    throw ArgumentException{fmt::format(
-        "The coordinate y should be in range from {} to {}", kMinY, kMaxY)};
+    userver::utils::LogErrorAndThrow<ArgumentException>(fmt::format(
+        "The coordinate y should be in range from {} to {}", kMinY, kMaxY));
   }
 
   x_ = x.GetUnderlying();

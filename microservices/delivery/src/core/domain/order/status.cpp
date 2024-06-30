@@ -1,6 +1,7 @@
 #include "status.hpp"
 
 #include <userver/utils/trivial_map.hpp>
+#include <userver/utils/exception.hpp>
 
 #include "exceptions.hpp"
 
@@ -31,7 +32,8 @@ OrderStatus::OrderStatus(Status const status) : status_{status} {}
 auto OrderStatus::ToString() const -> std::string {
   auto const status_as_string = kOrderStatusMapping.TryFindBySecond(*this);
   if (not status_as_string.has_value()) {
-    throw ArgumentException{"Cant convert status std::string"};
+    userver::utils::LogErrorAndThrow<ArgumentException>(
+        "Cant convert status std::string");
   }
 
   return std::string{status_as_string.value()};
@@ -40,7 +42,8 @@ auto OrderStatus::ToString() const -> std::string {
 auto OrderStatus::FromString(std::string_view const status) -> OrderStatus {
   auto const status_as_enum = kOrderStatusMapping.TryFindByFirst(status);
   if (not status_as_enum.has_value()) {
-    throw ArgumentException{"Cant convert to OrderStatus"};
+    userver::utils::LogErrorAndThrow<ArgumentException>(
+        "Cant convert to OrderStatus");
   }
 
   return status_as_enum.value();

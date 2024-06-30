@@ -45,7 +45,7 @@ class CourierRepository final : public ICourierRepository {
       }
     }
 
-    throw CourierNotFound{""};
+    userver::utils::LogErrorAndThrow<CourierNotFound>("");
   }
 
   auto GetById(domain::order::CourierId const& courier_id) const
