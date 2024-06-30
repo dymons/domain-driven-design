@@ -67,5 +67,5 @@ async def test_given_empty_orders_when_create_same_order_several_times_then_orde
     assert response_first.status == 200
     assert response_second.status == 200
     assert order_repository.get_orders() == [
-        (fake_basket_id(), 'created', None, '(1,1)', '(1)'),
+        (default_basket_id(), 'created', None, '(1,1)', '(1)'),
     ]

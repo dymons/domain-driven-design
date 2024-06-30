@@ -1,6 +1,6 @@
 
 def default_basket_id() -> str:
-    return 'fake_basket_id'
+    return 'default_basket_id'
 
 
 def default_api_v1_orders_request(
