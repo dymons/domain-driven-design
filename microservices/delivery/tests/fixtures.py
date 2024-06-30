@@ -26,10 +26,10 @@ async def api_v1_orders(
 async def orders_repository(pgsql):
     class Context:
         # noinspection PyMethodMayBeStatic
-        def execute(self, query):
+        def get_orders(self):
             cursor = pgsql['20240526213109_init'].cursor()
             try:
-                cursor.execute(query)
+                cursor.execute('SELECT * FROM delivery.orders')
                 return cursor.fetchall()
             finally:
                 cursor.close()
