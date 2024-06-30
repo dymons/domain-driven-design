@@ -3,6 +3,20 @@ from microservices.delivery.tests.fixtures import order_repository
 from microservices.delivery.tests.requests import fake_basket_id
 
 
+async def test_bad_request(
+        api_v1_orders,
+        order_repository,
+):
+    # Arrange
+    api_v1_orders.request = {}
+
+    # Act
+    response = await api_v1_orders.execute()
+
+    # Assert
+    assert response.status == 400
+
+
 async def test_given_empty_orders_when_create_order_then_order_is_created(
         api_v1_orders,
         order_repository,

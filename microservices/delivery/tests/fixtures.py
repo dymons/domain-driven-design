@@ -8,15 +8,13 @@ from microservices.delivery.tests.requests import get_api_v1_orders_request
 async def api_v1_orders(
         service_client,
 ):
-    request = get_api_v1_orders_request()
-
     class Context:
         def __init__(self):
-            pass
+            self.request = get_api_v1_orders_request()
 
         # noinspection PyMethodMayBeStatic
         async def execute(self):
-            return await service_client.post('/api/v1/orders', json=request)
+            return await service_client.post('/api/v1/orders', json=self.request)
 
     return Context()
 
