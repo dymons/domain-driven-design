@@ -1,5 +1,5 @@
 from microservices.delivery.tests.fixtures import api_v1_orders
-from microservices.delivery.tests.fixtures import orders_repository
+from microservices.delivery.tests.fixtures import order_repository
 
 
 async def test_given_empty_orders_when_create_order_then_order_is_created(
