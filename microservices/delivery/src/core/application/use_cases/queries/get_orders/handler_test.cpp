@@ -46,7 +46,7 @@ UTEST_F(GetOrdersHandlerShould, ReturnOrders) {
   // Arrange
   auto query = GetOrdersQuery{};
 
-  ASSERT_NO_THROW(([&, this]() {
+  ASSERT_NO_THROW(([&, this]()  {
     // Act
     auto const response = get_orders_handler_->Handle(std::move(query));
 

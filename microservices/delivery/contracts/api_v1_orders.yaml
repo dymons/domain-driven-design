@@ -2,7 +2,6 @@ openapi: "3.0.0"
 info:
   version: 1.0.0
   title: Swagger Delivery
-  description: Отвечает за учет курьеров, деспетчеризацию, доставку
 paths:
   /api/v1/orders:
     post:
