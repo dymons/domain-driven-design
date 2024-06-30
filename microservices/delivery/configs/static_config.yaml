@@ -56,6 +56,16 @@ components_manager:
             method: POST
             task_processor: main-task-processor
 
+        handler-api-v1-orders-active:
+            path: /api/v1/orders/active
+            method: GET
+            task_processor: main-task-processor
+
+        handler-api-v1-couriers:
+            path: /api/v1/couriers
+            method: GET
+            task_processor: main-task-processor
+
         delivery-database:
             dbconnection: $delivery-database-connection
             blocking_task_processor: fs-task-processor

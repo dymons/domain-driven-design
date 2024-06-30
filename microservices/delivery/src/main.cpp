@@ -8,6 +8,8 @@
 #include <userver/utils/daemon_run.hpp>
 
 #include <api/adapters/http/api_v1_orders/controller.hpp>
+#include <api/adapters/http/api_v1_couriers/controller.hpp>
+#include <api/adapters/http/api_v1_orders_active/controller.hpp>
 
 auto main(int argc, char* argv[]) -> int {
   auto components =
@@ -19,7 +21,11 @@ auto main(int argc, char* argv[]) -> int {
           .Append<userver::server::handlers::TestsControl>()
           .Append<userver::components::Postgres>("delivery-database");
 
+  // clang-format off
   delivery::api::adapters::http::api_v1_orders::AppendController(components);
+  delivery::api::adapters::http::api_v1_couriers::AppendController(components);
+  delivery::api::adapters::http::api_v1_orders_active::AppendController(components);
+  // clang-format on
 
   return userver::utils::DaemonMain(argc, argv, components);
 }
