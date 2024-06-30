@@ -10,6 +10,8 @@
 
 namespace delivery::core::domain::courier {
 
+// TODO (dymons) Add versioning with optimistic lock
+
 class Courier {
   CourierId id_;
   CourierName name_;

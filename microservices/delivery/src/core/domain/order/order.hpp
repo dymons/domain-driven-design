@@ -10,6 +10,8 @@
 
 namespace delivery::core::domain::order {
 
+// TODO (dymons) Add versioning with optimistic lock
+
 class Order {
   OrderId id_;
   OrderStatus status_;
