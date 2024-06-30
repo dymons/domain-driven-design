@@ -17,7 +17,7 @@ async def test_given_empty_orders_when_create_order_then_order_is_created(
     ]
 
 
-async def test_given_empty_orders_when_several_times_create_order_then_order_is_created_once(
+async def test_given_empty_orders_when_create_same_order_several_times_then_order_is_created_once(
         api_v1_orders,
         order_repository,
 ):
