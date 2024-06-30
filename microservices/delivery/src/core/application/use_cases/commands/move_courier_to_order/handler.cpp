@@ -41,6 +41,7 @@ class MoveCourierToOrderHandler final : public IMoveCourierToOrderHandler {
           courier->CompleteOrder();
         }
 
+        // TODO (dymons) Use UnitOfWork
         this->order_repository_->Update(order);
         this->courier_repository_->Update(courier);
       });
