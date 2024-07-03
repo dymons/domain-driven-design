@@ -1,10 +1,9 @@
 import pytest
 
-
-from microservices.delivery.tests.fixtures import api_v1_orders
 from microservices.delivery.tests.requests import default_basket_id
 from microservices.delivery.tests.requests import default_api_v1_orders_request
 from microservices.delivery.tests.delivery.fixtures.order_repository import order_repository
+from microservices.delivery.tests.delivery.fixtures.api_v1_orders import api_v1_orders
 
 
 @pytest.mark.parametrize(
