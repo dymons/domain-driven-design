@@ -62,6 +62,6 @@ template <>
 struct std::hash<delivery::core::domain::courier::Courier> {
   std::size_t operator()(
       const delivery::core::domain::courier::Courier& c) const {
-    return std::hash<std::string>{}(c.GetId().GetUnderlying());
+    return std::hash<delivery::core::domain::courier::CourierId>{}(c.GetId());
   }
 };

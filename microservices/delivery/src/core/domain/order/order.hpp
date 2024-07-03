@@ -57,6 +57,6 @@ class Order {
 template <>
 struct std::hash<delivery::core::domain::order::Order> {
   std::size_t operator()(const delivery::core::domain::order::Order& c) const {
-    return std::hash<std::string>{}(c.GetId().GetUnderlying());
+    return std::hash<delivery::core::domain::order::OrderId>{}(c.GetId());
   }
 };
