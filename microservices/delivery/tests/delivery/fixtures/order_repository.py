@@ -29,19 +29,20 @@ async def order_repository(pgsql):
                         delivery.orders
                 """)
                 rows = cursor.fetchall()
-                return [
-                    {
-                        'id': r[0],
-                        'status': r[1],
-                        'courier_id': r[2] if r[2] else None,
-                        'delivery_location': {
-                            'x': make_tuple(r[3])[0],
-                            'y': make_tuple(r[3])[1],
-                        },
-                        'weight': make_tuple(r[4]),
-                    }
-                    for r in rows]
+                return [self.__from_record(row) for row in rows]
             finally:
                 cursor.close()
+
+        def __from_record(self, record):
+            return {
+                'id': record[0],
+                'status': record[1],
+                'courier_id': record[2] if record[2] else None,
+                'delivery_location': {
+                    'x': make_tuple(record[3])[0],
+                    'y': make_tuple(record[3])[1],
+                },
+                'weight': make_tuple(record[4]),
+            }
 
     return Context()
