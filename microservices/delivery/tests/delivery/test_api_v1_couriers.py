@@ -1,3 +1,6 @@
+import operator
+
+
 from microservices.delivery.tests.delivery.fixtures.api_v1_couriers import api_v1_couriers
 from microservices.delivery.tests.delivery.fixtures.courier_repository import courier_repository
 from microservices.delivery.tests.delivery.fixtures.courier_repository import Courier
@@ -20,17 +23,27 @@ async def test_given_non_empty_couriers_when_get_couriers_then_couriers_are_rece
         courier_repository,
 ):
     # Arrange
-    courier_repository.insert_couriers([Courier()])
+    courier_repository.insert_couriers([
+        Courier(id=CourierId(default_courier_id() + '_1')),
+        Courier(id=CourierId(default_courier_id() + '_2')),
+    ])
 
     # Act
     response = await api_v1_couriers.execute()
 
     # Assert
     assert response.status == 200
+
+    response.json()['couriers'].sort(key=operator.itemgetter('id'))
     assert response.json() == {
         'couriers': [
             {
-                'id': default_courier_id(),
+                'id': default_courier_id() + '_2',
+                'location': default_location(),
+                'name': default_courier_name(),
+            },
+            {
+                'id': default_courier_id() + '_1',
                 'location': default_location(),
                 'name': default_courier_name(),
             },
