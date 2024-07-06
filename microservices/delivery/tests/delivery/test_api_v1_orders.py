@@ -54,10 +54,7 @@ async def test_given_empty_orders_when_create_order_then_order_is_created(
             'id': default_basket_id(),
             'status': 'created',
             'courier_id': None,
-            'delivery_location': {
-                'x': 1,
-                'y': 1,
-            },
+            'delivery_location': default_location(),
             'weight': 1,
         }
     ]
@@ -79,10 +76,7 @@ async def test_given_empty_orders_when_create_same_order_several_times_then_orde
             'id': default_basket_id(),
             'status': 'created',
             'courier_id': None,
-            'delivery_location': {
-                'x': 1,
-                'y': 1,
-            },
+            'delivery_location': default_location(),
             'weight': 1,
         }
     ]
