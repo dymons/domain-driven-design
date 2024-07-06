@@ -23,8 +23,10 @@ async def test_given_non_empty_couriers_when_get_couriers_then_couriers_are_rece
     ])
 
     # Act
-    # response = await api_v1_couriers.execute()
+    response = await api_v1_couriers.execute()
 
     # Assert
-    # assert response.status == 200
-    # assert response.json() == {'couriers': []}
+    assert response.status == 200
+    assert response.json() == {'couriers': [
+        {'id': 'id', 'location': {'x': 1, 'y': 1}, 'name': 'name'},
+    ]}

@@ -4,8 +4,8 @@
 #include <userver/server/handlers/http_handler_json_base.hpp>
 #include <userver/storages/postgres/component.hpp>
 
-#include <core/application/use_cases/queries/get_couriers/query.hpp>
 #include <core/application/use_cases/queries/get_couriers/handler.hpp>
+#include <core/application/use_cases/queries/get_couriers/query.hpp>
 #include <core/application/use_cases/queries/get_couriers/response.hpp>
 #include <infrastructure/adapters/postgres/courier_repository.hpp>
 
@@ -54,9 +54,8 @@ class Controller final : public userver::server::handlers::HttpHandlerJsonBase {
       userver::formats::json::Value const&,
       userver::server::request::RequestContext&) const
       -> userver::formats::json::Value final {
-    auto const get_couriers_handler =
-        core::application::use_cases::queries::get_couriers::
-            MakeGetCouriersHandler(courier_repository_);
+    auto const get_couriers_handler = core::application::use_cases::queries::
+        get_couriers::MakeGetCouriersHandler(courier_repository_);
 
     return std::visit(MakeResponse, get_couriers_handler->Handle({}));
   }

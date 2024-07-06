@@ -16,7 +16,7 @@ struct Transport {
   int id{};
   std::string name{};
   int speed{};
-  Weight capacity{};
+  int capacity{};
 };
 
 auto Convert(core::domain::courier::Transport const&) -> Transport;
