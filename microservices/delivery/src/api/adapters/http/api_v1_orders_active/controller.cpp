@@ -19,13 +19,13 @@ userver::formats::json::Value MakeResponse(
   auto response_builder = userver::formats::json::ValueBuilder{
       userver::formats::common::Type::kArray};
 
-  for (const auto& order : response.orders) {
+  std::ranges::for_each(response.orders, [&](auto const& order) {
     auto order_builder = userver::formats::json::ValueBuilder{};
     order_builder["id"] = order.GetId();
     order_builder["location"]["x"] = order.GetLocation().GetX();
     order_builder["location"]["y"] = order.GetLocation().GetY();
     response_builder.PushBack(order_builder.ExtractValue());
-  }
+  });
 
   return response_builder.ExtractValue();
 }
