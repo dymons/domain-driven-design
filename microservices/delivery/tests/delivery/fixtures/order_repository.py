@@ -7,8 +7,8 @@ async def order_repository(pgsql):
         def __init__(self):
             pass
 
-        # noinspection PyMethodMayBeStatic
-        def get_orders(self):
+        @staticmethod
+        def get_orders():
             cursor = pgsql['20240526213109_init'].cursor()
             try:
                 cursor.execute('SELECT * FROM delivery.orders')
