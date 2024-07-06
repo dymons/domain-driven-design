@@ -21,6 +21,10 @@ class GetOrdersHandler final : public IGetOrdersHandler {
     auto response = Response200{};
     response.orders.reserve(orders.size());
     for (auto&& order : orders) {
+      if (order->GetStatus().IsCompleted()) {
+        continue;
+      }
+
       response.orders.emplace_back(
           order->GetId().GetUnderlying(),
           Location{order->GetDeliveryLocation().GetX().GetUnderlying(),
