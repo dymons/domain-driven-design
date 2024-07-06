@@ -4,8 +4,10 @@ from typing import List
 
 from microservices.delivery.tests.delivery.utils.types import CourierId
 from microservices.delivery.tests.delivery.utils.types import CourierName
+from microservices.delivery.tests.delivery.utils.types import CourierStatus
 from microservices.delivery.tests.delivery.utils.types import default_courier_id
 from microservices.delivery.tests.delivery.utils.types import default_courier_name
+from microservices.delivery.tests.delivery.utils.types import default_courier_status
 
 
 class Courier:
@@ -13,7 +15,7 @@ class Courier:
             self,
             id: CourierId = default_courier_id(),
             name: CourierName = default_courier_name(),
-            status: str = 'not_available',
+            status: CourierStatus = default_courier_status(),
             transport: str = '(1, "pedestrian", 1, 1)',
             current_location: str = '(1,1)',
     ):
