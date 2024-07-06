@@ -5,11 +5,10 @@ import pytest
 async def order_repository(pgsql):
     class Context:
         def __init__(self):
-            pass
+            self._db = '20240526213109_init'
 
-        @staticmethod
-        def get_orders():
-            cursor = pgsql['20240526213109_init'].cursor()
+        def get_orders(self):
+            cursor = pgsql[self._db].cursor()
             try:
                 cursor.execute('SELECT * FROM delivery.orders')
                 return cursor.fetchall()

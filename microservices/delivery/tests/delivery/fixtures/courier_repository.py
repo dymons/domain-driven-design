@@ -7,11 +7,11 @@ from typing import List
 async def courier_repository(pgsql):
     class Context:
         def __init__(self):
-            self.db = '20240526213109_init'
+            self._db = '20240526213109_init'
 
         def insert_couriers(self, couriers: List):
             rows = ",".join(map(str, couriers))
-            cursor = pgsql[self.db].cursor()
+            cursor = pgsql[self._db].cursor()
             try:
                 cursor.execute(f"""
                     INSERT INTO delivery.couriers (id, name, status, transport, current_location) 
@@ -22,7 +22,7 @@ async def courier_repository(pgsql):
                 cursor.close()
 
         def get_couriers(self):
-            cursor = pgsql[self.db].cursor()
+            cursor = pgsql[self._db].cursor()
             try:
                 cursor.execute('SELECT * FROM delivery.couriers')
                 return cursor.fetchall()
