@@ -17,6 +17,6 @@ async def api_v1_couriers(
             self.request = default_api_v1_couriers_request()
 
         async def execute(self):
-            return await service_client.post('/api/v1/couriers', json=self.request)
+            return await service_client.get('/api/v1/couriers', json=self.request)
 
     return Context()
