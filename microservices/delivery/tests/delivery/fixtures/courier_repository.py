@@ -26,7 +26,7 @@ class Courier:
             self.name,
             self.status.name,
             f'({self.transport.id}, "{self.transport.name}", {self.transport.speed}, {self.transport.capacity})',
-            f'({self.current_location.x},{self.current_location.y})'
+            f'({self.current_location.x},{self.current_location.y})',
         )
 
 
