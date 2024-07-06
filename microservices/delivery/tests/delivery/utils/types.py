@@ -9,6 +9,7 @@ class Defaults(object):
     order_status = 'created'
     delivery_location = {'x': 1, 'y': 1}
     weight = 1
+    address = 'address'
 
 
 BasketId = NewType('basket_id', str)

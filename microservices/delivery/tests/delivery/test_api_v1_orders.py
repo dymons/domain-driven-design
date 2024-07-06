@@ -3,14 +3,14 @@ import pytest
 from microservices.delivery.tests.delivery.fixtures.order_repository import order_repository
 from microservices.delivery.tests.delivery.fixtures.api_v1_orders import api_v1_orders
 from microservices.delivery.tests.delivery.fixtures.api_v1_orders import default_api_v1_orders_request
-from microservices.delivery.tests.delivery.utils.types import *
+from microservices.delivery.tests.delivery.utils.types import Defaults
 
 
 @pytest.mark.parametrize(
     'api_v1_orders_request, api_v1_orders_expected_response',
     [
         (
-            default_api_v1_orders_request(basket_id=BasketId('')),
+            default_api_v1_orders_request(basket_id=''),
             {'code': '400', 'message': 'basket_id is empty'},
         ),
         (

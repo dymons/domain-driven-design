@@ -3,14 +3,13 @@ import pytest
 from typing import Dict
 from typing import Any
 
-from microservices.delivery.tests.delivery.utils.types import default_basket_id
-from microservices.delivery.tests.delivery.utils.types import BasketId
+from microservices.delivery.tests.delivery.utils.types import Defaults
 
 
 def default_api_v1_orders_request(
-        basket_id: BasketId = default_basket_id(),
-        address: str = 'address',
-        weight: int = 1,
+        basket_id: str = Defaults.basket_id,
+        address: str = Defaults.address,
+        weight: int = Defaults.weight,
 ) -> Dict[str, Any]:
     return {
         'basket_id': basket_id,
