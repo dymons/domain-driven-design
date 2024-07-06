@@ -44,7 +44,14 @@ async def courier_repository(pgsql):
             cursor = pgsql[self._db].cursor()
             try:
                 cursor.execute(f"""
-                    INSERT INTO delivery.couriers (id, name, status, transport, current_location) 
+                    INSERT INTO delivery.couriers 
+                    (
+                         id, 
+                         name, 
+                         status, 
+                         transport, 
+                         current_location
+                     ) 
                     VALUES {rows}
                 """)
             finally:
