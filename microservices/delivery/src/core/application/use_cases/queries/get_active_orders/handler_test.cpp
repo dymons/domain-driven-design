@@ -46,13 +46,13 @@ class GetOrdersHandlerShould : public ::testing::Test {
       });
 
  protected:
-  SharedRef<IGetOrdersHandler> get_orders_handler_ =
-      MakeGetOrdersHandler(mock_order_repository_);
+  SharedRef<IGetActiveOrdersHandler> get_orders_handler_ =
+      MakeGetActiveOrdersHandler(mock_order_repository_);
 };
 
 UTEST_F(GetOrdersHandlerShould, ReturnOrders) {
   // Arrange
-  auto query = GetOrdersQuery{};
+  auto query = GetActiveOrdersQuery{};
 
   ASSERT_NO_THROW(([&, this]() {
     // Act

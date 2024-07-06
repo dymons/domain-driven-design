@@ -9,15 +9,15 @@ namespace delivery::core::application::use_cases::queries::get_active_orders {
 
 namespace {
 
-class GetOrdersHandler final : public IGetOrdersHandler {
+class GetActiveOrdersHandler final : public IGetActiveOrdersHandler {
  public:
-  ~GetOrdersHandler() final = default;
+  ~GetActiveOrdersHandler() final = default;
 
-  explicit GetOrdersHandler(
+  explicit GetActiveOrdersHandler(
       SharedRef<core::ports::IOrderRepository> order_repository)
       : order_repository_(std::move(order_repository)) {}
 
-  auto Handle(GetOrdersQuery&&) const -> Response final {
+  auto Handle(GetActiveOrdersQuery&&) const -> Response final {
     auto orders = order_repository_->GetOrders();
 
     auto response = Response200{};
@@ -42,10 +42,10 @@ class GetOrdersHandler final : public IGetOrdersHandler {
 
 }  // namespace
 
-auto MakeGetOrdersHandler(
+auto MakeGetActiveOrdersHandler(
     SharedRef<core::ports::IOrderRepository> order_repository)
-    -> SharedRef<IGetOrdersHandler> {
-  return userver::utils::MakeSharedRef<const GetOrdersHandler>(
+    -> SharedRef<IGetActiveOrdersHandler> {
+  return userver::utils::MakeSharedRef<const GetActiveOrdersHandler>(
       std::move(order_repository));
 }
 

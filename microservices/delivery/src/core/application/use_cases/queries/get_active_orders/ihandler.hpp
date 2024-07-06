@@ -9,11 +9,11 @@
 namespace delivery::core::application::use_cases::queries::get_active_orders {
 // clang-format on
 
-class IGetOrdersHandler : private NonCopyableAndMoveable {
+class IGetActiveOrdersHandler : private NonCopyableAndMoveable {
  public:
-  virtual ~IGetOrdersHandler() = default;
+  virtual ~IGetActiveOrdersHandler() = default;
 
-  virtual auto Handle(GetOrdersQuery&&) const -> Response = 0;
+  virtual auto Handle(GetActiveOrdersQuery&&) const -> Response = 0;
 };
 
 // clang-format off

@@ -25,12 +25,14 @@ class CreateOrderHandlerShould : public ::testing::Test {
  protected:
   SharedRef<ICreateOrderHandler> create_order_handler_ =
       MakeCreateOrderHandler(mock_order_repository_);
-  SharedRef<queries::get_active_orders::IGetOrdersHandler> get_orders_handler_ =
-      queries::get_active_orders::MakeGetOrdersHandler(mock_order_repository_);
+  SharedRef<queries::get_active_orders::IGetActiveOrdersHandler>
+      get_orders_handler_ =
+          queries::get_active_orders::MakeGetActiveOrdersHandler(
+              mock_order_repository_);
 
   auto GetActiveOrders() -> std::vector<queries::get_active_orders::Order> {
     auto response = get_orders_handler_->Handle(
-        queries::get_active_orders::GetOrdersQuery{});
+        queries::get_active_orders::GetActiveOrdersQuery{});
     return std::get<queries::get_active_orders::Response200>(
                std::move(response))
         .orders;
