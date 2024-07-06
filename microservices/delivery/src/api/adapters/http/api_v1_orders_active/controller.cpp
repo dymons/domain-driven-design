@@ -14,23 +14,19 @@ namespace delivery::api::adapters::http::api_v1_orders_active {
 namespace {
 
 userver::formats::json::Value MakeResponse(
-    core::application::use_cases::queries::get_active_orders::Response const&
+    core::application::use_cases::queries::get_active_orders::Response200 const&
         response) {
   auto response_builder = userver::formats::json::ValueBuilder{
       userver::formats::common::Type::kArray};
-  std::visit(
-      [&](core::application::use_cases::queries::get_active_orders::
-              Response200 const& response) {
-        for (const auto& order : response.orders) {
-          auto order_builder = userver::formats::json::ValueBuilder{
-              userver::formats::common::Type::kObject};
-          order_builder["id"] = order.GetId();
-          order_builder["location"]["x"] = order.GetLocation().GetX();
-          order_builder["location"]["y"] = order.GetLocation().GetY();
-          response_builder.PushBack(order_builder.ExtractValue());
-        }
-      },
-      response);
+
+  for (const auto& order : response.orders) {
+    auto order_builder = userver::formats::json::ValueBuilder{};
+    order_builder["id"] = order.GetId();
+    order_builder["location"]["x"] = order.GetLocation().GetX();
+    order_builder["location"]["y"] = order.GetLocation().GetY();
+    response_builder.PushBack(order_builder.ExtractValue());
+  }
+
   return response_builder.ExtractValue();
 }
 
@@ -59,7 +55,7 @@ class Controller final : public userver::server::handlers::HttpHandlerJsonBase {
         core::application::use_cases::queries::get_active_orders::
             MakeGetActiveOrdersHandler(order_repository_);
 
-    return MakeResponse(get_active_orders_handler->Handle({}));
+    return std::visit(MakeResponse, get_active_orders_handler->Handle({}));
   }
 
  private:
