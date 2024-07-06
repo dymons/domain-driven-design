@@ -42,6 +42,7 @@ async def courier_repository(pgsql):
 
             rows = ",".join(map(str, [c.to_record() for c in couriers]))
             cursor = pgsql[self._db].cursor()
+
             try:
                 cursor.execute(f"""
                     INSERT INTO delivery.couriers 
@@ -54,14 +55,6 @@ async def courier_repository(pgsql):
                      ) 
                     VALUES {rows}
                 """)
-            finally:
-                cursor.close()
-
-        def get_couriers(self):
-            cursor = pgsql[self._db].cursor()
-            try:
-                cursor.execute('SELECT * FROM delivery.couriers')
-                return cursor.fetchall()
             finally:
                 cursor.close()
 
