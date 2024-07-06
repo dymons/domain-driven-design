@@ -35,6 +35,12 @@ class GetOrdersHandlerShould : public ::testing::Test {
                .delivery_location =
                    core::domain::Location{core::domain::X{3},
                                           core::domain::Y{3}}}),
+          core::domain::order::MockOrder(
+              {.basket_id = kBasketIdThree,
+               .status = core::domain::order::OrderStatus::kCompleted,
+               .delivery_location =
+                   core::domain::Location{core::domain::X{3},
+                                          core::domain::Y{3}}}),
       });
 
  protected:
@@ -46,7 +52,7 @@ UTEST_F(GetOrdersHandlerShould, ReturnOrders) {
   // Arrange
   auto query = GetOrdersQuery{};
 
-  ASSERT_NO_THROW(([&, this]() {
+//  ASSERT_NO_THROW(([&, this]() {
     // Act
     auto const response = get_orders_handler_->Handle(std::move(query));
 
@@ -63,7 +69,7 @@ UTEST_F(GetOrdersHandlerShould, ReturnOrders) {
     std::ranges::sort(expected_orders);
 
     ASSERT_EQ(orders, expected_orders);
-  }()));
+//  }()));
 }
 
 }  // namespace

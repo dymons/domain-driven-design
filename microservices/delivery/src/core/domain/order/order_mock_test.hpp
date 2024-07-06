@@ -10,12 +10,14 @@
 namespace delivery::core::domain::order {
 
 struct MockCourierParams final {
-  std::optional<std::string> basket_id = std::nullopt;
-  Location delivery_location = MockLocation();
-  Weight weight = MockWeight();
+  std::optional<std::string> basket_id{std::nullopt};
+  OrderStatus status{OrderStatus::kCreated};
+  std::optional<CourierId> courier_id{std::nullopt};
+  Location delivery_location{MockLocation()};
+  Weight weight{MockWeight()};
 };
 
-[[nodiscard]] auto MockOrder(MockCourierParams params = {})
+[[nodiscard]] auto MockOrder(MockCourierParams&& params = {})
     -> MutableSharedRef<Order>;
 
 }  // namespace delivery::core::domain::order
