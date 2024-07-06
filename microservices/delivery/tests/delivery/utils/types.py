@@ -31,6 +31,9 @@ class Location:
         self.x = x
         self.y = y
 
+    def __eq__(self, other: dict):
+        return other == {'x': self.x, 'y': self.y}
+
 
 def default_basket_id() -> BasketId:
     return BasketId('default_basket_id')

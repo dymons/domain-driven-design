@@ -27,10 +27,12 @@ async def test_given_non_empty_couriers_when_get_couriers_then_couriers_are_rece
 
     # Assert
     assert response.status == 200
-    assert response.json() == {'couriers': [
-        {
-            'id': default_courier_id(),
-            'location': {'x': 1, 'y': 1},
-            'name': default_courier_name(),
-        },
-    ]}
+    assert response.json() == {
+        'couriers': [
+            {
+                'id': default_courier_id(),
+                'location': default_location(),
+                'name': default_courier_name(),
+            },
+        ],
+    }
