@@ -16,6 +16,8 @@ class Order;
 
 namespace delivery::core::domain_services {
 
+// TODO (dymons) Maybe inject ICourierRepository?
+
 class IDispatchService : private NonCopyableAndMoveable {
  public:
   virtual ~IDispatchService() = default;
