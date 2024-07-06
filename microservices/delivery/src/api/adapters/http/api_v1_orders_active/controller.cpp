@@ -16,7 +16,7 @@ namespace {
 auto MakeResponse(
     core::application::use_cases::queries::get_active_orders::Response200 const&
         response) -> userver::formats::json::Value {
-  auto response_builder = userver::formats::json::ValueBuilder{
+  auto orders_builder = userver::formats::json::ValueBuilder{
       userver::formats::common::Type::kArray};
 
   std::ranges::for_each(response.orders, [&](auto const& order) {
@@ -24,9 +24,11 @@ auto MakeResponse(
     order_builder["id"] = order.GetId();
     order_builder["location"]["x"] = order.GetLocation().GetX();
     order_builder["location"]["y"] = order.GetLocation().GetY();
-    response_builder.PushBack(order_builder.ExtractValue());
+    orders_builder.PushBack(order_builder.ExtractValue());
   });
 
+  auto response_builder = userver::formats::json::ValueBuilder{};
+  response_builder["orders"] = orders_builder.ExtractValue();
   return response_builder.ExtractValue();
 }
 

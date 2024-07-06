@@ -16,7 +16,7 @@ namespace {
 auto MakeResponse(
     core::application::use_cases::queries::get_couriers::Response200 const&
         response) -> userver::formats::json::Value {
-  auto response_builder = userver::formats::json::ValueBuilder{
+  auto couriers_builder = userver::formats::json::ValueBuilder{
       userver::formats::common::Type::kArray};
 
   std::ranges::for_each(response.couriers, [&](auto const& courier) {
@@ -25,9 +25,11 @@ auto MakeResponse(
     courier_builder["name"] = courier.GetName();
     courier_builder["location"]["x"] = courier.GetLocation().GetX();
     courier_builder["location"]["y"] = courier.GetLocation().GetY();
-    response_builder.PushBack(courier_builder.ExtractValue());
+    couriers_builder.PushBack(courier_builder.ExtractValue());
   });
 
+  auto response_builder = userver::formats::json::ValueBuilder{};
+  response_builder["couriers"] = couriers_builder.ExtractValue();
   return response_builder.ExtractValue();
 }
 
