@@ -8,8 +8,6 @@ BasketId = NewType('basket_id', str)
 CourierId = NewType('courier_id', str)
 CourierName = NewType('courier_name', str)
 CourierStatus = Enum('courier_status', ['not_available', 'ready', 'busy'])
-OrderId = NewType('order_id', str)
-OrderStatus = Enum('order_status', ['created', 'assigned', 'completed'])
 Weight = NewType('weight', int)
 
 
@@ -68,13 +66,13 @@ def default_location() -> Dict[str, Any]:
     return {'x': 1, 'y': 1}
 
 
-def default_order_id() -> OrderId:
-    return OrderId('default_order_id')
+def default_order_id() -> str:
+    return 'default_order_id'
 
 
-def default_order_status() -> OrderStatus:
-    return OrderStatus['created']
+def default_order_status() -> str:
+    return 'created'
 
 
-def default_weight() -> Weight:
-    return Weight(1)
+def default_weight() -> int:
+    return 1

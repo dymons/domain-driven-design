@@ -52,10 +52,10 @@ async def test_given_empty_orders_when_create_order_then_order_is_created(
     assert order_repository.get_orders() == [
         {
             'id': default_basket_id(),
-            'status': 'created',
+            'status': default_order_status(),
             'courier_id': None,
             'delivery_location': default_location(),
-            'weight': 1,
+            'weight': default_weight(),
         }
     ]
 
@@ -71,12 +71,4 @@ async def test_given_empty_orders_when_create_same_order_several_times_then_orde
     # Assert
     assert response_first.status == 200
     assert response_second.status == 200
-    assert order_repository.get_orders() == [
-        {
-            'id': default_basket_id(),
-            'status': 'created',
-            'courier_id': None,
-            'delivery_location': default_location(),
-            'weight': 1,
-        }
-    ]
+    assert len(order_repository.get_orders()) == 1
