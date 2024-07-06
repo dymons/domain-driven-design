@@ -13,9 +13,9 @@ namespace delivery::api::adapters::http::api_v1_orders_active {
 
 namespace {
 
-userver::formats::json::Value MakeResponse(
+auto MakeResponse(
     core::application::use_cases::queries::get_active_orders::Response200 const&
-        response) {
+        response) -> userver::formats::json::Value {
   auto response_builder = userver::formats::json::ValueBuilder{
       userver::formats::common::Type::kArray};
 
