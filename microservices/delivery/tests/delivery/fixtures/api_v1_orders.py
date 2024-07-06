@@ -4,10 +4,11 @@ from typing import Dict
 from typing import Any
 
 from microservices.delivery.tests.delivery.utils.types import default_basket_id
+from microservices.delivery.tests.delivery.utils.types import BasketId
 
 
 def default_api_v1_orders_request(
-        basket_id: str = default_basket_id(),
+        basket_id: BasketId = default_basket_id(),
         address: str = 'address',
         weight: int = 1,
 ) -> Dict[str, Any]:
