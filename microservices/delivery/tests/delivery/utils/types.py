@@ -4,6 +4,13 @@ from typing import Any
 from enum import Enum
 
 
+class Defaults(object):
+    basket_id = 'default_basket_id'
+    order_status = 'created'
+    delivery_location = {'x': 1, 'y': 1}
+    weight = 1
+
+
 BasketId = NewType('basket_id', str)
 CourierId = NewType('courier_id', str)
 CourierName = NewType('courier_name', str)
@@ -67,11 +74,3 @@ def default_location() -> Dict[str, Any]:
 
 def default_order_id() -> str:
     return 'default_order_id'
-
-
-def default_order_status() -> str:
-    return 'created'
-
-
-def default_weight() -> int:
-    return 1

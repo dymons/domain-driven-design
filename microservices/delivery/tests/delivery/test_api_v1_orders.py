@@ -51,11 +51,11 @@ async def test_given_empty_orders_when_create_order_then_order_is_created(
     assert response.status == 200
     assert order_repository.get_orders() == [
         {
-            'id': default_basket_id(),
-            'status': default_order_status(),
+            'id': Defaults.basket_id,
+            'status': Defaults.order_status,
             'courier_id': None,
-            'delivery_location': default_location(),
-            'weight': default_weight(),
+            'delivery_location': Defaults.delivery_location,
+            'weight': Defaults.weight,
         }
     ]
 
