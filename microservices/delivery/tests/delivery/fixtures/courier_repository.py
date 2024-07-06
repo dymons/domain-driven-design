@@ -10,6 +10,9 @@ async def courier_repository(pgsql):
             self._db = '20240526213109_init'
 
         def insert_couriers(self, couriers: List):
+            if not couriers:
+                return
+
             rows = ",".join(map(str, couriers))
             cursor = pgsql[self._db].cursor()
             try:
@@ -17,7 +20,6 @@ async def courier_repository(pgsql):
                     INSERT INTO delivery.couriers (id, name, status, transport, current_location) 
                     VALUES {rows}
                 """)
-                return cursor.fetchall()
             finally:
                 cursor.close()
 
