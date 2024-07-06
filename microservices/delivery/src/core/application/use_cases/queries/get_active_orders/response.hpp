@@ -4,7 +4,9 @@
 #include <variant>
 #include <vector>
 
-namespace delivery::core::application::use_cases::queries::get_orders {
+// clang-format off
+namespace delivery::core::application::use_cases::queries::get_active_orders {
+// clang-format on
 
 class Location final {
   int x_;
@@ -38,4 +40,6 @@ struct Response200 {
 
 using Response = std::variant<Response200>;
 
-}  // namespace delivery::core::application::use_cases::queries::get_orders
+// clang-format off
+}  // namespace delivery::core::application::use_cases::queries::get_active_orders
+// clang-format on

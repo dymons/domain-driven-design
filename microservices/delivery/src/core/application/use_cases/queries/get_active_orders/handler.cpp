@@ -3,7 +3,9 @@
 #include <core/domain/order/order.hpp>
 #include <core/ports/order_repository/irepository.hpp>
 
-namespace delivery::core::application::use_cases::queries::get_orders {
+// clang-format off
+namespace delivery::core::application::use_cases::queries::get_active_orders {
+// clang-format on
 
 namespace {
 
@@ -47,4 +49,6 @@ auto MakeGetOrdersHandler(
       std::move(order_repository));
 }
 
-}  // namespace delivery::core::application::use_cases::queries::get_orders
+// clang-format off
+}  // namespace delivery::core::application::use_cases::queries::get_active_orders
+// clang-format on

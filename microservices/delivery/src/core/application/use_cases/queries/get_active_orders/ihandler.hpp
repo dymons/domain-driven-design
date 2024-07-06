@@ -5,7 +5,9 @@
 #include "query.hpp"
 #include "response.hpp"
 
-namespace delivery::core::application::use_cases::queries::get_orders {
+// clang-format off
+namespace delivery::core::application::use_cases::queries::get_active_orders {
+// clang-format on
 
 class IGetOrdersHandler : private NonCopyableAndMoveable {
  public:
@@ -14,4 +16,6 @@ class IGetOrdersHandler : private NonCopyableAndMoveable {
   virtual auto Handle(GetOrdersQuery&&) const -> Response = 0;
 };
 
-}  // namespace delivery::core::application::use_cases::queries::get_orders
+// clang-format off
+}  // namespace delivery::core::application::use_cases::queries::get_active_orders
+// clang-format on

@@ -5,7 +5,9 @@
 
 #include "handler.hpp"
 
-namespace delivery::core::application::use_cases::queries::get_orders {
+// clang-format off
+namespace delivery::core::application::use_cases::queries::get_active_orders {
+// clang-format on
 
 namespace {
 
@@ -74,4 +76,6 @@ UTEST_F(GetOrdersHandlerShould, ReturnOrders) {
 
 }  // namespace
 
-}  // namespace delivery::core::application::use_cases::queries::get_orders
+// clang-format off
+}  // namespace delivery::core::application::use_cases::queries::get_active_orders
+// clang-format on

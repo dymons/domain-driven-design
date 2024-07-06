@@ -1,6 +1,6 @@
 #include <userver/utest/utest.hpp>
 
-#include <core/application/use_cases/queries/get_orders/handler.hpp>
+#include <core/application/use_cases/queries/get_active_orders/handler.hpp>
 #include <core/domain/order/order.hpp>
 #include <core/ports/order_repository/repository_mock_test.hpp>
 
@@ -25,12 +25,15 @@ class CreateOrderHandlerShould : public ::testing::Test {
  protected:
   SharedRef<ICreateOrderHandler> create_order_handler_ =
       MakeCreateOrderHandler(mock_order_repository_);
-  SharedRef<queries::get_orders::IGetOrdersHandler> get_orders_handler_ =
-      queries::get_orders::MakeGetOrdersHandler(mock_order_repository_);
+  SharedRef<queries::get_active_orders::IGetOrdersHandler> get_orders_handler_ =
+      queries::get_active_orders::MakeGetOrdersHandler(mock_order_repository_);
 
-  auto GetOrders() -> std::vector<queries::get_orders::Order> {
-    auto r = get_orders_handler_->Handle(queries::get_orders::GetOrdersQuery{});
-    return std::get<queries::get_orders::Response200>(std::move(r)).orders;
+  auto GetActiveOrders() -> std::vector<queries::get_active_orders::Order> {
+    auto response = get_orders_handler_->Handle(
+        queries::get_active_orders::GetOrdersQuery{});
+    return std::get<queries::get_active_orders::Response200>(
+               std::move(response))
+        .orders;
   }
 };
 
@@ -42,12 +45,12 @@ UTEST_F(CreateOrderHandlerShould, CreateOrder) {
   ASSERT_NO_THROW(create_order_handler_->Handle(std::move(command)));
 
   // Assert
-  auto const orders = GetOrders();
+  auto const orders = GetActiveOrders();
   ASSERT_EQ(orders.size(), 1);
 
   auto const& order = orders.front();
   ASSERT_EQ(order.GetId(), kBasketId);
-  ASSERT_EQ(order.GetLocation(), (queries::get_orders::Location{1, 1}));
+  ASSERT_EQ(order.GetLocation(), (queries::get_active_orders::Location{1, 1}));
 }
 
 UTEST_F(CreateOrderHandlerShould, IdempotencyCreateOrder) {
@@ -59,7 +62,7 @@ UTEST_F(CreateOrderHandlerShould, IdempotencyCreateOrder) {
   ASSERT_NO_THROW(create_order_handler_->Handle(CreateOrderCommand{command}));
 
   // Assert
-  auto const orders = GetOrders();
+  auto const orders = GetActiveOrders();
   ASSERT_EQ(orders.size(), 1);
 }
 

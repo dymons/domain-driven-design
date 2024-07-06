@@ -1,6 +1,8 @@
 #include "response.hpp"
 
-namespace delivery::core::application::use_cases::queries::get_orders {
+// clang-format off
+namespace delivery::core::application::use_cases::queries::get_active_orders {
+// clang-format on
 
 Location::Location(int x, int y) : x_{x}, y_{y} {}
 
@@ -15,4 +17,6 @@ auto Order::GetId() const noexcept -> std::string { return id_; }
 
 auto Order::GetLocation() const noexcept -> Location { return location_; }
 
-}  // namespace delivery::core::application::use_cases::queries::get_orders
+// clang-format off
+}  // namespace delivery::core::application::use_cases::queries::get_active_orders
+// clang-format on
