@@ -20,6 +20,15 @@ class Courier:
         self.transport = transport
         self.current_location = current_location
 
+    def to_record(self):
+        return (
+            self.id,
+            self.name,
+            self.status.name,
+            f'({self.transport.id}, "{self.transport.name}", {self.transport.speed}, {self.transport.capacity})',
+            f'({self.current_location.x},{self.current_location.y})'
+        )
+
 
 @pytest.fixture
 async def courier_repository(pgsql):
@@ -27,11 +36,11 @@ async def courier_repository(pgsql):
         def __init__(self):
             self._db = '20240526213109_init'
 
-        def insert_couriers(self, couriers: List):
+        def insert_couriers(self, couriers: List[Courier]):
             if not couriers:
                 return
 
-            rows = ",".join(map(str, couriers))
+            rows = ",".join(map(str, [c.to_record() for c in couriers]))
             cursor = pgsql[self._db].cursor()
             try:
                 cursor.execute(f"""

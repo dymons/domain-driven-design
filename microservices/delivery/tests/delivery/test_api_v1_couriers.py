@@ -1,5 +1,7 @@
 from microservices.delivery.tests.delivery.fixtures.api_v1_couriers import api_v1_couriers
 from microservices.delivery.tests.delivery.fixtures.courier_repository import courier_repository
+from microservices.delivery.tests.delivery.fixtures.courier_repository import Courier
+from microservices.delivery.tests.delivery.utils.types import *
 
 
 async def test_empty_couriers(
@@ -18,9 +20,7 @@ async def test_given_non_empty_couriers_when_get_couriers_then_couriers_are_rece
         courier_repository,
 ):
     # Arrange
-    courier_repository.insert_couriers([
-        ('id', 'name', 'not_available', '(1, "pedestrian", 1, 1)', '(1,1)'),
-    ])
+    courier_repository.insert_couriers([Courier()])
 
     # Act
     response = await api_v1_couriers.execute()
@@ -28,5 +28,9 @@ async def test_given_non_empty_couriers_when_get_couriers_then_couriers_are_rece
     # Assert
     assert response.status == 200
     assert response.json() == {'couriers': [
-        {'id': 'id', 'location': {'x': 1, 'y': 1}, 'name': 'name'},
+        {
+            'id': default_courier_id(),
+            'location': {'x': 1, 'y': 1},
+            'name': default_courier_name(),
+        },
     ]}
