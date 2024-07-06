@@ -74,24 +74,28 @@ class CourierRepository final : public core::ports::ICourierRepository {
         core::domain::courier::CourierId{courier_id.GetUnderlying()});
   }
 
-  auto GetByReadyStatus() const -> std::unordered_set<
-      MutableSharedRef<core::domain::courier::Courier>> final {
+  auto GetByReadyStatus() const
+      -> std::unordered_set<
+          MutableSharedRef<core::domain::courier::Courier>> final {
     return GetByStatus(core::domain::courier::CourierStatus::kReady);
   }
 
-  auto GetByBusyStatus() const -> std::unordered_set<
-      MutableSharedRef<core::domain::courier::Courier>> final {
+  auto GetByBusyStatus() const
+      -> std::unordered_set<
+          MutableSharedRef<core::domain::courier::Courier>> final {
     return GetByStatus(core::domain::courier::CourierStatus::kBusy);
   }
 
-  auto GetCouriers() const -> std::unordered_set<
-      MutableSharedRef<core::domain::courier::Courier>> final {
-    auto const result =
-        cluster_->Execute(userver::storages::postgres::ClusterHostType::kMaster,
-                          "SELECT id, name, transport, current_location, status"
-                          "FROM delivery.couriers");
+  auto GetCouriers() const
+      -> std::unordered_set<
+          MutableSharedRef<core::domain::courier::Courier>> final {
+    auto const result = cluster_->Execute(
+        userver::storages::postgres::ClusterHostType::kMaster,
+        "SELECT id, name, transport, current_location, status "
+        "FROM delivery.couriers");
 
-    auto const records = result.AsContainer<std::vector<dto::Courier>>();
+    auto const records = result.AsContainer<std::vector<dto::Courier>>(
+        userver::storages::postgres::RowTag{});
     auto couriers =
         std::unordered_set<MutableSharedRef<core::domain::courier::Courier>>{};
     couriers.reserve(records.size());
