@@ -40,7 +40,7 @@ async def order_repository(pgsql):
                             'x': make_tuple(r[3])[0],
                             'y': make_tuple(r[3])[1],
                         },
-                        'weight': 1, # make_tuple(r[4])[0],
+                        'weight': make_tuple(r[4]),
                     }
                     for r in rows]
             finally:
