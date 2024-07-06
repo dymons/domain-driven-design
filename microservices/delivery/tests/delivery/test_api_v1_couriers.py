@@ -33,7 +33,6 @@ async def test_given_non_empty_couriers_when_get_couriers_then_couriers_are_rece
 
     # Assert
     assert response.status == 200
-
     response.json()['couriers'].sort(key=operator.itemgetter('id'))
     assert response.json() == {
         'couriers': [
