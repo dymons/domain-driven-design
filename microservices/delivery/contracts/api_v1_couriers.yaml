@@ -14,9 +14,14 @@ paths:
           content:
             application/json:
               schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/Courier'
+                type: object
+                required:
+                  - couriers
+                properties:
+                  couriers:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Courier'
         default:
           description: Ошибка
           content:
