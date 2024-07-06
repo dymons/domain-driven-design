@@ -2,15 +2,17 @@ import pytest
 
 from typing import List
 
+from microservices.delivery.tests.delivery.utils.types import default_courier_id
+
 
 class Courier:
     def __init__(
-        self,
-        id: str = 'id',
-        name: str = 'name',
-        status: str = 'not_available',
-        transport: str = '(1, "pedestrian", 1, 1)',
-        current_location: str = '(1,1)',
+            self,
+            id: str = default_courier_id(),
+            name: str = 'name',
+            status: str = 'not_available',
+            transport: str = '(1, "pedestrian", 1, 1)',
+            current_location: str = '(1,1)',
     ):
         self.id = id
         self.name = name
