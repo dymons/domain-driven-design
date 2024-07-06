@@ -1,4 +1,6 @@
 from typing import NewType
+from typing import Dict
+from typing import Any
 from enum import Enum
 
 
@@ -6,6 +8,9 @@ BasketId = NewType('basket_id', str)
 CourierId = NewType('courier_id', str)
 CourierName = NewType('courier_name', str)
 CourierStatus = Enum('courier_status', ['not_available', 'ready', 'busy'])
+OrderId = NewType('order_id', str)
+OrderStatus = Enum('order_status', ['created', 'assigned', 'completed'])
+Weight = NewType('weight', int)
 
 
 class Transport:
@@ -31,8 +36,12 @@ class Location:
         self.x = x
         self.y = y
 
-    def __eq__(self, other: dict):
-        return other == {'x': self.x, 'y': self.y}
+    def to_json(self):
+        return {'x': self.x, 'y': self.y}
+
+    @staticmethod
+    def from_record(record):
+        return Location(x=record[0], y=record[1])
 
 
 def default_basket_id() -> BasketId:
@@ -55,5 +64,17 @@ def default_transport() -> Transport:
     return Transport(id=1, name='pedestrian', speed=1, capacity=1)
 
 
-def default_location() -> Location:
-    return Location(x=1, y=1)
+def default_location() -> Dict[str, Any]:
+    return {'x': 1, 'y': 1}
+
+
+def default_order_id() -> OrderId:
+    return OrderId('default_order_id')
+
+
+def default_order_status() -> OrderStatus:
+    return OrderStatus['created']
+
+
+def default_weight() -> Weight:
+    return Weight(1)

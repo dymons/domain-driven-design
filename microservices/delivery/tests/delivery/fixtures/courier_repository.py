@@ -12,7 +12,7 @@ class Courier:
             name: CourierName = default_courier_name(),
             status: CourierStatus = default_courier_status(),
             transport: Transport = default_transport(),
-            current_location: Location = default_location(),
+            current_location: Location = Location(x=1, y=1),
     ):
         self.id = id
         self.name = name

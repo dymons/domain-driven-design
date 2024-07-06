@@ -1,16 +1,16 @@
 import pytest
 
-from microservices.delivery.tests.delivery.utils.types import default_basket_id
 from microservices.delivery.tests.delivery.fixtures.order_repository import order_repository
 from microservices.delivery.tests.delivery.fixtures.api_v1_orders import api_v1_orders
 from microservices.delivery.tests.delivery.fixtures.api_v1_orders import default_api_v1_orders_request
+from microservices.delivery.tests.delivery.utils.types import *
 
 
 @pytest.mark.parametrize(
     'api_v1_orders_request, api_v1_orders_expected_response',
     [
         (
-            default_api_v1_orders_request(basket_id=''),
+            default_api_v1_orders_request(basket_id=BasketId('')),
             {'code': '400', 'message': 'basket_id is empty'},
         ),
         (
@@ -50,7 +50,16 @@ async def test_given_empty_orders_when_create_order_then_order_is_created(
     # Assert
     assert response.status == 200
     assert order_repository.get_orders() == [
-        (default_basket_id(), 'created', None, '(1,1)', '(1)'),
+        {
+            'id': default_basket_id(),
+            'status': 'created',
+            'courier_id': None,
+            'delivery_location': {
+                'x': 1,
+                'y': 1,
+            },
+            'weight': 1,
+        }
     ]
 
 
@@ -66,5 +75,14 @@ async def test_given_empty_orders_when_create_same_order_several_times_then_orde
     assert response_first.status == 200
     assert response_second.status == 200
     assert order_repository.get_orders() == [
-        (default_basket_id(), 'created', None, '(1,1)', '(1)'),
+        {
+            'id': default_basket_id(),
+            'status': 'created',
+            'courier_id': None,
+            'delivery_location': {
+                'x': 1,
+                'y': 1,
+            },
+            'weight': 1,
+        }
     ]
