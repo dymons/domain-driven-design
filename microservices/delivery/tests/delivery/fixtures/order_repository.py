@@ -3,10 +3,8 @@ import pytest
 from ast import literal_eval as make_tuple
 
 from typing import List
-from typing import Optional
 from typing import Dict
 from typing import Any
-
 
 from microservices.delivery.tests.delivery.utils.types import *
 
