@@ -52,7 +52,7 @@ UTEST_F(GetOrdersHandlerShould, ReturnOrders) {
   // Arrange
   auto query = GetOrdersQuery{};
 
-//  ASSERT_NO_THROW(([&, this]() {
+  ASSERT_NO_THROW(([&, this]() {
     // Act
     auto const response = get_orders_handler_->Handle(std::move(query));
 
@@ -69,7 +69,7 @@ UTEST_F(GetOrdersHandlerShould, ReturnOrders) {
     std::ranges::sort(expected_orders);
 
     ASSERT_EQ(orders, expected_orders);
-//  }()));
+  }()));
 }
 
 }  // namespace
