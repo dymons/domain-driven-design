@@ -8,7 +8,6 @@ BasketId = NewType('basket_id', str)
 CourierId = NewType('courier_id', str)
 CourierName = NewType('courier_name', str)
 CourierStatus = Enum('courier_status', ['not_available', 'ready', 'busy'])
-Weight = NewType('weight', int)
 
 
 class Transport:
