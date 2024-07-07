@@ -24,7 +24,7 @@ class GeocodeMapsClient final : public IGeocodeMapsClient {
       : location_{userver::utils::MakeSharedRef<const GeocodeMapsLocation>(
             location)} {}
 
-  auto Geocode(std::string const&) const
+  [[nodiscard]] auto Geocode(std::string const&) const
       -> SharedRef<IGeocodeMapsLocation> final {
     return location_;
   }
