@@ -1,6 +1,5 @@
 import operator
 
-
 from microservices.delivery.tests.delivery.fixtures.api_v1_couriers import api_v1_couriers
 from microservices.delivery.tests.delivery.fixtures.courier_repository import courier_repository
 from microservices.delivery.tests.delivery.utils.types import Defaults

@@ -1,3 +1,5 @@
+import operator
+
 from microservices.delivery.tests.delivery.fixtures.api_v1_orders_active import api_v1_orders_active
 from microservices.delivery.tests.delivery.fixtures.order_repository import order_repository
 from microservices.delivery.tests.delivery.utils.types import make_order
@@ -30,4 +32,14 @@ async def test_given_non_empty_orders_when_get_orders_then_active_orders_are_rec
 
     # Assert
     assert response.status == 200
-    # assert response.json() == {'orders': []}
+    response.json()['orders'].sort(key=operator.itemgetter('id'))
+    assert response.json() == {'orders': [
+        {
+            'id': Defaults.basket_id + '_1',
+            'location': Defaults.delivery_location,
+        },
+        {
+            'id': Defaults.basket_id + '_2',
+            'location': Defaults.delivery_location,
+        },
+    ]}
