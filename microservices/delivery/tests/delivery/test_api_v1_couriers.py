@@ -3,7 +3,7 @@ import operator
 
 from microservices.delivery.tests.delivery.fixtures.api_v1_couriers import api_v1_couriers
 from microservices.delivery.tests.delivery.fixtures.courier_repository import courier_repository
-from microservices.delivery.tests.delivery.fixtures.courier_repository import Courier
+# from microservices.delivery.tests.delivery.fixtures.courier_repository import Courier
 from microservices.delivery.tests.delivery.utils.types import *
 
 
@@ -24,8 +24,8 @@ async def test_given_non_empty_couriers_when_get_couriers_then_couriers_are_rece
 ):
     # Arrange
     courier_repository.insert_couriers([
-        Courier(id=CourierId(default_courier_id() + '_1')),
-        Courier(id=CourierId(default_courier_id() + '_2')),
+        make_courier(id=Defaults.courier_id + '_1'),
+        make_courier(id=Defaults.courier_id + '_2'),
     ])
 
     # Act
