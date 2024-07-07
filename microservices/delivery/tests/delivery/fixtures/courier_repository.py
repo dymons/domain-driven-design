@@ -33,7 +33,8 @@ async def courier_repository(pgsql):
             finally:
                 cursor.close()
 
-        def __to_record(self, courier):
+        @staticmethod
+        def __to_record(courier):
             return (
                 courier['id'],
                 courier['name'],

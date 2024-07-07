@@ -31,7 +31,8 @@ async def order_repository(pgsql):
             finally:
                 cursor.close()
 
-        def __from_record(self, record):
+        @staticmethod
+        def __from_record(record):
             return {
                 'id': record[0],
                 'status': record[1],
