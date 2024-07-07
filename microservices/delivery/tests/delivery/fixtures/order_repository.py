@@ -6,8 +6,6 @@ from typing import List
 from typing import Dict
 from typing import Any
 
-from microservices.delivery.tests.delivery.utils.types import *
-
 
 @pytest.fixture
 async def order_repository(pgsql):
