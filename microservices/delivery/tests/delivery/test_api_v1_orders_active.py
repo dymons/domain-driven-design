@@ -17,7 +17,7 @@ async def test_empty_orders(
     assert response.json() == {'orders': []}
 
 
-async def test_given_non_empty_orders_when_get_orders_then_active_orders_are_received(
+async def test_given_non_empty_orders_when_get_active_orders_then_active_orders_are_received(
         api_v1_orders_active,
         order_repository,
 ):
