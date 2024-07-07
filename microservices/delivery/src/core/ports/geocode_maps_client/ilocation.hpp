@@ -9,7 +9,7 @@ class IGeocodeMapsLocation : private NonCopyableAndMoveable {
  public:
   virtual ~IGeocodeMapsLocation() = default;
 
-  virtual auto GetLocation() const -> core::domain::Location = 0;
+  [[nodiscard]] virtual auto GetLocation() const -> core::domain::Location = 0;
 };
 
 }  // namespace delivery::core::ports

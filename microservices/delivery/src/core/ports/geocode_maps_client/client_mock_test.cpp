@@ -10,7 +10,9 @@ class GeocodeMapsLocation final : public IGeocodeMapsLocation {
 
   GeocodeMapsLocation(core::domain::Location location) : location_{location} {}
 
-  auto GetLocation() const -> core::domain::Location final { return location_; }
+  [[nodiscard]] auto GetLocation() const -> core::domain::Location final {
+    return location_;
+  }
 
  private:
   core::domain::Location location_;
