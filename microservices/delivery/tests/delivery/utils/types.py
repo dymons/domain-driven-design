@@ -1,7 +1,6 @@
-from typing import NewType
 from typing import Dict
 from typing import Any
-from enum import Enum
+from typing import Optional
 
 
 class Defaults(object):
@@ -28,8 +27,8 @@ def make_courier(
         id: str = Defaults.courier_id,
         name: str = Defaults.courier_name,
         status: str = Defaults.courier_statis,
-        transport=None,
-        current_location=None,
+        transport: Optional[Dict[str, Any]] = None,
+        current_location: Optional[Dict[str, Any]] = None,
 ):
     if current_location is None:
         current_location = Defaults.delivery_location
