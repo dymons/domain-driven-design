@@ -31,6 +31,45 @@ async def order_repository(pgsql):
             finally:
                 cursor.close()
 
+        def insert_orders(self, orders: List[Dict[str, Any]]):
+            if not orders:
+                return
+
+            rows = ",".join(map(str, [self.__to_record(c) for c in orders]))
+            cursor = pgsql[self._db].cursor()
+
+            try:
+                cursor.execute(f"""
+                    INSERT INTO 
+                        delivery.orders 
+                        (
+                             id, 
+                             status, 
+                             courier_id, 
+                             delivery_location, 
+                             weight
+                        )
+                    VALUES 
+                        {rows}
+                """)
+            finally:
+                cursor.close()
+
+        @staticmethod
+        def __to_record(order):
+            return (
+                order['id'],
+                order['status'],
+                order['courier_id'] if order['courier_id'] else f'NULL',
+                f'('
+                f'  {order["delivery_location"]["x"]},'
+                f'  {order["delivery_location"]["y"]}'
+                f')',
+                f'('
+                f'  {order["weight"]}'
+                f')',
+            )
+
         @staticmethod
         def __from_record(record):
             return {
