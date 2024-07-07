@@ -56,7 +56,7 @@ async def test_given_empty_orders_when_create_order_then_order_is_created(
             'courier_id': None,
             'delivery_location': Defaults.delivery_location,
             'weight': Defaults.weight,
-        }
+        },
     ]
 
 
