@@ -28,9 +28,13 @@ def make_courier(
         id: str = Defaults.courier_id,
         name: str = Defaults.courier_name,
         status: str = Defaults.courier_statis,
-        transport: Dict[str, Any] = Defaults.transport,
-        current_location: Dict[str, Any] = Defaults.delivery_location,
+        transport=None,
+        current_location=None,
 ):
+    if current_location is None:
+        current_location = Defaults.delivery_location
+    if transport is None:
+        transport = Defaults.transport
     return {
         'id': id,
         'name': name,
