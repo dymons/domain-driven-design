@@ -38,8 +38,16 @@ async def courier_repository(pgsql):
                 courier['id'],
                 courier['name'],
                 courier['status'],
-                f'({courier["transport"]["id"]}, "{courier["transport"]["name"]}", {courier["transport"]["speed"]}, {courier["transport"]["capacity"]})',
-                f'({courier["current_location"]["x"]},{courier["current_location"]["y"]})',
+                f'('
+                f'  {courier["transport"]["id"]},'
+                f'  "{courier["transport"]["name"]}",'
+                f'  {courier["transport"]["speed"]},'
+                f'  {courier["transport"]["capacity"]}'
+                f')',
+                f'('
+                f'  {courier["current_location"]["x"]},'
+                f'  {courier["current_location"]["y"]}'
+                f')',
             )
 
     return Context()
