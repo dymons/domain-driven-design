@@ -4,11 +4,11 @@ namespace delivery::core::ports {
 
 namespace {
 
-class Location final : public ILocation {
+class GeocodeMapsLocation final : public IGeocodeMapsLocation {
  public:
-  ~Location() final = default;
+  ~GeocodeMapsLocation() final = default;
 
-  explicit Location(core::domain::Location location) : location_{location} {}
+  GeocodeMapsLocation(core::domain::Location location) : location_{location} {}
 
   auto GetLocation() const -> core::domain::Location final { return location_; }
 
@@ -20,15 +20,17 @@ class GeocodeMapsClient final : public IGeocodeMapsClient {
  public:
   ~GeocodeMapsClient() final = default;
 
-  explicit GeocodeMapsClient(core::domain::Location location)
-      : location_{userver::utils::MakeSharedRef<const Location>(location)} {}
+  GeocodeMapsClient(core::domain::Location location)
+      : location_{userver::utils::MakeSharedRef<const GeocodeMapsLocation>(
+            location)} {}
 
-  auto Geocode(std::string const&) const -> SharedRef<ILocation> final {
+  auto Geocode(std::string const&) const
+      -> SharedRef<IGeocodeMapsLocation> final {
     return location_;
   }
 
  private:
-  SharedRef<ILocation> const location_;
+  SharedRef<IGeocodeMapsLocation> const location_;
 };
 
 }  // namespace

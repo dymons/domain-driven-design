@@ -13,7 +13,8 @@ class IGeocodeMapsClient : private NonCopyableAndMoveable {
  public:
   virtual ~IGeocodeMapsClient() = default;
 
-  virtual auto Geocode(std::string const&) const -> SharedRef<ILocation> = 0;
+  virtual auto Geocode(std::string const&) const
+      -> SharedRef<IGeocodeMapsLocation> = 0;
 };
 
 }  // namespace delivery::core::ports

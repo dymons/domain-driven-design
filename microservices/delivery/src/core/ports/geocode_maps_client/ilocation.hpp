@@ -5,9 +5,9 @@
 
 namespace delivery::core::ports {
 
-class ILocation : private NonCopyableAndMoveable {
+class IGeocodeMapsLocation : private NonCopyableAndMoveable {
  public:
-  virtual ~ILocation() = default;
+  virtual ~IGeocodeMapsLocation() = default;
 
   virtual auto GetLocation() const -> core::domain::Location = 0;
 };
