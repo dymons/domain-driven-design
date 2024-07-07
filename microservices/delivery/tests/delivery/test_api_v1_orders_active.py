@@ -25,6 +25,7 @@ async def test_given_non_empty_orders_when_get_orders_then_active_orders_are_rec
     order_repository.insert_orders([
         make_order(id=Defaults.basket_id + '_1'),
         make_order(id=Defaults.basket_id + '_2'),
+        make_order(id=Defaults.basket_id + '_3', status='completed'),
     ])
 
     # Act
