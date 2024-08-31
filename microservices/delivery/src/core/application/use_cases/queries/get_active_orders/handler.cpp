@@ -45,7 +45,7 @@ class GetActiveOrdersHandler final : public IGetActiveOrdersHandler {
 auto MakeGetActiveOrdersHandler(
     SharedRef<core::ports::IOrderRepository> order_repository)
     -> SharedRef<IGetActiveOrdersHandler> {
-  return userver::utils::MakeSharedRef<const GetActiveOrdersHandler>(
+  return delivery::MakeSharedRef<GetActiveOrdersHandler>(
       std::move(order_repository));
 }
 

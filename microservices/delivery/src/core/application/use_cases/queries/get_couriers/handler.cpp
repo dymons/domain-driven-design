@@ -39,7 +39,7 @@ class GetCouriersHandler final : public IGetCouriersHandler {
 auto MakeGetCouriersHandler(
     SharedRef<core::ports::ICourierRepository> courier_repository)
     -> SharedRef<IGetCouriersHandler> {
-  return userver::utils::MakeSharedRef<const GetCouriersHandler>(
+  return delivery::MakeSharedRef<GetCouriersHandler>(
       std::move(courier_repository));
 }
 

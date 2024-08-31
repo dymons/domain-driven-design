@@ -29,8 +29,7 @@ class DispatchService final : public IDispatchService {
 
 auto MockDispatchService(IDispatchService::DispatchResult dispatch_result)
     -> SharedRef<IDispatchService> {
-  return userver::utils::MakeSharedRef<const DispatchService>(
-      std::move(dispatch_result));
+  return delivery::MakeSharedRef<DispatchService>(std::move(dispatch_result));
 }
 
 }  // namespace delivery::core::domain_services

@@ -23,8 +23,7 @@ class GeocodeMapsClient final : public IGeocodeMapsClient {
   ~GeocodeMapsClient() final = default;
 
   GeocodeMapsClient(core::domain::Location location)
-      : location_{userver::utils::MakeSharedRef<const GeocodeMapsLocation>(
-            location)} {}
+      : location_{delivery::MakeSharedRef<GeocodeMapsLocation>(location)} {}
 
   [[nodiscard]] auto Geocode(std::string const&) const
       -> SharedRef<IGeocodeMapsLocation> final {
@@ -39,7 +38,7 @@ class GeocodeMapsClient final : public IGeocodeMapsClient {
 
 auto MockGeocodeMapsClient(core::domain::Location location)
     -> SharedRef<IGeocodeMapsClient> {
-  return userver::utils::MakeSharedRef<const GeocodeMapsClient>(location);
+  return delivery::MakeSharedRef<GeocodeMapsClient>(location);
 }
 
 }  // namespace delivery::core::ports

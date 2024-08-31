@@ -60,7 +60,7 @@ class DispatchService final : public IDispatchService {
 }  // namespace
 
 auto MakeDispatchService() -> SharedRef<IDispatchService> {
-  return userver::utils::MakeSharedRef<const DispatchService>();
+  return delivery::MakeSharedRef<DispatchService>();
 }
 
 }  // namespace delivery::core::domain_services
