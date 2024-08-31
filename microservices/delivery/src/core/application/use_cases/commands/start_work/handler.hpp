@@ -1,12 +1,9 @@
 #pragma once
 
+#include <core/ports/courier_repository/fwd.hpp>
 #include <utils/memory.hpp>
 
-#include "ihandler.hpp"
-
-namespace delivery::core::ports {
-class ICourierRepository;
-}  // namespace delivery::core::ports
+#include "fwd.hpp"
 
 namespace delivery::core::application::use_cases::commands::start_work {
 

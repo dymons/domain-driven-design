@@ -1,8 +1,7 @@
 #pragma once
 
-#include <utils/memory.hpp>
-
 #include <core/ports/courier_repository/fwd.hpp>
+#include <utils/memory.hpp>
 
 #include "fwd.hpp"
 
