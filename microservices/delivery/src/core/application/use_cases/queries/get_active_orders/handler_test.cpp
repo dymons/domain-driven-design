@@ -1,7 +1,7 @@
 #include <userver/utest/utest.hpp>
 
-#include <core/domain/order/order_mock_test.hpp>
-#include <core/ports/order_repository/repository_mock_test.hpp>
+#include <core/domain/order/order_mock.hpp>
+#include <core/ports/order_repository/repository_mock.hpp>
 
 #include "handler.hpp"
 

@@ -1,4 +1,4 @@
-#include "location_mock_test.hpp"
+#include "location_mock.hpp"
 
 namespace delivery::core::domain {
 

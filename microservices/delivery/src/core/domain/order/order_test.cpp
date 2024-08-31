@@ -3,7 +3,7 @@
 #include <core/domain/courier/courier_mock.hpp>
 
 #include "exceptions.hpp"
-#include "order_mock_test.hpp"
+#include "order_mock.hpp"
 
 namespace delivery::core::domain::order {
 

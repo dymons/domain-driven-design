@@ -1,4 +1,4 @@
-#include "order_mock_test.hpp"
+#include "order_mock.hpp"
 
 #include <userver/utils/uuid7.hpp>
 

@@ -1,4 +1,4 @@
-#include "repository_mock_test.hpp"
+#include "repository_mock.hpp"
 
 #include <userver/utils/exception.hpp>
 

@@ -1,4 +1,4 @@
-#include "weight_mock_test.hpp"
+#include "weight_mock.hpp"
 
 namespace delivery::core::domain {
 

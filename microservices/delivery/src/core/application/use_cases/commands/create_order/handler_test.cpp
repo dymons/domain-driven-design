@@ -2,7 +2,7 @@
 
 #include <core/application/use_cases/queries/get_active_orders/handler.hpp>
 #include <core/domain/order/order.hpp>
-#include <core/ports/order_repository/repository_mock_test.hpp>
+#include <core/ports/order_repository/repository_mock.hpp>
 
 #include "handler.hpp"
 
