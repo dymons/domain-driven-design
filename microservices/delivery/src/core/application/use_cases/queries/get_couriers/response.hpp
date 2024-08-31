@@ -30,10 +30,4 @@ class Courier final {
   [[nodiscard]] auto GetLocation() const noexcept -> Location;
 };
 
-struct Response200 final {
-  std::vector<Courier> couriers;
-};
-
-using Response = std::variant<Response200>;
-
 }  // namespace delivery::core::application::use_cases::queries::get_couriers

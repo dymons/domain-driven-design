@@ -5,6 +5,7 @@
 #include <userver/storages/postgres/component.hpp>
 
 #include <core/application/use_cases/queries/get_couriers/handler.hpp>
+#include <core/application/use_cases/queries/get_couriers/ihandler.hpp>
 #include <core/application/use_cases/queries/get_couriers/query.hpp>
 #include <core/application/use_cases/queries/get_couriers/response.hpp>
 #include <infrastructure/adapters/postgres/courier_repository.hpp>
@@ -14,12 +15,13 @@ namespace delivery::api::adapters::http::api_v1_couriers {
 namespace {
 
 auto MakeResponse(
-    core::application::use_cases::queries::get_couriers::Response200 const&
-        response) -> userver::formats::json::Value {
+    std::vector<
+        core::application::use_cases::queries::get_couriers::Courier> const&
+        couriers) -> userver::formats::json::Value {
   auto couriers_builder = userver::formats::json::ValueBuilder{
       userver::formats::common::Type::kArray};
 
-  std::ranges::for_each(response.couriers, [&](auto const& courier) {
+  std::ranges::for_each(couriers, [&](auto const& courier) {
     auto courier_builder = userver::formats::json::ValueBuilder{};
     courier_builder["id"] = courier.GetId();
     courier_builder["name"] = courier.GetName();
@@ -57,7 +59,7 @@ class Controller final : public userver::server::handlers::HttpHandlerJsonBase {
     auto const get_couriers_handler = core::application::use_cases::queries::
         get_couriers::MakeGetCouriersHandler(courier_repository_);
 
-    return std::visit(MakeResponse, get_couriers_handler->Handle({}));
+    return MakeResponse(get_couriers_handler->Handle({}));
   }
 
  private:

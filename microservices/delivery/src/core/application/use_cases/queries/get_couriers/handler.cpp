@@ -3,6 +3,10 @@
 #include <core/domain/courier/courier.hpp>
 #include <core/ports/courier_repository/irepository.hpp>
 
+#include "ihandler.hpp"
+#include "query.hpp"
+#include "response.hpp"
+
 namespace delivery::core::application::use_cases::queries::get_couriers {
 
 namespace {
@@ -15,19 +19,20 @@ class GetCouriersHandler final : public IGetCouriersHandler {
       SharedRef<core::ports::ICourierRepository> courier_repository)
       : courier_repository_(std::move(courier_repository)) {}
 
-  auto Handle(GetCouriersQuery&&) const -> Response final {
+  [[nodiscard]] auto Handle(GetCouriersQuery&&) const
+      -> std::vector<Courier> final {
     auto couriers = courier_repository_->GetCouriers();
 
-    auto response = Response200{};
-    response.couriers.reserve(couriers.size());
+    auto result = std::vector<Courier>{};
+    result.reserve(couriers.size());
     for (auto&& courier : couriers) {
-      response.couriers.emplace_back(
+      result.emplace_back(
           courier->GetId().GetUnderlying(), courier->GetName().GetUnderlying(),
           Location{courier->GetCurrentLocation().GetX().GetUnderlying(),
                    courier->GetCurrentLocation().GetY().GetUnderlying()});
     }
 
-    return std::move(response);
+    return result;
   }
 
  private:
