@@ -6,8 +6,8 @@
 
 namespace delivery::core::domain {
 
-using X = userver::utils::StrongTypedef<struct XTag, int>;
-using Y = userver::utils::StrongTypedef<struct YTag, int>;
+using XCoord = userver::utils::StrongTypedef<struct XCoordTag, int>;
+using YCoord = userver::utils::StrongTypedef<struct YCoordTag, int>;
 using Distance = userver::utils::StrongTypedef<struct DistanceTag, int>;
 
 class Location final {
@@ -20,12 +20,12 @@ class Location final {
 
   // Constructors
 
-  Location(X, Y);
+  Location(XCoord, YCoord);
 
   // Observers
 
-  [[nodiscard]] auto GetX() const noexcept -> X;
-  [[nodiscard]] auto GetY() const noexcept -> Y;
+  [[nodiscard]] auto GetX() const noexcept -> XCoord;
+  [[nodiscard]] auto GetY() const noexcept -> YCoord;
   [[nodiscard]] auto DistanceTo(Location const&) const noexcept -> Distance;
 
   auto operator<=>(Location const&) const -> std::strong_ordering = default;

@@ -25,24 +25,24 @@ class GetOrdersHandlerShould : public ::testing::Test {
           core::domain::order::MockOrder(
               {.basket_id = kBasketIdOne,
                .delivery_location =
-                   core::domain::Location{core::domain::X{1},
-                                          core::domain::Y{1}}}),
+                   core::domain::Location{core::domain::XCoord{1},
+                                          core::domain::YCoord{1}}}),
           core::domain::order::MockOrder(
               {.basket_id = kBasketIdTwo,
                .delivery_location =
-                   core::domain::Location{core::domain::X{2},
-                                          core::domain::Y{2}}}),
+                   core::domain::Location{core::domain::XCoord{2},
+                                          core::domain::YCoord{2}}}),
           core::domain::order::MockOrder(
               {.basket_id = kBasketIdThree,
                .delivery_location =
-                   core::domain::Location{core::domain::X{3},
-                                          core::domain::Y{3}}}),
+                   core::domain::Location{core::domain::XCoord{3},
+                                          core::domain::YCoord{3}}}),
           core::domain::order::MockOrder(
               {.basket_id = kBasketIdThree,
                .status = core::domain::order::OrderStatus::kCompleted,
                .delivery_location =
-                   core::domain::Location{core::domain::X{3},
-                                          core::domain::Y{3}}}),
+                   core::domain::Location{core::domain::XCoord{3},
+                                          core::domain::YCoord{3}}}),
       });
 
  protected:

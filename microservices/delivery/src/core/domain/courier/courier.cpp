@@ -53,16 +53,18 @@ auto Courier::MoveTo(Location const to_location) -> void {
 
   auto new_x = current_location_.GetX();
   if (new_x != to_location.GetX()) {
-    new_x = X{std::min(current_location_.GetX().GetUnderlying() + cruise_range,
-                       to_location.GetX().GetUnderlying())};
+    new_x =
+        XCoord{std::min(current_location_.GetX().GetUnderlying() + cruise_range,
+                        to_location.GetX().GetUnderlying())};
     cruise_range -= (to_location.GetX().GetUnderlying() -
                      current_location_.GetX().GetUnderlying());
   }
 
   auto new_y = current_location_.GetY();
   if (new_y != to_location.GetY() && cruise_range > 0) {
-    new_y = Y{std::min(current_location_.GetY().GetUnderlying() + cruise_range,
-                       to_location.GetY().GetUnderlying())};
+    new_y =
+        YCoord{std::min(current_location_.GetY().GetUnderlying() + cruise_range,
+                        to_location.GetY().GetUnderlying())};
   }
 
   auto reached_location = Location{new_x, new_y};

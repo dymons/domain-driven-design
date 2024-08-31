@@ -10,15 +10,15 @@
 
 namespace delivery::core::domain {
 
-const auto kMinX = X{1};
-const auto kMaxX = X{10};
-const auto kMinY = Y{1};
-const auto kMaxY = Y{10};
+const auto kMinX = XCoord{1};
+const auto kMaxX = XCoord{10};
+const auto kMinY = YCoord{1};
+const auto kMaxY = YCoord{10};
 
 const Location Location::kMinLocation = Location{kMinX, kMinY};
 const Location Location::kMaxLocation = Location{kMaxX, kMaxY};
 
-Location::Location(X x, Y y) {
+Location::Location(XCoord x, YCoord y) {
   if (x < kMinX || x > kMaxX) {
     userver::utils::LogErrorAndThrow<ArgumentException>(fmt::format(
         "The coordinate x should be in range from {} to {}", kMinX, kMaxX));
@@ -33,9 +33,9 @@ Location::Location(X x, Y y) {
   y_ = y.GetUnderlying();
 }
 
-auto Location::GetX() const noexcept -> X { return X{x_}; }
+auto Location::GetX() const noexcept -> XCoord { return XCoord{x_}; }
 
-auto Location::GetY() const noexcept -> Y { return Y{y_}; }
+auto Location::GetY() const noexcept -> YCoord { return YCoord{y_}; }
 
 auto Location::DistanceTo(Location const& other) const noexcept -> Distance {
   return Distance{

@@ -20,10 +20,10 @@ UTEST(CourierShould, MoveToLocation) {
   auto courier = MockCourier({.transport = Transport::kBicycle});
 
   // Act
-  courier->MoveTo(Location{X{5}, Y{5}});
+  courier->MoveTo(Location{XCoord{5}, YCoord{5}});
 
   // Assert
-  ASSERT_EQ(courier->GetCurrentLocation(), (Location{X{3}, Y{1}}));
+  ASSERT_EQ(courier->GetCurrentLocation(), (Location{XCoord{3}, YCoord{1}}));
 }
 
 UTEST(CourierShould, CanStartWork) {
