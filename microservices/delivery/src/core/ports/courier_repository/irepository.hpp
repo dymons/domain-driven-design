@@ -2,15 +2,12 @@
 
 #include <unordered_set>
 
+#include <core/domain/courier/fwd.hpp>
 #include <core/domain/courier/strong_typedefs.hpp>
 #include <core/domain/order/strong_typedefs.hpp>
 #include <core/domain/shared_kernel/strong_typedefs.hpp>
 #include <utils/memory.hpp>
 #include <utils/non_copyable_and_moveable.hpp>
-
-namespace delivery::core::domain::courier {
-class Courier;
-}  // namespace delivery::core::domain::courier
 
 namespace delivery::core::ports {
 

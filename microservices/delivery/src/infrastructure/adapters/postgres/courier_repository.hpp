@@ -2,11 +2,8 @@
 
 #include <userver/storages/postgres/postgres_fwd.hpp>
 
+#include <core/ports/courier_repository/fwd.hpp>
 #include <utils/memory.hpp>
-
-namespace delivery::core::ports {
-class ICourierRepository;
-}  // namespace delivery::core::ports
 
 namespace delivery::infrastructure::adapters::postgres {
 
