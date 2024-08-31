@@ -4,7 +4,9 @@
 #include <core/domain/order/order.hpp>
 #include <core/ports/order_repository/repository_mock.hpp>
 
+#include "command.hpp"
 #include "handler.hpp"
+#include "ihandler.hpp"
 
 namespace delivery::core::application::use_cases::commands::create_order {
 
