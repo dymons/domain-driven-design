@@ -25,6 +25,7 @@ set(CMAKE_CXX_STANDARD 23)
 # Common sources
 file(GLOB_RECURSE ${PROJECT_NAME}_SOURCES "src/*.hpp" "src/*.cpp")
 list(FILTER ${PROJECT_NAME}_SOURCES EXCLUDE REGEX ".*_test\\.cpp|hpp$")
+list(FILTER ${PROJECT_NAME}_SOURCES EXCLUDE REGEX ".*_mock\\.cpp|hpp$")
 list(FILTER ${PROJECT_NAME}_SOURCES EXCLUDE REGEX ".*main\\.cpp$")
 add_library(${PROJECT_NAME}_objs OBJECT ${${PROJECT_NAME}_SOURCES})
 target_include_directories(${PROJECT_NAME}_objs PUBLIC src)
@@ -38,7 +39,7 @@ target_link_libraries(${PROJECT_NAME} PRIVATE ${PROJECT_NAME}_objs)
 
 
 # Unit Tests
-file(GLOB_RECURSE ${PROJECT_NAME}_UNITTESTS "src/*_test.cpp")
+file(GLOB_RECURSE ${PROJECT_NAME}_UNITTESTS "src/*_test.cpp" "src/*_mock.cpp")
 add_executable(${PROJECT_NAME}_unittest ${${PROJECT_NAME}_UNITTESTS})
 target_link_libraries(${PROJECT_NAME}_unittest PRIVATE ${PROJECT_NAME}_objs userver-utest)
 add_google_tests(${PROJECT_NAME}_unittest)
