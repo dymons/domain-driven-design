@@ -2,13 +2,10 @@
 
 #include <vector>
 
+#include <core/domain/order/fwd.hpp>
 #include <core/domain/order/strong_typedefs.hpp>
 #include <utils/memory.hpp>
 #include <utils/non_copyable_and_moveable.hpp>
-
-namespace delivery::core::domain::order {
-class Order;
-}  // namespace delivery::core::domain::order
 
 namespace delivery::core::ports {
 
