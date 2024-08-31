@@ -2,7 +2,7 @@
 
 #include <utils/non_copyable_and_moveable.hpp>
 
-#include "command.hpp"
+#include "fwd.hpp"
 
 namespace delivery::core::application::use_cases::commands::stop_work {
 

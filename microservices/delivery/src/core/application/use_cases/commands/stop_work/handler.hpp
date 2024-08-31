@@ -2,11 +2,9 @@
 
 #include <utils/memory.hpp>
 
-#include "ihandler.hpp"
+#include <core/ports/courier_repository/fwd.hpp>
 
-namespace delivery::core::ports {
-class ICourierRepository;
-}  // namespace delivery::core::ports
+#include "fwd.hpp"
 
 namespace delivery::core::application::use_cases::commands::stop_work {
 

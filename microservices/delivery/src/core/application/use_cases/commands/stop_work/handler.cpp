@@ -3,6 +3,9 @@
 #include <core/domain/courier/courier.hpp>
 #include <core/ports/courier_repository/irepository.hpp>
 
+#include "command.hpp"
+#include "ihandler.hpp"
+
 namespace delivery::core::application::use_cases::commands::stop_work {
 
 namespace {

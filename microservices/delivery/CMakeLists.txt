@@ -33,10 +33,13 @@ target_include_directories(${PROJECT_NAME}_objs PUBLIC src)
 # Dependencies
 target_link_libraries(${PROJECT_NAME}_objs PUBLIC userver-core userver::postgresql)
 
+# Include What You Use
+find_program(iwyu_path NAMES include-what-you-use iwyu REQUIRED)
+set_property(TARGET ${PROJECT_NAME}_objs PROPERTY CXX_INCLUDE_WHAT_YOU_USE ${iwyu_path})
+
 # The Service
 add_executable(${PROJECT_NAME} src/main.cpp)
 target_link_libraries(${PROJECT_NAME} PRIVATE ${PROJECT_NAME}_objs)
-
 
 # Unit Tests
 file(GLOB_RECURSE ${PROJECT_NAME}_UNITTESTS "src/*_test.cpp" "src/*_mock.cpp")
