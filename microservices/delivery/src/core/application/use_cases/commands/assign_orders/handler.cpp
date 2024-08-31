@@ -8,6 +8,9 @@
 #include <utils/container.hpp>
 #include <utils/optional.hpp>
 
+#include "command.hpp"
+#include "ihandler.hpp"
+
 namespace delivery::core::application::use_cases::commands::assign_orders {
 
 namespace {
@@ -20,9 +23,9 @@ class AssignOrdersHandler final : public IAssignOrdersHandler {
       SharedRef<core::ports::ICourierRepository> courier_repository,
       SharedRef<core::ports::IOrderRepository> order_repository,
       SharedRef<core::domain_services::IDispatchService> dispatch_service)
-      : courier_repository_(std::move(courier_repository)),
-        order_repository_(std::move(order_repository)),
-        dispatch_service_(std::move(dispatch_service)) {}
+      : courier_repository_{std::move(courier_repository)},
+        order_repository_{std::move(order_repository)},
+        dispatch_service_{std::move(dispatch_service)} {}
 
   auto Handle(AssignOrdersCommand&&) const -> void final {
     auto const dispatch_view =
@@ -55,7 +58,7 @@ auto MakeAssignOrdersHandler(
     SharedRef<core::ports::IOrderRepository> order_repository,
     SharedRef<core::domain_services::IDispatchService> dispatch_service)
     -> SharedRef<IAssignOrdersHandler> {
-  return userver::utils::MakeSharedRef<const AssignOrdersHandler>(
+  return delivery::MakeSharedRef<AssignOrdersHandler>(
       std::move(courier_repository), std::move(order_repository),
       std::move(dispatch_service));
 }

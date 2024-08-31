@@ -1,20 +1,11 @@
 #pragma once
 
+#include <core/domain_services/dispatch_service/fwd.hpp>
+#include <core/ports/courier_repository/fwd.hpp>
+#include <core/ports/order_repository/fwd.hpp>
 #include <utils/memory.hpp>
 
-#include "ihandler.hpp"
-
-namespace delivery::core::ports {
-class IOrderRepository;
-}  // namespace delivery::core::ports
-
-namespace delivery::core::ports {
-class ICourierRepository;
-}  // namespace delivery::core::ports
-
-namespace delivery::core::domain_services {
-class IDispatchService;
-}  // namespace delivery::core::domain_services
+#include "fwd.hpp"
 
 namespace delivery::core::application::use_cases::commands::assign_orders {
 
