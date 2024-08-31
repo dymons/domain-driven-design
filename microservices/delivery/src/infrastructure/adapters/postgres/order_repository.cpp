@@ -51,7 +51,7 @@ class OrderRepository final : public core::ports::IOrderRepository {
     }
   }
 
-  auto GetById(core::domain::order::OrderId const& order_id) const
+  [[nodiscard]] auto GetById(core::domain::order::OrderId const& order_id) const
       -> MutableSharedRef<core::domain::order::Order> final try {
     auto const result = cluster_->Execute(
         userver::storages::postgres::ClusterHostType::kMaster,
@@ -66,7 +66,7 @@ class OrderRepository final : public core::ports::IOrderRepository {
     userver::utils::LogErrorAndThrow<core::ports::OrderNotFound>(ex.what());
   }
 
-  auto GetNotAssigned() const
+  [[nodiscard]] auto GetNotAssigned() const
       -> std::vector<MutableSharedRef<core::domain::order::Order>> final {
     auto const result = cluster_->Execute(
         userver::storages::postgres::ClusterHostType::kMaster,
@@ -85,7 +85,7 @@ class OrderRepository final : public core::ports::IOrderRepository {
     return orders;
   }
 
-  auto GetAssigned() const
+  [[nodiscard]] auto GetAssigned() const
       -> std::vector<MutableSharedRef<core::domain::order::Order>> final {
     auto const result = cluster_->Execute(
         userver::storages::postgres::ClusterHostType::kMaster,
@@ -104,7 +104,7 @@ class OrderRepository final : public core::ports::IOrderRepository {
     return orders;
   }
 
-  auto GetOrders() const
+  [[nodiscard]] auto GetOrders() const
       -> std::vector<MutableSharedRef<core::domain::order::Order>> final {
     auto const result = cluster_->Execute(
         userver::storages::postgres::ClusterHostType::kMaster,
