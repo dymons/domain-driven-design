@@ -6,4 +6,4 @@ class Courier;
 class CourierStatus;
 class Transport;
 
-} // namespace delivery::core::domain::courier
+}  // namespace delivery::core::domain::courier

@@ -4,4 +4,4 @@ namespace delivery::core::ports {
 
 class IOrderRepository;
 
-} // namespace delivery::core::ports
+}  // namespace delivery::core::ports

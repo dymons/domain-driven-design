@@ -4,4 +4,4 @@ namespace delivery::core::ports {
 
 class ICourierRepository;
 
-} // namespace delivery::core::ports
+}  // namespace delivery::core::ports

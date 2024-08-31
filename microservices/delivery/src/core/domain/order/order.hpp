@@ -3,8 +3,8 @@
 #include <optional>
 
 #include <core/domain/shared_kernel/location/location.hpp>
-#include <core/domain/shared_kernel/weight/weight.hpp>
 #include <core/domain/shared_kernel/strong_typedefs.hpp>
+#include <core/domain/shared_kernel/weight/weight.hpp>
 #include <utils/memory.hpp>
 #include "status.hpp"
 #include "strong_typedefs.hpp"

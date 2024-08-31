@@ -5,4 +5,4 @@ namespace delivery::core::domain::order {
 class Order;
 class OrderStatus;
 
-} // namespace delivery::core::domain::order
+}  // namespace delivery::core::domain::order
