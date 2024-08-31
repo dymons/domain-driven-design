@@ -16,7 +16,7 @@ class StartWorkHandler final : public IStartWorkHandler {
 
   explicit StartWorkHandler(
       SharedRef<core::ports::ICourierRepository> courier_repository)
-      : courier_repository_(std::move(courier_repository)) {}
+      : courier_repository_{std::move(courier_repository)} {}
 
   auto Handle(StartWorkCommand&& command) const -> void final try {
     auto courier =
@@ -42,7 +42,7 @@ class StartWorkHandler final : public IStartWorkHandler {
 auto MakeStartWorkHandler(
     SharedRef<core::ports::ICourierRepository> courier_repository)
     -> SharedRef<IStartWorkHandler> {
-  return userver::utils::MakeSharedRef<const StartWorkHandler>(
+  return delivery::MakeSharedRef<StartWorkHandler>(
       std::move(courier_repository));
 }
 
