@@ -23,6 +23,10 @@ class GetCouriersHandler final : public IGetCouriersHandler {
       -> std::vector<Courier> final {
     auto couriers = courier_repository_->GetCouriers();
 
+    // TODO (dymons) Wait support std::ranges::to at C++23 (libstdc++14)
+    // return couriers | std::ranges::transform(ConvertCourier)
+    //                 | std::ranges::to<std::vector>();
+
     auto result = std::vector<Courier>{};
     result.reserve(couriers.size());
     for (auto&& courier : couriers) {
