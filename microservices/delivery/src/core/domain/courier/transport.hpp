@@ -14,7 +14,7 @@ class Transport {
   // Constructors
 
   Transport(TransportId id, TransportName name, Speed speed, Weight capacity)
-      : id_(id), name_(std::move(name)), speed_(speed), capacity_(capacity) {}
+      : id_{id}, name_{std::move(name)}, speed_{speed}, capacity_{capacity} {}
 
  public:
   static auto Hydrate(TransportId, TransportName, Speed, Weight) -> Transport;
