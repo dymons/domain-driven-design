@@ -3,6 +3,7 @@
 #include <core/domain/order/order.hpp>
 #include <core/ports/order_repository/irepository.hpp>
 
+#include "command.hpp"
 #include "ihandler.hpp"
 
 namespace delivery::core::application::use_cases::commands::create_order {
@@ -38,7 +39,7 @@ class CreateOrderHandler final : public ICreateOrderHandler {
 auto MakeCreateOrderHandler(
     SharedRef<core::ports::IOrderRepository> order_repository)
     -> SharedRef<ICreateOrderHandler> {
-  return userver::utils::MakeSharedRef<const CreateOrderHandler>(
+  return delivery::MakeSharedRef<CreateOrderHandler>(
       std::move(order_repository));
 }
 
