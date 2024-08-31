@@ -18,7 +18,7 @@ auto Convert(SharedRef<core::domain::courier::Courier> const& courier)
 auto Convert(Courier const& courier)
     -> MutableSharedRef<core::domain::courier::Courier> {
   return core::domain::courier::Courier::Hydrate(
-      core::domain::courier::CourierId{courier.id},
+      core::domain::CourierId{courier.id},
       core::domain::courier::CourierName{courier.name},
       dto::Convert(courier.transport), dto::Convert(courier.current_location),
       core::domain::courier::CourierStatus::FromString(courier.status));

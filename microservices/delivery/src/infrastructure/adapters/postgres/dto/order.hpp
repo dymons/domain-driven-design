@@ -5,6 +5,7 @@
 #include <userver/storages/postgres/io/user_types.hpp>
 
 #include <core/domain/order/strong_typedefs.hpp>
+#include <core/domain/shared_kernel/strong_typedefs.hpp>
 #include <utils/memory.hpp>
 
 #include "location.hpp"
@@ -19,7 +20,7 @@ namespace delivery::infrastructure::adapters::postgres::dto {
 struct Order final {
   core::domain::order::OrderId id{};
   std::string status{};
-  std::optional<core::domain::order::CourierId> courier_id{};
+  std::optional<core::domain::CourierId> courier_id{};
   Location delivery_location{};
   Weight weight{};
 };

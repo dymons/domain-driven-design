@@ -4,6 +4,7 @@
 
 #include <core/domain/courier/strong_typedefs.hpp>
 #include <core/domain/order/strong_typedefs.hpp>
+#include <core/domain/shared_kernel/strong_typedefs.hpp>
 #include <utils/memory.hpp>
 #include <utils/non_copyable_and_moveable.hpp>
 
@@ -35,8 +36,7 @@ class ICourierRepository : private NonCopyableAndMoveable {
   // Observers
 
   // clang-format off
-  virtual auto GetById(domain::courier::CourierId const&) const -> MutableSharedRef<domain::courier::Courier> = 0;
-  virtual auto GetById(domain::order::CourierId const&) const -> MutableSharedRef<domain::courier::Courier> = 0;
+  virtual auto GetById(domain::CourierId const&) const -> MutableSharedRef<domain::courier::Courier> = 0;
   virtual auto GetByReadyStatus() const -> std::unordered_set<MutableSharedRef<domain::courier::Courier>> = 0;
   virtual auto GetByBusyStatus() const -> std::unordered_set<MutableSharedRef<domain::courier::Courier>> = 0;
   virtual auto GetCouriers() const -> std::unordered_set<MutableSharedRef<domain::courier::Courier>> = 0;

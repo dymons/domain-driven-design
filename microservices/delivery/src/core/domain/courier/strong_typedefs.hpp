@@ -7,8 +7,6 @@ namespace delivery::core::domain::courier {
 // TODO (dymons) Use libraries to work with Duration/Speed/Time
 // TODO (dymons) Use refinement types
 
-using CourierId =
-    userver::utils::StrongTypedef<struct CourierIdTag, std::string>;
 using CourierName =
     userver::utils::StrongTypedef<struct CourierNameTag, std::string>;
 

@@ -16,8 +16,8 @@ class StartWorkHandler final : public IStartWorkHandler {
       : courier_repository_(std::move(courier_repository)) {}
 
   auto Handle(StartWorkCommand&& command) const -> void final try {
-    auto courier = courier_repository_->GetById(
-        domain::courier::CourierId{command.GetCourierId()});
+    auto courier =
+        courier_repository_->GetById(domain::CourierId{command.GetCourierId()});
 
     try {
       courier->StartWork();

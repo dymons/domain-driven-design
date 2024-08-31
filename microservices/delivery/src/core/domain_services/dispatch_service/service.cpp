@@ -47,9 +47,7 @@ class DispatchService final : public IDispatchService {
 
     if (not scores.empty()) {
       auto best_courier = scores.begin()->courier;
-      auto const courier_id = best_courier->GetId().GetUnderlying();
-
-      order->AssignCourier(domain::order::CourierId{courier_id});
+      order->AssignCourier(best_courier->GetId());
       best_courier->StartWork();
 
       return {.order = std::move(order), .courier = std::move(best_courier)};

@@ -1,6 +1,7 @@
 #pragma once
 
 #include <core/domain/shared_kernel/location/location.hpp>
+#include <core/domain/shared_kernel/strong_typedefs.hpp>
 #include <utils/memory.hpp>
 
 #include "exceptions.hpp"
@@ -62,6 +63,6 @@ template <>
 struct std::hash<delivery::core::domain::courier::Courier> {
   std::size_t operator()(
       const delivery::core::domain::courier::Courier& c) const {
-    return std::hash<delivery::core::domain::courier::CourierId>{}(c.GetId());
+    return std::hash<delivery::core::domain::CourierId>{}(c.GetId());
   }
 };

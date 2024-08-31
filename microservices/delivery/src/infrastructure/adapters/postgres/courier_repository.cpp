@@ -53,7 +53,7 @@ class CourierRepository final : public core::ports::ICourierRepository {
     }
   }
 
-  auto GetById(core::domain::courier::CourierId const& courier_id) const
+  auto GetById(core::domain::CourierId const& courier_id) const
       -> MutableSharedRef<core::domain::courier::Courier> final try {
     auto const result =
         cluster_->Execute(userver::storages::postgres::ClusterHostType::kMaster,
@@ -66,12 +66,6 @@ class CourierRepository final : public core::ports::ICourierRepository {
         result.AsSingleRow<dto::Courier>(userver::storages::postgres::kRowTag));
   } catch (const userver::storages::postgres::NonSingleRowResultSet& ex) {
     userver::utils::LogErrorAndThrow<core::ports::CourierNotFound>(ex.what());
-  }
-
-  auto GetById(core::domain::order::CourierId const& courier_id) const
-      -> MutableSharedRef<core::domain::courier::Courier> final {
-    return GetById(
-        core::domain::courier::CourierId{courier_id.GetUnderlying()});
   }
 
   auto GetByReadyStatus() const -> std::unordered_set<
