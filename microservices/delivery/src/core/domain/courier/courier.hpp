@@ -24,11 +24,11 @@ class Courier {
 
   Courier(CourierId id, CourierName name, Transport transport,
           Location current_location, CourierStatus status)
-      : id_(std::move(id)),
-        name_(std::move(name)),
-        transport_(std::move(transport)),
-        current_location_(current_location),
-        status_(status) {}
+      : id_{std::move(id)},
+        name_{std::move(name)},
+        transport_{std::move(transport)},
+        current_location_{current_location},
+        status_{status} {}
 
  public:
   [[nodiscard]] static auto Create(CourierName, Transport)

@@ -87,8 +87,7 @@ class CourierRepository final : public ICourierRepository {
 auto MockCourierRepository(
     std::unordered_set<MutableSharedRef<domain::courier::Courier>> couriers)
     -> SharedRef<ICourierRepository> {
-  return userver::utils::MakeSharedRef<const CourierRepository>(
-      std::move(couriers));
+  return delivery::MakeSharedRef<CourierRepository>(std::move(couriers));
 }
 
 }  // namespace delivery::core::ports

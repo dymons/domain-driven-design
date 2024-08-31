@@ -14,7 +14,7 @@ class OrderRepository final : public IOrderRepository {
 
   explicit OrderRepository(
       std::unordered_set<MutableSharedRef<domain::order::Order>> orders)
-      : orders_(std::move(orders)) {}
+      : orders_{std::move(orders)} {}
 
   auto Add(SharedRef<core::domain::order::Order> const& order) const
       -> void final {
@@ -90,8 +90,7 @@ class OrderRepository final : public IOrderRepository {
 auto MockOrderRepository(
     std::unordered_set<MutableSharedRef<domain::order::Order>> orders)
     -> SharedRef<IOrderRepository> {
-  return userver::utils::MakeSharedRef<const OrderRepository>(
-      std::move(orders));
+  return delivery::MakeSharedRef<OrderRepository>(std::move(orders));
 }
 
 }  // namespace delivery::core::ports

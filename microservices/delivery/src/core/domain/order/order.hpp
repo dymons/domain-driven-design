@@ -24,11 +24,11 @@ class Order {
 
   Order(OrderId id, OrderStatus status, std::optional<CourierId> courier_id,
         Location delivery_location, Weight weight)
-      : id_(std::move(id)),
-        status_(status),
-        courier_id_(std::move(courier_id)),
-        delivery_location_(delivery_location),
-        weight_(weight) {}
+      : id_{std::move(id)},
+        status_{status},
+        courier_id_{std::move(courier_id)},
+        delivery_location_{delivery_location},
+        weight_{weight} {}
 
  public:
   [[nodiscard]] static auto Create(BasketId, Location, Weight)

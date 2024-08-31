@@ -2,11 +2,8 @@
 
 #include <userver/storages/postgres/postgres_fwd.hpp>
 
+#include <core/ports/order_repository/fwd.hpp>
 #include <utils/memory.hpp>
-
-namespace delivery::core::ports {
-class IOrderRepository;
-}  // namespace delivery::core::ports
 
 namespace delivery::infrastructure::adapters::postgres {
 

@@ -18,7 +18,7 @@ class OrderRepository final : public core::ports::IOrderRepository {
   ~OrderRepository() final = default;
 
   explicit OrderRepository(userver::storages::postgres::ClusterPtr cluster)
-      : cluster_(std::move(cluster)) {}
+      : cluster_{std::move(cluster)} {}
 
   auto Add(SharedRef<core::domain::order::Order> const& order) const
       -> void final {
@@ -130,8 +130,7 @@ class OrderRepository final : public core::ports::IOrderRepository {
 
 auto MakeOrderRepository(userver::storages::postgres::ClusterPtr cluster)
     -> SharedRef<core::ports::IOrderRepository> {
-  return userver::utils::MakeSharedRef<const OrderRepository>(
-      std::move(cluster));
+  return MakeSharedRef<OrderRepository>(std::move(cluster));
 }
 
 }  // namespace delivery::infrastructure::adapters::postgres
