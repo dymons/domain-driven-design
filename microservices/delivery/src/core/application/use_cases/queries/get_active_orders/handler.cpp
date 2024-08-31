@@ -3,6 +3,10 @@
 #include <core/domain/order/order.hpp>
 #include <core/ports/order_repository/irepository.hpp>
 
+#include "ihandler.hpp"
+#include "query.hpp"
+#include "response.hpp"
+
 // clang-format off
 namespace delivery::core::application::use_cases::queries::get_active_orders {
 // clang-format on
@@ -15,25 +19,26 @@ class GetActiveOrdersHandler final : public IGetActiveOrdersHandler {
 
   explicit GetActiveOrdersHandler(
       SharedRef<core::ports::IOrderRepository> order_repository)
-      : order_repository_(std::move(order_repository)) {}
+      : order_repository_{std::move(order_repository)} {}
 
-  auto Handle(GetActiveOrdersQuery&&) const -> Response final {
+  [[nodiscard]] auto Handle(GetActiveOrdersQuery&&) const
+      -> std::vector<Order> final {
     auto orders = order_repository_->GetOrders();
 
-    auto response = Response200{};
-    response.orders.reserve(orders.size());
+    auto result = std::vector<Order>{};
+    result.reserve(orders.size());
     for (auto&& order : orders) {
       if (order->GetStatus().IsCompleted()) {
         continue;
       }
 
-      response.orders.emplace_back(
+      result.emplace_back(
           order->GetId().GetUnderlying(),
           Location{order->GetDeliveryLocation().GetX().GetUnderlying(),
                    order->GetDeliveryLocation().GetY().GetUnderlying()});
     }
 
-    return std::move(response);
+    return result;
   }
 
  private:

@@ -1,8 +1,6 @@
 #pragma once
 
 #include <string>
-#include <variant>
-#include <vector>
 
 // clang-format off
 namespace delivery::core::application::use_cases::queries::get_active_orders {
@@ -18,7 +16,7 @@ class Location final {
   [[nodiscard]] auto GetX() const noexcept -> int;
   [[nodiscard]] auto GetY() const noexcept -> int;
 
-  auto operator<=>(Location const&) const -> std::strong_ordering = default;
+  auto operator<=>(Location const&) const = default;
 };
 
 class Order final {
@@ -31,14 +29,8 @@ class Order final {
   [[nodiscard]] auto GetId() const noexcept -> std::string;
   [[nodiscard]] auto GetLocation() const noexcept -> Location;
 
-  auto operator<=>(Order const&) const -> std::strong_ordering = default;
+  auto operator<=>(Order const&) const = default;
 };
-
-struct Response200 {
-  std::vector<Order> orders;
-};
-
-using Response = std::variant<Response200>;
 
 // clang-format off
 }  // namespace delivery::core::application::use_cases::queries::get_active_orders

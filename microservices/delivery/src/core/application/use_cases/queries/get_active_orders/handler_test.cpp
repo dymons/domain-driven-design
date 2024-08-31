@@ -4,6 +4,9 @@
 #include <core/ports/order_repository/repository_mock.hpp>
 
 #include "handler.hpp"
+#include "ihandler.hpp"
+#include "query.hpp"
+#include "response.hpp"
 
 // clang-format off
 namespace delivery::core::application::use_cases::queries::get_active_orders {
@@ -56,12 +59,9 @@ UTEST_F(GetOrdersHandlerShould, ReturnOrders) {
 
   ASSERT_NO_THROW(([&, this]() {
     // Act
-    auto const response = get_orders_handler_->Handle(std::move(query));
+    auto orders = get_orders_handler_->Handle(std::move(query));
 
     // Assert
-    ASSERT_TRUE(std::holds_alternative<Response200>(response));
-
-    auto orders = std::get<Response200>(response).orders;
     auto expected_orders =
         std::vector<Order>{Order{kBasketIdOne, Location{1, 1}},
                            Order{kBasketIdTwo, Location{2, 2}},

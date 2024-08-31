@@ -5,6 +5,7 @@
 #include <userver/storages/postgres/component.hpp>
 
 #include <core/application/use_cases/queries/get_active_orders/handler.hpp>
+#include <core/application/use_cases/queries/get_active_orders/ihandler.hpp>
 #include <core/application/use_cases/queries/get_active_orders/query.hpp>
 #include <core/application/use_cases/queries/get_active_orders/response.hpp>
 #include <infrastructure/adapters/postgres/order_repository.hpp>
@@ -14,12 +15,13 @@ namespace delivery::api::adapters::http::api_v1_orders_active {
 namespace {
 
 auto MakeResponse(
-    core::application::use_cases::queries::get_active_orders::Response200 const&
-        response) -> userver::formats::json::Value {
+    std::vector<
+        core::application::use_cases::queries::get_active_orders::Order> const&
+        orders) -> userver::formats::json::Value {
   auto orders_builder = userver::formats::json::ValueBuilder{
       userver::formats::common::Type::kArray};
 
-  std::ranges::for_each(response.orders, [&](auto const& order) {
+  std::ranges::for_each(orders, [&](auto const& order) {
     auto order_builder = userver::formats::json::ValueBuilder{};
     order_builder["id"] = order.GetId();
     order_builder["location"]["x"] = order.GetLocation().GetX();
@@ -57,7 +59,7 @@ class Controller final : public userver::server::handlers::HttpHandlerJsonBase {
         core::application::use_cases::queries::get_active_orders::
             MakeGetActiveOrdersHandler(order_repository_);
 
-    return std::visit(MakeResponse, get_active_orders_handler->Handle({}));
+    return MakeResponse(get_active_orders_handler->Handle({}));
   }
 
  private:

@@ -1,6 +1,9 @@
 #include <userver/utest/utest.hpp>
 
 #include <core/application/use_cases/queries/get_active_orders/handler.hpp>
+#include <core/application/use_cases/queries/get_active_orders/ihandler.hpp>
+#include <core/application/use_cases/queries/get_active_orders/query.hpp>
+#include <core/application/use_cases/queries/get_active_orders/response.hpp>
 #include <core/domain/order/order.hpp>
 #include <core/ports/order_repository/repository_mock.hpp>
 
@@ -33,11 +36,8 @@ class CreateOrderHandlerShould : public ::testing::Test {
               mock_order_repository_);
 
   auto GetActiveOrders() -> std::vector<queries::get_active_orders::Order> {
-    auto response = get_orders_handler_->Handle(
+    return get_orders_handler_->Handle(
         queries::get_active_orders::GetActiveOrdersQuery{});
-    return std::get<queries::get_active_orders::Response200>(
-               std::move(response))
-        .orders;
   }
 };
 
