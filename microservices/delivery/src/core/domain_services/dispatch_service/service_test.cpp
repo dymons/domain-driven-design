@@ -21,8 +21,7 @@ UTEST(DispatchServiceShould, DispatchCourier) {
 
   // Assert
   ASSERT_TRUE(result.order->IsCourierAssigned());
-  ASSERT_EQ(result.order->GetCourierId(),
-            domain::order::CourierId{courier->GetId().GetUnderlying()});
+  ASSERT_EQ(result.order->GetCourierId(), courier->GetId());
 }
 
 UTEST(DispatchServiceShould, NotDispatchWhenNotReadyCouriers) {

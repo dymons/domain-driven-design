@@ -37,7 +37,7 @@ class CourierRepository final : public ICourierRepository {
     Add(raw_courier);
   }
 
-  auto GetById(domain::courier::CourierId const& courier_id) const
+  auto GetById(domain::CourierId const& courier_id) const
       -> MutableSharedRef<domain::courier::Courier> final {
     for (const auto& courier : couriers_) {
       if (courier->GetId() == courier_id) {
@@ -46,11 +46,6 @@ class CourierRepository final : public ICourierRepository {
     }
 
     userver::utils::LogErrorAndThrow<CourierNotFound>("");
-  }
-
-  auto GetById(domain::order::CourierId const& courier_id) const
-      -> MutableSharedRef<domain::courier::Courier> final {
-    return GetById(domain::courier::CourierId{courier_id.GetUnderlying()});
   }
 
   auto GetByReadyStatus() const
