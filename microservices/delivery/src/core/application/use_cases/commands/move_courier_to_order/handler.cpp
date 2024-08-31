@@ -7,9 +7,13 @@
 #include <utils/container.hpp>
 #include <utils/optional.hpp>
 
+#include "command.hpp"
+#include "ihandler.hpp"
+
 // clang-format off
 namespace delivery::core::application::use_cases::commands::move_courier_to_order {
 // clang-format on
+
 namespace {
 
 class MoveCourierToOrderHandler final : public IMoveCourierToOrderHandler {
@@ -19,8 +23,8 @@ class MoveCourierToOrderHandler final : public IMoveCourierToOrderHandler {
   MoveCourierToOrderHandler(
       SharedRef<core::ports::ICourierRepository> courier_repository,
       SharedRef<core::ports::IOrderRepository> order_repository)
-      : courier_repository_(std::move(courier_repository)),
-        order_repository_(std::move(order_repository)) {}
+      : courier_repository_{std::move(courier_repository)},
+        order_repository_{std::move(order_repository)} {}
 
   auto Handle(MoveCourierToOrderCommand&&) const -> void final {
     auto order = container::FirstOrNullopt(order_repository_->GetAssigned());
@@ -59,7 +63,7 @@ auto MakeAssignOrdersHandler(
     SharedRef<core::ports::ICourierRepository> courier_repository,
     SharedRef<core::ports::IOrderRepository> order_repository)
     -> SharedRef<IMoveCourierToOrderHandler> {
-  return userver::utils::MakeSharedRef<const MoveCourierToOrderHandler>(
+  return delivery::MakeSharedRef<MoveCourierToOrderHandler>(
       std::move(courier_repository), std::move(order_repository));
 }
 

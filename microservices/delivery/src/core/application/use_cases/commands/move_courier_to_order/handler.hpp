@@ -1,16 +1,10 @@
 #pragma once
 
+#include <core/ports/courier_repository/fwd.hpp>
+#include <core/ports/order_repository/fwd.hpp>
 #include <utils/memory.hpp>
 
-#include "ihandler.hpp"
-
-namespace delivery::core::ports {
-class IOrderRepository;
-}  // namespace delivery::core::ports
-
-namespace delivery::core::ports {
-class ICourierRepository;
-}  // namespace delivery::core::ports
+#include "fwd.hpp"
 
 // clang-format off
 namespace delivery::core::application::use_cases::commands::move_courier_to_order {
