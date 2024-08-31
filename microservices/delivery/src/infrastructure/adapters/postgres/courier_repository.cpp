@@ -53,7 +53,7 @@ class CourierRepository final : public core::ports::ICourierRepository {
     }
   }
 
-  auto GetById(core::domain::CourierId const& courier_id) const
+  [[nodiscard]] auto GetById(core::domain::CourierId const& courier_id) const
       -> MutableSharedRef<core::domain::courier::Courier> final try {
     auto const result =
         cluster_->Execute(userver::storages::postgres::ClusterHostType::kMaster,
@@ -68,17 +68,17 @@ class CourierRepository final : public core::ports::ICourierRepository {
     userver::utils::LogErrorAndThrow<core::ports::CourierNotFound>(ex.what());
   }
 
-  auto GetByReadyStatus() const -> std::unordered_set<
+  [[nodiscard]] auto GetByReadyStatus() const -> std::unordered_set<
       MutableSharedRef<core::domain::courier::Courier>> final {
     return GetByStatus(core::domain::courier::CourierStatus::kReady);
   }
 
-  auto GetByBusyStatus() const -> std::unordered_set<
+  [[nodiscard]] auto GetByBusyStatus() const -> std::unordered_set<
       MutableSharedRef<core::domain::courier::Courier>> final {
     return GetByStatus(core::domain::courier::CourierStatus::kBusy);
   }
 
-  auto GetCouriers() const -> std::unordered_set<
+  [[nodiscard]] auto GetCouriers() const -> std::unordered_set<
       MutableSharedRef<core::domain::courier::Courier>> final {
     auto const result = cluster_->Execute(
         userver::storages::postgres::ClusterHostType::kMaster,
@@ -98,7 +98,8 @@ class CourierRepository final : public core::ports::ICourierRepository {
   }
 
  private:
-  auto GetByStatus(core::domain::courier::CourierStatus status) const
+  [[nodiscard]] auto GetByStatus(
+      core::domain::courier::CourierStatus status) const
       -> std::unordered_set<MutableSharedRef<core::domain::courier::Courier>> {
     auto const result =
         cluster_->Execute(userver::storages::postgres::ClusterHostType::kMaster,
