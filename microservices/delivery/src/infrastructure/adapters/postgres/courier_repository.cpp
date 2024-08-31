@@ -17,7 +17,7 @@ class CourierRepository final : public core::ports::ICourierRepository {
   ~CourierRepository() final = default;
 
   explicit CourierRepository(userver::storages::postgres::ClusterPtr cluster)
-      : cluster_(std::move(cluster)) {}
+      : cluster_{std::move(cluster)} {}
 
   auto Add(SharedRef<core::domain::courier::Courier> const& courier) const
       -> void final {
@@ -125,8 +125,7 @@ class CourierRepository final : public core::ports::ICourierRepository {
 
 auto MakeCourierRepository(userver::storages::postgres::ClusterPtr cluster)
     -> SharedRef<core::ports::ICourierRepository> {
-  return userver::utils::MakeSharedRef<const CourierRepository>(
-      std::move(cluster));
+  return MakeSharedRef<CourierRepository>(std::move(cluster));
 }
 
 }  // namespace delivery::infrastructure::adapters::postgres
