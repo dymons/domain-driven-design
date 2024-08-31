@@ -1,6 +1,6 @@
 #include <userver/utest/utest.hpp>
 
-#include "courier_mock_test.hpp"
+#include "courier_mock.hpp"
 
 namespace delivery::core::domain::courier {
 

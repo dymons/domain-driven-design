@@ -1,6 +1,6 @@
 #include <userver/utest/utest.hpp>
 
-#include <core/domain/courier/courier_mock_test.hpp>
+#include <core/domain/courier/courier_mock.hpp>
 #include <core/domain/order/order_mock_test.hpp>
 
 #include "iservice.hpp"
