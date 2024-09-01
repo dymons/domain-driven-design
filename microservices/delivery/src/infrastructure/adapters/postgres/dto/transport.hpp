@@ -4,11 +4,7 @@
 
 #include <userver/storages/postgres/io/user_types.hpp>
 
-#include "weight.hpp"
-
-namespace delivery::core::domain::courier {
-class Transport;
-}  // namespace delivery::core::domain::courier
+#include <core/domain/courier/fwd.hpp>
 
 namespace delivery::infrastructure::adapters::postgres::dto {
 

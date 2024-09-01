@@ -2,9 +2,7 @@
 
 #include <userver/storages/postgres/io/user_types.hpp>
 
-namespace delivery::core::domain {
-class Weight;
-}  // namespace delivery::core::domain
+#include <core/domain/shared_kernel/weight/fwd.hpp>
 
 namespace delivery::infrastructure::adapters::postgres::dto {
 
