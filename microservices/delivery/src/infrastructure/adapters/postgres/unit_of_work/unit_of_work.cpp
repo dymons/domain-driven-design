@@ -7,15 +7,16 @@
 #include <infrastructure/adapters/postgres/courier_repository/repository.hpp>
 #include <infrastructure/adapters/postgres/order_repository/repository.hpp>
 
-#include "irun_transaction_context.hpp"
-#include "iunit_of_work.hpp"
+#include <core/ports/unit_of_work/irun_transaction_context.hpp>
+#include <core/ports/unit_of_work/iunit_of_work.hpp>
+
 #include "run_transaction_context.hpp"
 
 namespace delivery::infrastructure::adapters::postgres {
 
 namespace {
 
-class UnitOfWork final : public IUnitOfWork {
+class UnitOfWork final : public core::ports::IUnitOfWork {
  public:
   ~UnitOfWork() final = default;
 
@@ -23,8 +24,8 @@ class UnitOfWork final : public IUnitOfWork {
       : cluster_{std::move(cluster)} {}
 
   auto RunTransaction(
-      std::function<void(SharedRef<IRunTransactionContext>)> routine) const
-      -> void final {
+      std::function<void(SharedRef<core::ports::IRunTransactionContext>)>
+          routine) const -> void final {
     auto transaction = delivery::MakeMutableSharedRef<
         userver::storages::postgres::Transaction>(cluster_->Begin({}));
 
@@ -44,7 +45,7 @@ class UnitOfWork final : public IUnitOfWork {
 }  // namespace
 
 auto MakeUnitOfWork(userver::storages::postgres::ClusterPtr cluster)
-    -> SharedRef<IUnitOfWork> {
+    -> SharedRef<core::ports::IUnitOfWork> {
   return delivery::MakeSharedRef<UnitOfWork>(std::move(cluster));
 }
 

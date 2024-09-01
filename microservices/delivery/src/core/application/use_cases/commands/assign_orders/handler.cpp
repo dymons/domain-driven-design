@@ -5,6 +5,8 @@
 #include <core/domain_services/dispatch_service/iservice.hpp>
 #include <core/ports/courier_repository/irepository.hpp>
 #include <core/ports/order_repository/irepository.hpp>
+#include <core/ports/unit_of_work/irun_transaction_context.hpp>
+#include <core/ports/unit_of_work/iunit_of_work.hpp>
 #include <utils/container.hpp>
 #include <utils/optional.hpp>
 
@@ -22,9 +24,11 @@ class AssignOrdersHandler final : public IAssignOrdersHandler {
   AssignOrdersHandler(
       SharedRef<core::ports::ICourierRepository> courier_repository,
       SharedRef<core::ports::IOrderRepository> order_repository,
+      SharedRef<core::ports::IUnitOfWork> unit_of_work,
       SharedRef<core::domain_services::IDispatchService> dispatch_service)
       : courier_repository_{std::move(courier_repository)},
         order_repository_{std::move(order_repository)},
+        unit_of_work_{std::move(unit_of_work)},
         dispatch_service_{std::move(dispatch_service)} {}
 
   auto Handle(AssignOrdersCommand&&) const -> void final {
@@ -37,10 +41,11 @@ class AssignOrdersHandler final : public IAssignOrdersHandler {
             });
 
     optional::map(dispatch_view, [this](auto const& dispatch) {
-      // TODO (dymons) Use UnitOfWork
-      this->order_repository_->Update(dispatch.order);
-      optional::map(dispatch.courier, [this](auto const& courier) {
-        this->courier_repository_->Update(courier);
+      this->unit_of_work_->RunTransaction([&](const auto& context) {
+        context->GetOrderRepository()->Update(dispatch.order);
+        optional::map(dispatch.courier, [&](auto const& courier) {
+          context->GetCourierRepository()->Update(courier);
+        });
       });
     });
   }
@@ -48,6 +53,7 @@ class AssignOrdersHandler final : public IAssignOrdersHandler {
  private:
   SharedRef<core::ports::ICourierRepository> const courier_repository_;
   SharedRef<core::ports::IOrderRepository> const order_repository_;
+  SharedRef<core::ports::IUnitOfWork> const unit_of_work_;
   SharedRef<core::domain_services::IDispatchService> const dispatch_service_;
 };
 
@@ -56,11 +62,12 @@ class AssignOrdersHandler final : public IAssignOrdersHandler {
 auto MakeAssignOrdersHandler(
     SharedRef<core::ports::ICourierRepository> courier_repository,
     SharedRef<core::ports::IOrderRepository> order_repository,
+    SharedRef<core::ports::IUnitOfWork> unit_of_work,
     SharedRef<core::domain_services::IDispatchService> dispatch_service)
     -> SharedRef<IAssignOrdersHandler> {
   return delivery::MakeSharedRef<AssignOrdersHandler>(
       std::move(courier_repository), std::move(order_repository),
-      std::move(dispatch_service));
+      std::move(unit_of_work), std::move(dispatch_service));
 }
 
 }  // namespace delivery::core::application::use_cases::commands::assign_orders

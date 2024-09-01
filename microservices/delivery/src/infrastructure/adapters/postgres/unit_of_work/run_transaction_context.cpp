@@ -3,13 +3,13 @@
 #include <infrastructure/adapters/postgres/courier_repository/repository.hpp>
 #include <infrastructure/adapters/postgres/order_repository/repository.hpp>
 
-#include "irun_transaction_context.hpp"
+#include <core/ports/unit_of_work/irun_transaction_context.hpp>
 
 namespace delivery::infrastructure::adapters::postgres {
 
 namespace {
 
-class RunTransactionContext final : public IRunTransactionContext {
+class RunTransactionContext final : public core::ports::IRunTransactionContext {
  public:
   ~RunTransactionContext() final = default;
 
@@ -35,7 +35,7 @@ class RunTransactionContext final : public IRunTransactionContext {
 
 auto MakeRunTransactionContext(
     MutableSharedRef<userver::storages::postgres::Transaction> transaction)
-    -> SharedRef<IRunTransactionContext> {
+    -> SharedRef<core::ports::IRunTransactionContext> {
   return delivery::MakeSharedRef<RunTransactionContext>(std::move(transaction));
 }
 

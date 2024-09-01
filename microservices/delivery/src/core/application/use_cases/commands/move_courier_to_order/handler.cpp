@@ -4,6 +4,8 @@
 #include <core/domain/order/order.hpp>
 #include <core/ports/courier_repository/irepository.hpp>
 #include <core/ports/order_repository/irepository.hpp>
+#include <core/ports/unit_of_work/irun_transaction_context.hpp>
+#include <core/ports/unit_of_work/iunit_of_work.hpp>
 #include <utils/container.hpp>
 #include <utils/optional.hpp>
 
@@ -22,9 +24,11 @@ class MoveCourierToOrderHandler final : public IMoveCourierToOrderHandler {
 
   MoveCourierToOrderHandler(
       SharedRef<core::ports::ICourierRepository> courier_repository,
-      SharedRef<core::ports::IOrderRepository> order_repository)
+      SharedRef<core::ports::IOrderRepository> order_repository,
+      SharedRef<core::ports::IUnitOfWork> unit_of_work)
       : courier_repository_{std::move(courier_repository)},
-        order_repository_{std::move(order_repository)} {}
+        order_repository_{std::move(order_repository)},
+        unit_of_work_{std::move(unit_of_work)} {}
 
   auto Handle(MoveCourierToOrderCommand&&) const -> void final {
     auto order = container::FirstOrNullopt(order_repository_->GetAssigned());
@@ -45,9 +49,10 @@ class MoveCourierToOrderHandler final : public IMoveCourierToOrderHandler {
           courier->CompleteOrder();
         }
 
-        // TODO (dymons) Use UnitOfWork
-        this->order_repository_->Update(order);
-        this->courier_repository_->Update(courier);
+        this->unit_of_work_->RunTransaction([&](const auto& context) {
+          context->GetOrderRepository()->Update(order);
+          context->GetCourierRepository()->Update(courier);
+        });
       });
     });
   }
@@ -55,16 +60,19 @@ class MoveCourierToOrderHandler final : public IMoveCourierToOrderHandler {
  private:
   SharedRef<core::ports::ICourierRepository> const courier_repository_;
   SharedRef<core::ports::IOrderRepository> const order_repository_;
+  SharedRef<core::ports::IUnitOfWork> const unit_of_work_;
 };
 
 }  // namespace
 
 auto MakeAssignOrdersHandler(
     SharedRef<core::ports::ICourierRepository> courier_repository,
-    SharedRef<core::ports::IOrderRepository> order_repository)
+    SharedRef<core::ports::IOrderRepository> order_repository,
+    SharedRef<core::ports::IUnitOfWork> unit_of_work)
     -> SharedRef<IMoveCourierToOrderHandler> {
   return delivery::MakeSharedRef<MoveCourierToOrderHandler>(
-      std::move(courier_repository), std::move(order_repository));
+      std::move(courier_repository), std::move(order_repository),
+      std::move(unit_of_work));
 }
 
 // clang-format off

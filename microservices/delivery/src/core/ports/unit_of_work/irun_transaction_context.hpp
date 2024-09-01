@@ -7,7 +7,7 @@
 
 #include "fwd.hpp"
 
-namespace delivery::infrastructure::adapters::postgres {
+namespace delivery::core::ports {
 
 class IRunTransactionContext : private NonCopyableAndMoveable {
  public:
@@ -20,4 +20,4 @@ class IRunTransactionContext : private NonCopyableAndMoveable {
       -> SharedRef<core::ports::IOrderRepository> = 0;
 };
 
-}  // namespace delivery::infrastructure::adapters::postgres
+}  // namespace delivery::core::ports
