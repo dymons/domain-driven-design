@@ -12,9 +12,14 @@ namespace delivery::core::application::use_cases::queries::get_couriers {
 namespace {
 
 Courier ConvertCourier(SharedRef<domain::courier::Courier> const& courier) {
-  return {courier->GetId().GetUnderlying(), courier->GetName().GetUnderlying(),
-          Location{courier->GetCurrentLocation().GetX().GetUnderlying(),
-                   courier->GetCurrentLocation().GetY().GetUnderlying()}};
+  return {
+      .id = courier->GetId().GetUnderlying(),
+      .name = courier->GetName().GetUnderlying(),
+      .location{
+          .x = courier->GetCurrentLocation().GetX().GetUnderlying(),
+          .y = courier->GetCurrentLocation().GetY().GetUnderlying(),
+      },
+  };
 }
 
 class GetCouriersHandler final : public IGetCouriersHandler {

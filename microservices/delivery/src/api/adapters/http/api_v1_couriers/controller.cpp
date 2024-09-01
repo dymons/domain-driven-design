@@ -23,10 +23,10 @@ auto MakeResponse(
 
   std::ranges::for_each(couriers, [&](auto const& courier) {
     auto courier_builder = userver::formats::json::ValueBuilder{};
-    courier_builder["id"] = courier.GetId();
-    courier_builder["name"] = courier.GetName();
-    courier_builder["location"]["x"] = courier.GetLocation().GetX();
-    courier_builder["location"]["y"] = courier.GetLocation().GetY();
+    courier_builder["id"] = courier.id;
+    courier_builder["name"] = courier.name;
+    courier_builder["location"]["x"] = courier.location.x;
+    courier_builder["location"]["y"] = courier.location.y;
     couriers_builder.PushBack(courier_builder.ExtractValue());
   });
 
