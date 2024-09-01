@@ -2,7 +2,7 @@
 
 namespace delivery::infrastructure::adapters::postgres::sql {
 
-const std::string kAddOrder = R"~(
+const userver::storages::postgres::Query kAddOrder = R"~(
   INSERT INTO
     delivery.orders
   (
@@ -24,7 +24,7 @@ const std::string kAddOrder = R"~(
   RETURNING id
 )~";
 
-const std::string kUpdateOrder = R"~(
+const userver::storages::postgres::Query kUpdateOrder = R"~(
   UPDATE
     delivery.orders
   SET
@@ -37,7 +37,7 @@ const std::string kUpdateOrder = R"~(
     id = $1
 )~";
 
-const std::string kGetOrderById = R"~(
+const userver::storages::postgres::Query kGetOrderById = R"~(
   SELECT
     id,
     status,
@@ -50,7 +50,7 @@ const std::string kGetOrderById = R"~(
     id = $1
 )~";
 
-const std::string kGetOrdersExcludeByStatus = R"~(
+const userver::storages::postgres::Query kGetOrdersExcludeByStatus = R"~(
   SELECT
     id,
     status,
@@ -63,7 +63,7 @@ const std::string kGetOrdersExcludeByStatus = R"~(
     status != $1
 )~";
 
-const std::string kGetOrdersByStatus = R"~(
+const userver::storages::postgres::Query kGetOrdersByStatus = R"~(
   SELECT
     id,
     status,
@@ -76,7 +76,7 @@ const std::string kGetOrdersByStatus = R"~(
     status = $1
 )~";
 
-const std::string kGetOrders = R"~(
+const userver::storages::postgres::Query kGetOrders = R"~(
   SELECT
     id,
     status,

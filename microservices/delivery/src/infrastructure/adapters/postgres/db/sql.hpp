@@ -1,14 +1,14 @@
 #pragma once
 
-#include <string>
+#include <userver/storages/postgres/query.hpp>
 
 namespace delivery::infrastructure::adapters::postgres::sql {
 
-extern const std::string kAddOrder;
-extern const std::string kUpdateOrder;
-extern const std::string kGetOrderById;
-extern const std::string kGetOrdersExcludeByStatus;
-extern const std::string kGetOrdersByStatus;
-extern const std::string kGetOrders;
+extern const userver::storages::postgres::Query kAddOrder;
+extern const userver::storages::postgres::Query kUpdateOrder;
+extern const userver::storages::postgres::Query kGetOrderById;
+extern const userver::storages::postgres::Query kGetOrdersExcludeByStatus;
+extern const userver::storages::postgres::Query kGetOrdersByStatus;
+extern const userver::storages::postgres::Query kGetOrders;
 
 }  // namespace delivery::infrastructure::adapters::postgres::sql
