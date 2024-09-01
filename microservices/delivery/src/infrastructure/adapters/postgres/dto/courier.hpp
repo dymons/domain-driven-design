@@ -26,5 +26,6 @@ struct Courier final {
 auto Convert(SharedRef<core::domain::courier::Courier> const&) -> Courier;
 auto Convert(Courier const&)
     -> MutableSharedRef<core::domain::courier::Courier>;
+auto Convert(Courier&&) -> MutableSharedRef<core::domain::courier::Courier>;
 
 }  // namespace delivery::infrastructure::adapters::postgres::dto

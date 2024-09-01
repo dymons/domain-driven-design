@@ -20,4 +20,11 @@ auto Convert(Transport const& transport) -> core::domain::courier::Transport {
       core::domain::courier::Speed{transport.speed}, transport.capacity);
 }
 
+auto Convert(Transport&& transport) -> core::domain::courier::Transport {
+  return core::domain::courier::Transport::Hydrate(
+      core::domain::courier::TransportId{transport.id},
+      core::domain::courier::TransportName{std::move(transport.name)},
+      core::domain::courier::Speed{transport.speed}, transport.capacity);
+}
+
 }  // namespace delivery::infrastructure::adapters::postgres::dto

@@ -27,6 +27,7 @@ struct Order final {
 
 auto Convert(SharedRef<core::domain::order::Order> const&) -> Order;
 auto Convert(Order const&) -> MutableSharedRef<core::domain::order::Order>;
+auto Convert(Order&&) -> MutableSharedRef<core::domain::order::Order>;
 
 }  // namespace delivery::infrastructure::adapters::postgres::dto
 

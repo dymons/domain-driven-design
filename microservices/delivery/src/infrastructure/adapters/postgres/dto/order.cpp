@@ -22,4 +22,12 @@ auto Convert(Order const& order)
       dto::Convert(order.weight));
 }
 
+auto Convert(Order&& order) -> MutableSharedRef<core::domain::order::Order> {
+  return core::domain::order::Order::Hydrate(
+      std::move(order.id),
+      core::domain::order::OrderStatus::FromString(std::move(order.status)),
+      std::move(order.courier_id), dto::Convert(order.delivery_location),
+      dto::Convert(order.weight));
+}
+
 }  // namespace delivery::infrastructure::adapters::postgres::dto

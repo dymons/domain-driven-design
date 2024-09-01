@@ -21,6 +21,7 @@ struct Transport {
 
 auto Convert(core::domain::courier::Transport const&) -> Transport;
 auto Convert(Transport const&) -> core::domain::courier::Transport;
+auto Convert(Transport&&) -> core::domain::courier::Transport;
 
 }  // namespace delivery::infrastructure::adapters::postgres::dto
 

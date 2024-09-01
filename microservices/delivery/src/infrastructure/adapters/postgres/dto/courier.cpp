@@ -24,4 +24,15 @@ auto Convert(Courier const& courier)
       core::domain::courier::CourierStatus::FromString(courier.status));
 }
 
+auto Convert(Courier&& courier)
+    -> MutableSharedRef<core::domain::courier::Courier> {
+  return core::domain::courier::Courier::Hydrate(
+      core::domain::CourierId{std::move(courier.id)},
+      core::domain::courier::CourierName{std::move(courier.name)},
+      dto::Convert(std::move(courier.transport)),
+      dto::Convert(courier.current_location),
+      core::domain::courier::CourierStatus::FromString(
+          std::move(courier.status)));
+}
+
 }  // namespace delivery::infrastructure::adapters::postgres::dto
