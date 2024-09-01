@@ -8,7 +8,7 @@
 #include <core/application/use_cases/queries/get_active_orders/ihandler.hpp>
 #include <core/application/use_cases/queries/get_active_orders/query.hpp>
 #include <core/application/use_cases/queries/get_active_orders/response.hpp>
-#include <infrastructure/adapters/postgres/order_repository.hpp>
+#include <infrastructure/adapters/postgres/order_repository/repository.hpp>
 
 namespace delivery::api::adapters::http::api_v1_orders_active {
 

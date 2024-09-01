@@ -11,10 +11,4 @@ extern const userver::storages::postgres::Query kGetOrdersExcludeByStatus;
 extern const userver::storages::postgres::Query kGetOrdersByStatus;
 extern const userver::storages::postgres::Query kGetOrders;
 
-extern const userver::storages::postgres::Query kAddCourier;
-extern const userver::storages::postgres::Query kUpdateCourier;
-extern const userver::storages::postgres::Query kGetCourierById;
-extern const userver::storages::postgres::Query kGetCouriers;
-extern const userver::storages::postgres::Query kGetCouriersByStatus;
-
 }  // namespace delivery::infrastructure::adapters::postgres::sql

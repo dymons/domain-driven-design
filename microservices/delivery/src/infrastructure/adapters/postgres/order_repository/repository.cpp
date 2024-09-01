@@ -1,4 +1,4 @@
-#include "order_repository.hpp"
+#include "repository.hpp"
 
 #include <userver/storages/postgres/cluster.hpp>
 #include <userver/utils/exception.hpp>

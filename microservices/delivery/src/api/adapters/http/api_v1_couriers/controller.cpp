@@ -8,7 +8,7 @@
 #include <core/application/use_cases/queries/get_couriers/ihandler.hpp>
 #include <core/application/use_cases/queries/get_couriers/query.hpp>
 #include <core/application/use_cases/queries/get_couriers/response.hpp>
-#include <infrastructure/adapters/postgres/courier_repository.hpp>
+#include <infrastructure/adapters/postgres/courier_repository/repository.hpp>
 
 namespace delivery::api::adapters::http::api_v1_couriers {
 

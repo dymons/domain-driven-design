@@ -8,7 +8,7 @@
 #include <core/application/use_cases/commands/create_order/command.hpp>
 #include <core/application/use_cases/commands/create_order/handler.hpp>
 #include <core/application/use_cases/commands/create_order/ihandler.hpp>
-#include <infrastructure/adapters/postgres/order_repository.hpp>
+#include <infrastructure/adapters/postgres/order_repository/repository.hpp>
 
 #include "request.hpp"
 

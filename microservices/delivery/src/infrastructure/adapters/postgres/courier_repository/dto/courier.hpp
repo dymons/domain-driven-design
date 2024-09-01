@@ -5,9 +5,9 @@
 #include <core/domain/courier/fwd.hpp>
 #include <core/domain/courier/strong_typedefs.hpp>
 #include <core/domain/shared_kernel/strong_typedefs.hpp>
+#include <infrastructure/adapters/postgres/shared_kernel/dto/location.hpp>
 #include <utils/memory.hpp>
 
-#include "location.hpp"
 #include "transport.hpp"
 
 namespace delivery::infrastructure::adapters::postgres::dto {

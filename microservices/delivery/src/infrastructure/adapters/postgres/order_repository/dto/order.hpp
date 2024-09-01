@@ -7,10 +7,9 @@
 #include <core/domain/order/fwd.hpp>
 #include <core/domain/order/strong_typedefs.hpp>
 #include <core/domain/shared_kernel/strong_typedefs.hpp>
+#include <infrastructure/adapters/postgres/shared_kernel/dto/location.hpp>
+#include <infrastructure/adapters/postgres/shared_kernel/dto/weight.hpp>
 #include <utils/memory.hpp>
-
-#include "location.hpp"
-#include "weight.hpp"
 
 namespace delivery::infrastructure::adapters::postgres::dto {
 
