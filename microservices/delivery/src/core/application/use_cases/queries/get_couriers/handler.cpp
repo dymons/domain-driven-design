@@ -11,6 +11,12 @@ namespace delivery::core::application::use_cases::queries::get_couriers {
 
 namespace {
 
+Courier ConvertCourier(SharedRef<domain::courier::Courier> const& courier) {
+  return {courier->GetId().GetUnderlying(), courier->GetName().GetUnderlying(),
+          Location{courier->GetCurrentLocation().GetX().GetUnderlying(),
+                   courier->GetCurrentLocation().GetY().GetUnderlying()}};
+}
+
 class GetCouriersHandler final : public IGetCouriersHandler {
  public:
   ~GetCouriersHandler() final = default;
@@ -29,11 +35,8 @@ class GetCouriersHandler final : public IGetCouriersHandler {
 
     auto result = std::vector<Courier>{};
     result.reserve(couriers.size());
-    for (auto&& courier : couriers) {
-      result.emplace_back(
-          courier->GetId().GetUnderlying(), courier->GetName().GetUnderlying(),
-          Location{courier->GetCurrentLocation().GetX().GetUnderlying(),
-                   courier->GetCurrentLocation().GetY().GetUnderlying()});
+    for (auto const& courier : couriers) {
+      result.emplace_back(ConvertCourier(courier));
     }
 
     return result;
