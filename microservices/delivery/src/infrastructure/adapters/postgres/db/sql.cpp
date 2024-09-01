@@ -37,4 +37,17 @@ const std::string kUpdateOrder = R"~(
     id = $1
 )~";
 
+const std::string kGetOrderById = R"~(
+  SELECT
+    id,
+    status,
+    courier_id,
+    delivery_location,
+    weight
+  FROM
+    delivery.orders
+  WHERE
+    id = $1
+)~";
+
 }  // namespace delivery::infrastructure::adapters::postgres::sql

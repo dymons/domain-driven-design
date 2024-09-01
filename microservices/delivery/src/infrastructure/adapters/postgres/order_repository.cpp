@@ -58,12 +58,9 @@ class OrderRepository final : public core::ports::IOrderRepository {
 
   [[nodiscard]] auto GetById(core::domain::order::OrderId const& order_id) const
       -> MutableSharedRef<core::domain::order::Order> final try {
-    auto const result = cluster_->Execute(
-        userver::storages::postgres::ClusterHostType::kMaster,
-        "SELECT id, status, courier_id, delivery_location, weight"
-        "FROM delivery.orders"
-        "WHERE id = $1",
-        order_id.GetUnderlying());
+    auto const result =
+        cluster_->Execute(userver::storages::postgres::ClusterHostType::kMaster,
+                          sql::kGetOrderById, order_id.GetUnderlying());
 
     return dto::Convert(
         result.AsSingleRow<dto::Order>(userver::storages::postgres::kRowTag));
