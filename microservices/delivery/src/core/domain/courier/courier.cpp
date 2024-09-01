@@ -61,14 +61,14 @@ auto Courier::MoveTo(Location const to_location) -> void {
   }
 
   auto new_y = current_location_.GetY();
-  if (new_y != to_location.GetY() && cruise_range > 0) {
+  if (new_y != to_location.GetY() and (cruise_range > 0)) {
     new_y =
         YCoord{std::min(current_location_.GetY().GetUnderlying() + cruise_range,
                         to_location.GetY().GetUnderlying())};
   }
 
   auto reached_location = Location{new_x, new_y};
-  if (status_.IsBusy() && reached_location == to_location) {
+  if (status_.IsBusy() and (reached_location == to_location)) {
     status_ = CourierStatus::kReady;
   }
 
