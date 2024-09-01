@@ -5,6 +5,7 @@
 
 #include <core/domain/order/order.hpp>
 #include <core/ports/order_repository/irepository.hpp>
+#include <utils/ranges.hpp>
 
 #include "db/sql.hpp"
 #include "dto/order.hpp"
@@ -12,6 +13,13 @@
 namespace delivery::infrastructure::adapters::postgres {
 
 namespace {
+
+auto FromRecords(std::vector<dto::Order>&& records) {
+  return std::move(records) | std::views::transform([](auto&& record) {
+           return dto::Convert(std::move(record));
+         }) |
+         ranges::to<std::vector>();
+}
 
 class OrderRepository final : public core::ports::IOrderRepository {
  public:
@@ -75,14 +83,7 @@ class OrderRepository final : public core::ports::IOrderRepository {
         "WHERE status != $1",
         core::domain::order::OrderStatus::kAssigned.ToString());
 
-    auto const records = result.AsContainer<std::vector<dto::Order>>();
-    auto orders = std::vector<MutableSharedRef<core::domain::order::Order>>{};
-    orders.reserve(records.size());
-    std::ranges::transform(
-        records, std::back_inserter(orders),
-        [](auto const& record) { return dto::Convert(record); });
-
-    return orders;
+    return FromRecords(result.AsContainer<std::vector<dto::Order>>());
   }
 
   [[nodiscard]] auto GetAssigned() const
@@ -94,14 +95,7 @@ class OrderRepository final : public core::ports::IOrderRepository {
         "WHERE status = $1",
         core::domain::order::OrderStatus::kAssigned.ToString());
 
-    auto const records = result.AsContainer<std::vector<dto::Order>>();
-    auto orders = std::vector<MutableSharedRef<core::domain::order::Order>>{};
-    orders.reserve(records.size());
-    std::ranges::transform(
-        records, std::back_inserter(orders),
-        [](auto const& record) { return dto::Convert(record); });
-
-    return orders;
+    return FromRecords(result.AsContainer<std::vector<dto::Order>>());
   }
 
   [[nodiscard]] auto GetOrders() const
@@ -111,15 +105,9 @@ class OrderRepository final : public core::ports::IOrderRepository {
         "SELECT id, status, courier_id, delivery_location, weight "
         "FROM delivery.orders");
 
-    auto const records = result.AsContainer<std::vector<dto::Order>>(
+    auto records = result.AsContainer<std::vector<dto::Order>>(
         userver::storages::postgres::RowTag{});
-    auto orders = std::vector<MutableSharedRef<core::domain::order::Order>>{};
-    orders.reserve(records.size());
-    std::ranges::transform(
-        records, std::back_inserter(orders),
-        [](auto const& record) { return dto::Convert(record); });
-
-    return orders;
+    return FromRecords(std::move(records));
   };
 
  private:
