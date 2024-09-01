@@ -13,6 +13,13 @@ namespace delivery::infrastructure::adapters::postgres {
 
 namespace {
 
+auto FromRecords(std::vector<dto::Courier>&& records) {
+  return std::move(records) | std::views::transform([](auto&& record) {
+           return dto::Convert(std::move(record));
+         }) |
+         ranges::to<std::vector>();
+}
+
 class CourierRepository final : public core::ports::ICourierRepository {
  public:
   ~CourierRepository() final = default;
@@ -86,12 +93,9 @@ class CourierRepository final : public core::ports::ICourierRepository {
         "SELECT id, name, status, transport, current_location "
         "FROM delivery.couriers");
 
-    auto const records = result.AsContainer<std::vector<dto::Courier>>(
+    auto records = result.AsContainer<std::vector<dto::Courier>>(
         userver::storages::postgres::RowTag{});
-    return records | std::views::transform([](const auto& record) {
-             return dto::Convert(record);
-           }) |
-           ranges::to<std::vector>();
+    return FromRecords(std::move(records));
   }
 
  private:
@@ -104,11 +108,8 @@ class CourierRepository final : public core::ports::ICourierRepository {
                           "WHERE status = $1",
                           status.ToString());
 
-    auto const records = result.AsContainer<std::vector<dto::Courier>>();
-    return records | std::views::transform([](const auto& record) {
-             return dto::Convert(record);
-           }) |
-           ranges::to<std::vector>();
+    auto records = result.AsContainer<std::vector<dto::Courier>>();
+    return FromRecords(std::move(records));
   }
 
   userver::storages::postgres::ClusterPtr const cluster_;
