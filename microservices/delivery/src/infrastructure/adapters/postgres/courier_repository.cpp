@@ -7,6 +7,7 @@
 #include <core/ports/courier_repository/irepository.hpp>
 #include <utils/ranges.hpp>
 
+#include "db/sql.hpp"
 #include "dto/courier.hpp"
 
 namespace delivery::infrastructure::adapters::postgres {
@@ -30,13 +31,10 @@ class CourierRepository final : public core::ports::ICourierRepository {
   auto Add(SharedRef<core::domain::courier::Courier> const& courier) const
       -> void final {
     auto const record = dto::Convert(courier);
-    auto const result =
-        cluster_->Execute(userver::storages::postgres::ClusterHostType::kMaster,
-                          "INSERT INTO delivery.couriers"
-                          "(id, name, transport, current_location, status)"
-                          "VALUES ($1, $2, $3, $4, $5)",
-                          record.id, record.name, record.transport,
-                          record.current_location, record.status);
+    auto const result = cluster_->Execute(
+        userver::storages::postgres::ClusterHostType::kMaster, sql::kAddCourier,
+        record.id, record.name, record.transport, record.current_location,
+        record.status);
 
     if (result.IsEmpty()) {
       userver::utils::LogErrorAndThrow<core::ports::CourierAlreadyExists>(
@@ -49,11 +47,8 @@ class CourierRepository final : public core::ports::ICourierRepository {
     auto const record = dto::Convert(courier);
     auto const result = cluster_->Execute(
         userver::storages::postgres::ClusterHostType::kMaster,
-        "UPDATE delivery.couriers"
-        "SET id=$1, name=$2, transport=$3, current_location=$4, status=$5"
-        "WHERE id = $1",
-        record.id, record.name, record.transport, record.current_location,
-        record.status);
+        sql::kUpdateCourier, record.id, record.name, record.transport,
+        record.current_location, record.status);
 
     if (result.IsEmpty()) {
       userver::utils::LogErrorAndThrow<core::ports::CourierNotFound>(
@@ -65,10 +60,7 @@ class CourierRepository final : public core::ports::ICourierRepository {
       -> MutableSharedRef<core::domain::courier::Courier> final try {
     auto const result =
         cluster_->Execute(userver::storages::postgres::ClusterHostType::kMaster,
-                          "SELECT id, name, transport, current_location, status"
-                          "FROM delivery.couriers"
-                          "WHERE id = $1",
-                          courier_id.GetUnderlying());
+                          sql::kGetCourierById, courier_id.GetUnderlying());
 
     return dto::Convert(
         result.AsSingleRow<dto::Courier>(userver::storages::postgres::kRowTag));
@@ -88,10 +80,9 @@ class CourierRepository final : public core::ports::ICourierRepository {
 
   [[nodiscard]] auto GetCouriers() const
       -> std::vector<MutableSharedRef<core::domain::courier::Courier>> final {
-    auto const result = cluster_->Execute(
-        userver::storages::postgres::ClusterHostType::kMaster,
-        "SELECT id, name, status, transport, current_location "
-        "FROM delivery.couriers");
+    auto const result =
+        cluster_->Execute(userver::storages::postgres::ClusterHostType::kMaster,
+                          sql::kGetCouriers);
 
     auto records = result.AsContainer<std::vector<dto::Courier>>(
         userver::storages::postgres::RowTag{});
@@ -99,14 +90,12 @@ class CourierRepository final : public core::ports::ICourierRepository {
   }
 
  private:
-  [[nodiscard]] auto GetByStatus(core::domain::courier::CourierStatus status)
-      const -> std::vector<MutableSharedRef<core::domain::courier::Courier>> {
+  [[nodiscard]] auto GetByStatus(
+      core::domain::courier::CourierStatus const status) const
+      -> std::vector<MutableSharedRef<core::domain::courier::Courier>> {
     auto const result =
         cluster_->Execute(userver::storages::postgres::ClusterHostType::kMaster,
-                          "SELECT id, name, transport, current_location, status"
-                          "FROM delivery.couriers"
-                          "WHERE status = $1",
-                          status.ToString());
+                          sql::kGetCouriersByStatus, status.ToString());
 
     auto records = result.AsContainer<std::vector<dto::Courier>>();
     return FromRecords(std::move(records));
