@@ -1,5 +1,8 @@
 #include "repository_mock.hpp"
 
+#include <algorithm>
+#include <ranges>
+
 #include <userver/utils/exception.hpp>
 
 #include <core/domain/courier/courier.hpp>
@@ -18,21 +21,23 @@ class CourierRepository final : public ICourierRepository {
       std::vector<MutableSharedRef<domain::courier::Courier>> couriers)
       : couriers_{std::move(couriers)} {}
 
-  auto Add(SharedRef<domain::courier::Courier> const& courier) const
+  auto Add(SharedRef<domain::courier::Courier> const& new_courier) const
       -> void final {
-    for (const auto& courier : couriers_) {
-      if (courier->GetId() == courier->GetId()) {
-        userver::utils::LogErrorAndThrow<CourierAlreadyExists>("");
-      }
+    auto const is_courier_already_exists = std::ranges::any_of(
+        couriers_,
+        [&](const auto& courier) { return *courier == *new_courier; });
+
+    if (is_courier_already_exists) {
+      userver::utils::LogErrorAndThrow<CourierAlreadyExists>("");
     }
 
     couriers_.push_back(
-        MakeMutableSharedRef<domain::courier::Courier>(*courier));
+        MakeMutableSharedRef<domain::courier::Courier>(*new_courier));
   }
 
   auto Update(SharedRef<domain::courier::Courier> const& new_courier) const
       -> void final {
-    auto it = std::ranges::find_if(couriers_, [&](const auto& courier) {
+    auto const it = std::ranges::find_if(couriers_, [&](const auto& courier) {
       return courier->GetId() == new_courier->GetId();
     });
 

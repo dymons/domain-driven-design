@@ -1,8 +1,13 @@
 #include "repository_mock.hpp"
 
+#include <algorithm>
+#include <ranges>
+
 #include <userver/utils/exception.hpp>
 
 #include <core/domain/order/order.hpp>
+
+#include "irepository.hpp"
 
 namespace delivery::core::ports {
 
@@ -13,30 +18,32 @@ class OrderRepository final : public IOrderRepository {
   ~OrderRepository() final = default;
 
   explicit OrderRepository(
-      std::unordered_set<MutableSharedRef<domain::order::Order>> orders)
+      std::vector<MutableSharedRef<domain::order::Order>> orders)
       : orders_{std::move(orders)} {}
 
-  auto Add(SharedRef<core::domain::order::Order> const& order) const
+  auto Add(SharedRef<core::domain::order::Order> const& new_order) const
       -> void final {
-    auto raw_order = MakeMutableSharedRef<domain::order::Order>(*order);
-    for (const auto& o : orders_) {
-      if (o->GetId() == raw_order->GetId()) {
-        userver::utils::LogErrorAndThrow<OrderAlreadyExists>("");
-      }
+    auto const is_order_already_exists = std::ranges::any_of(
+        orders_, [&](const auto& order) { return *order == *new_order; });
+
+    if (is_order_already_exists) {
+      userver::utils::LogErrorAndThrow<OrderAlreadyExists>("");
     }
 
-    orders_.insert(raw_order);
+    orders_.push_back(MakeMutableSharedRef<domain::order::Order>(*new_order));
   }
 
-  auto Update(SharedRef<core::domain::order::Order> const& order) const
+  auto Update(SharedRef<core::domain::order::Order> const& new_order) const
       -> void final {
-    auto raw_order = MakeMutableSharedRef<domain::order::Order>(*order);
-    if (not orders_.contains(raw_order)) {
-      userver::utils::LogErrorAndThrow<OrderNotFound>("");
+    auto const it = std::ranges::find_if(orders_, [&](const auto& order) {
+      return order->GetId() == new_order->GetId();
+    });
+
+    if (it == orders_.end()) {
+      userver::utils::LogErrorAndThrow<OrderAlreadyExists>("");
     }
 
-    orders_.erase(raw_order);
-    Add(raw_order);
+    *it = MakeMutableSharedRef<domain::order::Order>(*new_order);
   }
 
   auto GetById(core::domain::order::OrderId const& order_id) const
@@ -82,13 +89,13 @@ class OrderRepository final : public IOrderRepository {
   };
 
  private:
-  mutable std::unordered_set<MutableSharedRef<domain::order::Order>> orders_;
+  mutable std::vector<MutableSharedRef<domain::order::Order>> orders_;
 };
 
 }  // namespace
 
 auto MockOrderRepository(
-    std::unordered_set<MutableSharedRef<domain::order::Order>> orders)
+    std::vector<MutableSharedRef<domain::order::Order>> orders)
     -> SharedRef<IOrderRepository> {
   return delivery::MakeSharedRef<OrderRepository>(std::move(orders));
 }

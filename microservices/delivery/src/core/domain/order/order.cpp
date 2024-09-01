@@ -39,6 +39,10 @@ auto Order::IsCourierAssigned() const noexcept -> bool {
   return courier_id_.has_value();
 }
 
+auto Order::operator==(const Order& that) const -> bool {
+  return this->GetId() == that.GetId();
+}
+
 auto Order::AssignCourier(CourierId const& courier_id) -> void {
   status_ = OrderStatus::kAssigned;
   courier_id_ = courier_id;

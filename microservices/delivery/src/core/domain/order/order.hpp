@@ -47,6 +47,8 @@ class Order {
   [[nodiscard]] auto GetWeight() const noexcept -> Weight;
   [[nodiscard]] auto IsCourierAssigned() const noexcept -> bool;
 
+  [[nodiscard]] auto operator==(const Order&) const -> bool;
+
   // Modifiers
 
   auto AssignCourier(CourierId const&) -> void;

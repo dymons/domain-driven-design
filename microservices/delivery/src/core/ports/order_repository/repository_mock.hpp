@@ -1,13 +1,16 @@
 #pragma once
 
-#include <unordered_set>
+#include <vector>
 
-#include "irepository.hpp"
+#include <core/domain/order/fwd.hpp>
+#include <utils/memory.hpp>
+
+#include "fwd.hpp"
 
 namespace delivery::core::ports {
 
 [[nodiscard]] auto MockOrderRepository(
-    std::unordered_set<MutableSharedRef<domain::order::Order>> = {})
+    std::vector<MutableSharedRef<domain::order::Order>> = {})
     -> SharedRef<IOrderRepository>;
 
 }  // namespace delivery::core::ports
