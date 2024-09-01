@@ -72,9 +72,7 @@ class OrderRepository final : public core::ports::IOrderRepository {
       -> std::vector<MutableSharedRef<core::domain::order::Order>> final {
     auto const result = cluster_->Execute(
         userver::storages::postgres::ClusterHostType::kMaster,
-        "SELECT id, status, courier_id, delivery_location, weight"
-        "FROM delivery.orders"
-        "WHERE status != $1",
+        sql::kGetOrdersExcludeByStatus,
         core::domain::order::OrderStatus::kAssigned.ToString());
 
     return FromRecords(result.AsContainer<std::vector<dto::Order>>());
@@ -84,9 +82,7 @@ class OrderRepository final : public core::ports::IOrderRepository {
       -> std::vector<MutableSharedRef<core::domain::order::Order>> final {
     auto const result = cluster_->Execute(
         userver::storages::postgres::ClusterHostType::kMaster,
-        "SELECT id, status, courier_id, delivery_location, weight"
-        "FROM delivery.orders"
-        "WHERE status = $1",
+        sql::kGetOrdersByStatus,
         core::domain::order::OrderStatus::kAssigned.ToString());
 
     return FromRecords(result.AsContainer<std::vector<dto::Order>>());
@@ -95,9 +91,7 @@ class OrderRepository final : public core::ports::IOrderRepository {
   [[nodiscard]] auto GetOrders() const
       -> std::vector<MutableSharedRef<core::domain::order::Order>> final {
     auto const result = cluster_->Execute(
-        userver::storages::postgres::ClusterHostType::kMaster,
-        "SELECT id, status, courier_id, delivery_location, weight "
-        "FROM delivery.orders");
+        userver::storages::postgres::ClusterHostType::kMaster, sql::kGetOrders);
 
     auto records = result.AsContainer<std::vector<dto::Order>>(
         userver::storages::postgres::RowTag{});

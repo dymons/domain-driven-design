@@ -50,4 +50,41 @@ const std::string kGetOrderById = R"~(
     id = $1
 )~";
 
+const std::string kGetOrdersExcludeByStatus = R"~(
+  SELECT
+    id,
+    status,
+    courier_id,
+    delivery_location,
+    weight
+  FROM
+    delivery.orders
+  WHERE
+    status != $1
+)~";
+
+const std::string kGetOrdersByStatus = R"~(
+  SELECT
+    id,
+    status,
+    courier_id,
+    delivery_location,
+    weight
+  FROM
+    delivery.orders
+  WHERE
+    status = $1
+)~";
+
+const std::string kGetOrders = R"~(
+  SELECT
+    id,
+    status,
+    courier_id,
+    delivery_location,
+    weight
+  FROM
+    delivery.orders
+)~";
+
 }  // namespace delivery::infrastructure::adapters::postgres::sql
