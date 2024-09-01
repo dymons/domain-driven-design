@@ -31,7 +31,8 @@ UTEST(DispatchServiceShould, NotDispatchWhenNotReadyCouriers) {
   auto couriers = std::vector<MutableSharedRef<domain::courier::Courier>>{};
 
   // Act
-  auto result = dispatcher->Dispatch(std::move(order), std::move(couriers));
+  auto const result =
+      dispatcher->Dispatch(std::move(order), std::move(couriers));
 
   // Assert
   ASSERT_FALSE(result.order->IsCourierAssigned());
