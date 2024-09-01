@@ -12,7 +12,7 @@ namespace delivery::infrastructure::adapters::postgres {
     -> SharedRef<core::ports::ICourierRepository>;
 
 [[nodiscard]] auto MakeCourierRepository(
-    SharedRef<userver::storages::postgres::Transaction>)
+    MutableSharedRef<userver::storages::postgres::Transaction>)
     -> SharedRef<core::ports::ICourierRepository>;
 
 }  // namespace delivery::infrastructure::adapters::postgres

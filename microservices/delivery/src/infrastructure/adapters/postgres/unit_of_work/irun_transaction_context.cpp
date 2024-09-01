@@ -2,4 +2,4 @@
 
 namespace delivery::infrastructure::adapters::postgres {
 
-} // namespace delivery::infrastructure::adapters::postgres
+}  // namespace delivery::infrastructure::adapters::postgres

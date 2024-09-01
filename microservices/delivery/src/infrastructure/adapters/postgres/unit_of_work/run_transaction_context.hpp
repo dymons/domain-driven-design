@@ -9,7 +9,7 @@
 namespace delivery::infrastructure::adapters::postgres {
 
 [[nodiscard]] auto MakeRunTransactionContext(
-    SharedRef<userver::storages::postgres::Transaction>)
+    MutableSharedRef<userver::storages::postgres::Transaction>)
     -> SharedRef<IRunTransactionContext>;
 
 }  // namespace delivery::infrastructure::adapters::postgres

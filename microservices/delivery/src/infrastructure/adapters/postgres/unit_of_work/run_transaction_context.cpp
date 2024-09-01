@@ -14,7 +14,7 @@ class RunTransactionContext final : public IRunTransactionContext {
   ~RunTransactionContext() final = default;
 
   explicit RunTransactionContext(
-      SharedRef<userver::storages::postgres::Transaction> transaction)
+      MutableSharedRef<userver::storages::postgres::Transaction> transaction)
       : transaction_{std::move(transaction)} {}
 
   [[nodiscard]] auto GetCourierRepository() const
@@ -28,13 +28,13 @@ class RunTransactionContext final : public IRunTransactionContext {
   }
 
  private:
-  SharedRef<userver::storages::postgres::Transaction> const transaction_;
+  MutableSharedRef<userver::storages::postgres::Transaction> const transaction_;
 };
 
 }  // namespace
 
 auto MakeRunTransactionContext(
-    SharedRef<userver::storages::postgres::Transaction> transaction)
+    MutableSharedRef<userver::storages::postgres::Transaction> transaction)
     -> SharedRef<IRunTransactionContext> {
   return delivery::MakeSharedRef<RunTransactionContext>(std::move(transaction));
 }

@@ -11,7 +11,7 @@ namespace delivery::infrastructure::adapters::postgres {
     -> SharedRef<core::ports::IOrderRepository>;
 
 [[nodiscard]] auto MakeOrderRepository(
-    SharedRef<userver::storages::postgres::Transaction>)
+    MutableSharedRef<userver::storages::postgres::Transaction>)
     -> SharedRef<core::ports::IOrderRepository>;
 
 }  // namespace delivery::infrastructure::adapters::postgres
