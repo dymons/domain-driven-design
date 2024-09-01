@@ -4,4 +4,4 @@ namespace delivery::core::domain {
 
 class Weight;
 
-} // namespace delivery::core::domain
+}  // namespace delivery::core::domain
