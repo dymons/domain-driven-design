@@ -111,4 +111,10 @@ auto MakeCourierRepository(userver::storages::postgres::ClusterPtr cluster)
   return MakeSharedRef<CourierRepository>(std::move(cluster));
 }
 
+auto MakeCourierRepository(
+    SharedRef<userver::storages::postgres::Transaction>)
+    -> SharedRef<core::ports::ICourierRepository> {
+  // TODO
+}
+
 }  // namespace delivery::infrastructure::adapters::postgres

@@ -109,4 +109,10 @@ auto MakeOrderRepository(userver::storages::postgres::ClusterPtr cluster)
   return MakeSharedRef<OrderRepository>(std::move(cluster));
 }
 
+auto MakeOrderRepository(
+    SharedRef<userver::storages::postgres::Transaction>)
+    -> SharedRef<core::ports::IOrderRepository> {
+  // TODO
+}
+
 }  // namespace delivery::infrastructure::adapters::postgres

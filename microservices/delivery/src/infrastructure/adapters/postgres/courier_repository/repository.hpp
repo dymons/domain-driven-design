@@ -11,4 +11,8 @@ namespace delivery::infrastructure::adapters::postgres {
     userver::storages::postgres::ClusterPtr)
     -> SharedRef<core::ports::ICourierRepository>;
 
+[[nodiscard]] auto MakeCourierRepository(
+    SharedRef<userver::storages::postgres::Transaction>)
+    -> SharedRef<core::ports::ICourierRepository>;
+
 }  // namespace delivery::infrastructure::adapters::postgres
