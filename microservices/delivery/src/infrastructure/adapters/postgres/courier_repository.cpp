@@ -5,6 +5,7 @@
 
 #include <core/domain/courier/courier.hpp>
 #include <core/ports/courier_repository/irepository.hpp>
+#include <utils/ranges.hpp>
 
 #include "dto/courier.hpp"
 
@@ -87,14 +88,10 @@ class CourierRepository final : public core::ports::ICourierRepository {
 
     auto const records = result.AsContainer<std::vector<dto::Courier>>(
         userver::storages::postgres::RowTag{});
-    auto couriers =
-        std::vector<MutableSharedRef<core::domain::courier::Courier>>{};
-    couriers.reserve(records.size());
-    for (auto const& record : records) {
-      couriers.push_back(dto::Convert(record));
-    }
-
-    return couriers;
+    return records | std::views::transform([](const auto& record) {
+             return dto::Convert(record);
+           }) |
+           ranges::to<std::vector>();
   }
 
  private:
@@ -108,14 +105,10 @@ class CourierRepository final : public core::ports::ICourierRepository {
                           status.ToString());
 
     auto const records = result.AsContainer<std::vector<dto::Courier>>();
-    auto couriers =
-        std::vector<MutableSharedRef<core::domain::courier::Courier>>{};
-    couriers.reserve(records.size());
-    for (auto const& record : records) {
-      couriers.push_back(dto::Convert(record));
-    }
-
-    return couriers;
+    return records | std::views::transform([](const auto& record) {
+             return dto::Convert(record);
+           }) |
+           ranges::to<std::vector>();
   }
 
   userver::storages::postgres::ClusterPtr const cluster_;
