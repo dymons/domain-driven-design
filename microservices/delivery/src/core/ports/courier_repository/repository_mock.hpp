@@ -1,6 +1,11 @@
 #pragma once
 
-#include "irepository.hpp"
+#include <unordered_set>
+
+#include <core/domain/courier/fwd.hpp>
+#include <utils/memory.hpp>
+
+#include "fwd.hpp"
 
 namespace delivery::core::ports {
 

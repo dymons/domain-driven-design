@@ -4,6 +4,8 @@
 
 #include <core/domain/courier/courier.hpp>
 
+#include "irepository.hpp"
+
 namespace delivery::core::ports {
 
 namespace {
