@@ -12,10 +12,10 @@
 namespace delivery::infrastructure::adapters::postgres {
 
 class QueryExecution final {
- public:
   using Cluster = userver::storages::postgres::ClusterPtr;
   using Trx = MutableSharedRef<userver::storages::postgres::Transaction>;
 
+ public:
   explicit QueryExecution(Cluster);
   explicit QueryExecution(Trx);
 
@@ -23,20 +23,14 @@ class QueryExecution final {
   [[nodiscard]] auto Execute(
       const userver::storages::postgres::ClusterHostType cluster_type,
       const userver::storages::postgres::Query& query,
-      const Args&... args) const -> userver::storages::postgres::ResultSet {
-    return std::visit(variant::overloaded{[&](const Cluster& executor) {
-                                            return executor->Execute(
-                                                cluster_type, query, args...);
-                                          },
-                                          [&](const Trx& executor) {
-                                            return executor->Execute(query,
-                                                                     args...);
-                                          }},
-                      executor_);
-  }
+      const Args&... args) const -> userver::storages::postgres::ResultSet;
 
  private:
   std::variant<Cluster, Trx> executor_;
 };
 
 }  // namespace delivery::infrastructure::adapters::postgres
+
+#define DELIVERY_QUERY_EXECUTION_HPP
+#include <infrastructure/adapters/postgres/query_execution/query_execution-inl.hpp>
+#undef DELIVERY_QUERY_EXECUTION_HPP
