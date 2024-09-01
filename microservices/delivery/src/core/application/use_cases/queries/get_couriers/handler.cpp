@@ -29,7 +29,7 @@ class GetCouriersHandler final : public IGetCouriersHandler {
 
   explicit GetCouriersHandler(
       SharedRef<core::ports::ICourierRepository> courier_repository)
-      : courier_repository_(std::move(courier_repository)) {}
+      : courier_repository_{std::move(courier_repository)} {}
 
   [[nodiscard]] auto Handle(GetCouriersQuery&&) const
       -> std::vector<Courier> final {
