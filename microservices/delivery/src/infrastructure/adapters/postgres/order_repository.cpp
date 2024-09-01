@@ -47,11 +47,8 @@ class OrderRepository final : public core::ports::IOrderRepository {
     auto const record = dto::Convert(order);
     auto const result = cluster_->Execute(
         userver::storages::postgres::ClusterHostType::kMaster,
-        "UPDATE delivery.orders"
-        "SET id=$1, status=$2, courier_id=$3, delivery_location=$4, weight=$5"
-        "WHERE id = $1",
-        record.id, record.status, record.courier_id, record.delivery_location,
-        record.weight);
+        sql::kUpdateOrder, record.id, record.status, record.courier_id,
+        record.delivery_location, record.weight);
 
     if (result.IsEmpty()) {
       userver::utils::LogErrorAndThrow<core::ports::OrderNotFound>(

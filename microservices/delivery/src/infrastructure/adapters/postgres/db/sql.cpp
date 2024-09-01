@@ -3,7 +3,8 @@
 namespace delivery::infrastructure::adapters::postgres::sql {
 
 const std::string kAddOrder = R"~(
-  INSERT INTO delivery.orders
+  INSERT INTO
+    delivery.orders
   (
     id,
     status,
@@ -21,6 +22,19 @@ const std::string kAddOrder = R"~(
   )
   ON CONFLICT (id) DO NOTHING
   RETURNING id
+)~";
+
+const std::string kUpdateOrder = R"~(
+  UPDATE
+    delivery.orders
+  SET
+    id=$1,
+    status=$2,
+    courier_id=$3,
+    delivery_location=$4,
+    weight=$5
+  WHERE
+    id = $1
 )~";
 
 }  // namespace delivery::infrastructure::adapters::postgres::sql
