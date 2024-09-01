@@ -36,12 +36,12 @@ async def test_given_non_empty_couriers_when_get_couriers_then_couriers_are_rece
     assert response.json() == {
         'couriers': [
             {
-                'id': Defaults.courier_id + '_2',
+                'id': Defaults.courier_id + '_1',
                 'location': Defaults.delivery_location,
                 'name': Defaults.courier_name,
             },
             {
-                'id': Defaults.courier_id + '_1',
+                'id': Defaults.courier_id + '_2',
                 'location': Defaults.delivery_location,
                 'name': Defaults.courier_name,
             },

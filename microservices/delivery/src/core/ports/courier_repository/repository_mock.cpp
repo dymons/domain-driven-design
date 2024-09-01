@@ -15,28 +15,32 @@ class CourierRepository final : public ICourierRepository {
   ~CourierRepository() final = default;
 
   explicit CourierRepository(
-      std::unordered_set<MutableSharedRef<domain::courier::Courier>> couriers)
+      std::vector<MutableSharedRef<domain::courier::Courier>> couriers)
       : couriers_{std::move(couriers)} {}
 
   auto Add(SharedRef<domain::courier::Courier> const& courier) const
       -> void final {
-    auto [_, success] = couriers_.insert(
-        MakeMutableSharedRef<domain::courier::Courier>(*courier));
-
-    if (not success) {
-      userver::utils::LogErrorAndThrow<CourierAlreadyExists>("");
+    for (const auto& courier : couriers_) {
+      if (courier->GetId() == courier->GetId()) {
+        userver::utils::LogErrorAndThrow<CourierAlreadyExists>("");
+      }
     }
+
+    couriers_.push_back(
+        MakeMutableSharedRef<domain::courier::Courier>(*courier));
   }
 
-  auto Update(SharedRef<domain::courier::Courier> const& courier) const
+  auto Update(SharedRef<domain::courier::Courier> const& new_courier) const
       -> void final {
-    auto raw_courier = MakeMutableSharedRef<domain::courier::Courier>(*courier);
-    if (not couriers_.contains(raw_courier)) {
+    auto it = std::ranges::find_if(couriers_, [&](const auto& courier) {
+      return courier->GetId() == new_courier->GetId();
+    });
+
+    if (it == couriers_.end()) {
       userver::utils::LogErrorAndThrow<CourierNotFound>("");
     }
 
-    couriers_.erase(raw_courier);
-    Add(raw_courier);
+    *it = MakeMutableSharedRef<domain::courier::Courier>(*new_courier);
   }
 
   auto GetById(domain::CourierId const& courier_id) const
@@ -51,43 +55,40 @@ class CourierRepository final : public ICourierRepository {
   }
 
   auto GetByReadyStatus() const
-      -> std::unordered_set<MutableSharedRef<domain::courier::Courier>> final {
-    auto result =
-        std::unordered_set<MutableSharedRef<domain::courier::Courier>>{};
+      -> std::vector<MutableSharedRef<domain::courier::Courier>> final {
+    auto result = std::vector<MutableSharedRef<domain::courier::Courier>>{};
     for (const auto& courier : couriers_) {
       if (courier->GetStatus().IsReady()) {
-        result.insert(courier);
+        result.push_back(courier);
       }
     }
     return result;
   }
 
   auto GetByBusyStatus() const
-      -> std::unordered_set<MutableSharedRef<domain::courier::Courier>> final {
-    auto result =
-        std::unordered_set<MutableSharedRef<domain::courier::Courier>>{};
+      -> std::vector<MutableSharedRef<domain::courier::Courier>> final {
+    auto result = std::vector<MutableSharedRef<domain::courier::Courier>>{};
     for (const auto& courier : couriers_) {
       if (courier->GetStatus().IsBusy()) {
-        result.insert(courier);
+        result.push_back(courier);
       }
     }
     return result;
   }
 
   auto GetCouriers() const
-      -> std::unordered_set<MutableSharedRef<domain::courier::Courier>> final {
+      -> std::vector<MutableSharedRef<domain::courier::Courier>> final {
     return couriers_;
   }
 
  private:
-  mutable std::unordered_set<MutableSharedRef<domain::courier::Courier>>
-      couriers_;
+  mutable std::vector<MutableSharedRef<domain::courier::Courier>> couriers_;
 };
 
 }  // namespace
 
 auto MockCourierRepository(
-    std::unordered_set<MutableSharedRef<domain::courier::Courier>> couriers)
+    std::vector<MutableSharedRef<domain::courier::Courier>> couriers)
     -> SharedRef<ICourierRepository> {
   return delivery::MakeSharedRef<CourierRepository>(std::move(couriers));
 }

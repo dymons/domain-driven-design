@@ -1,7 +1,7 @@
 #pragma once
 
 #include <optional>
-#include <unordered_set>
+#include <vector>
 
 #include <core/domain/courier/fwd.hpp>
 #include <core/domain/order/fwd.hpp>
@@ -23,7 +23,7 @@ class IDispatchService : private NonCopyableAndMoveable {
 
   [[nodiscard]] virtual auto Dispatch(
       MutableSharedRef<domain::order::Order>&&,
-      std::unordered_set<MutableSharedRef<domain::courier::Courier>>&&) const
+      std::vector<MutableSharedRef<domain::courier::Courier>>&&) const
       -> DispatchResult = 0;
 };
 

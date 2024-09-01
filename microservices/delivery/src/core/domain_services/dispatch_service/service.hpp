@@ -2,9 +2,9 @@
 
 #include <utils/memory.hpp>
 
-namespace delivery::core::domain_services {
+#include "fwd.hpp"
 
-class IDispatchService;
+namespace delivery::core::domain_services {
 
 [[nodiscard]] auto MakeDispatchService() -> SharedRef<IDispatchService>;
 

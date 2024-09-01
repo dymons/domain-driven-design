@@ -16,7 +16,7 @@ class DispatchService final : public IDispatchService {
 
   [[nodiscard]] auto Dispatch(
       MutableSharedRef<domain::order::Order>&&,
-      std::unordered_set<MutableSharedRef<domain::courier::Courier>>&&) const
+      std::vector<MutableSharedRef<domain::courier::Courier>>&&) const
       -> DispatchResult final {
     return dispatch_result_;
   }

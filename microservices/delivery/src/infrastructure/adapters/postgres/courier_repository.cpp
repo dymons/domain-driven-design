@@ -68,18 +68,18 @@ class CourierRepository final : public core::ports::ICourierRepository {
     userver::utils::LogErrorAndThrow<core::ports::CourierNotFound>(ex.what());
   }
 
-  [[nodiscard]] auto GetByReadyStatus() const -> std::unordered_set<
-      MutableSharedRef<core::domain::courier::Courier>> final {
+  [[nodiscard]] auto GetByReadyStatus() const
+      -> std::vector<MutableSharedRef<core::domain::courier::Courier>> final {
     return GetByStatus(core::domain::courier::CourierStatus::kReady);
   }
 
-  [[nodiscard]] auto GetByBusyStatus() const -> std::unordered_set<
-      MutableSharedRef<core::domain::courier::Courier>> final {
+  [[nodiscard]] auto GetByBusyStatus() const
+      -> std::vector<MutableSharedRef<core::domain::courier::Courier>> final {
     return GetByStatus(core::domain::courier::CourierStatus::kBusy);
   }
 
-  [[nodiscard]] auto GetCouriers() const -> std::unordered_set<
-      MutableSharedRef<core::domain::courier::Courier>> final {
+  [[nodiscard]] auto GetCouriers() const
+      -> std::vector<MutableSharedRef<core::domain::courier::Courier>> final {
     auto const result = cluster_->Execute(
         userver::storages::postgres::ClusterHostType::kMaster,
         "SELECT id, name, status, transport, current_location "
@@ -88,19 +88,18 @@ class CourierRepository final : public core::ports::ICourierRepository {
     auto const records = result.AsContainer<std::vector<dto::Courier>>(
         userver::storages::postgres::RowTag{});
     auto couriers =
-        std::unordered_set<MutableSharedRef<core::domain::courier::Courier>>{};
+        std::vector<MutableSharedRef<core::domain::courier::Courier>>{};
     couriers.reserve(records.size());
     for (auto const& record : records) {
-      couriers.insert(dto::Convert(record));
+      couriers.push_back(dto::Convert(record));
     }
 
     return couriers;
   }
 
  private:
-  [[nodiscard]] auto GetByStatus(
-      core::domain::courier::CourierStatus status) const
-      -> std::unordered_set<MutableSharedRef<core::domain::courier::Courier>> {
+  [[nodiscard]] auto GetByStatus(core::domain::courier::CourierStatus status)
+      const -> std::vector<MutableSharedRef<core::domain::courier::Courier>> {
     auto const result =
         cluster_->Execute(userver::storages::postgres::ClusterHostType::kMaster,
                           "SELECT id, name, transport, current_location, status"
@@ -110,10 +109,10 @@ class CourierRepository final : public core::ports::ICourierRepository {
 
     auto const records = result.AsContainer<std::vector<dto::Courier>>();
     auto couriers =
-        std::unordered_set<MutableSharedRef<core::domain::courier::Courier>>{};
+        std::vector<MutableSharedRef<core::domain::courier::Courier>>{};
     couriers.reserve(records.size());
     for (auto const& record : records) {
-      couriers.insert(dto::Convert(record));
+      couriers.push_back(dto::Convert(record));
     }
 
     return couriers;

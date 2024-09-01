@@ -36,8 +36,8 @@ class DispatchService final : public IDispatchService {
 
   [[nodiscard]] auto Dispatch(
       MutableSharedRef<domain::order::Order>&& order,
-      std::unordered_set<MutableSharedRef<domain::courier::Courier>>&& couriers)
-      const -> DispatchResult final {
+      std::vector<MutableSharedRef<domain::courier::Courier>>&& couriers) const
+      -> DispatchResult final {
     auto scores = std::set<Score>{};
     std::ranges::transform(std::move(couriers),
                            std::inserter(scores, scores.begin()),

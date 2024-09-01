@@ -1,6 +1,6 @@
 #pragma once
 
-#include <unordered_set>
+#include <vector>
 
 #include <core/domain/courier/fwd.hpp>
 #include <core/domain/courier/strong_typedefs.hpp>
@@ -34,9 +34,9 @@ class ICourierRepository : private NonCopyableAndMoveable {
 
   // clang-format off
   virtual auto GetById(domain::CourierId const&) const -> MutableSharedRef<domain::courier::Courier> = 0;
-  virtual auto GetByReadyStatus() const -> std::unordered_set<MutableSharedRef<domain::courier::Courier>> = 0;
-  virtual auto GetByBusyStatus() const -> std::unordered_set<MutableSharedRef<domain::courier::Courier>> = 0;
-  virtual auto GetCouriers() const -> std::unordered_set<MutableSharedRef<domain::courier::Courier>> = 0;
+  virtual auto GetByReadyStatus() const -> std::vector<MutableSharedRef<domain::courier::Courier>> = 0;
+  virtual auto GetByBusyStatus() const -> std::vector<MutableSharedRef<domain::courier::Courier>> = 0;
+  virtual auto GetCouriers() const -> std::vector<MutableSharedRef<domain::courier::Courier>> = 0;
   // clang-format on
 };
 
