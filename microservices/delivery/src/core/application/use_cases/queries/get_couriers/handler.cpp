@@ -2,6 +2,7 @@
 
 #include <core/domain/courier/courier.hpp>
 #include <core/ports/courier_repository/irepository.hpp>
+#include <utils/ranges.hpp>
 
 #include "ihandler.hpp"
 #include "query.hpp"
@@ -32,19 +33,9 @@ class GetCouriersHandler final : public IGetCouriersHandler {
 
   [[nodiscard]] auto Handle(GetCouriersQuery&&) const
       -> std::vector<Courier> final {
-    auto couriers = courier_repository_->GetCouriers();
-
-    // TODO (dymons) Wait support std::ranges::to at C++23 (libstdc++14)
-    // return couriers | std::ranges::transform(ConvertCourier)
-    //                 | std::ranges::to<std::vector>();
-
-    auto result = std::vector<Courier>{};
-    result.reserve(couriers.size());
-    for (auto const& courier : couriers) {
-      result.emplace_back(ConvertCourier(courier));
-    }
-
-    return result;
+    return courier_repository_->GetCouriers()       //
+           | std::views::transform(ConvertCourier)  //
+           | ranges::to<std::vector>();
   }
 
  private:
