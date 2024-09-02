@@ -41,7 +41,7 @@ class AssignOrdersHandler final : public IAssignOrdersHandler {
             });
 
     optional::map(dispatch_view, [this](auto const& dispatch) {
-      this->unit_of_work_->RunTransaction([&](const auto& context) {
+      this->unit_of_work_->RunTransaction([&](auto const& context) {
         context->GetOrderRepository()->Update(dispatch.order);
         optional::map(dispatch.courier, [&](auto const& courier) {
           context->GetCourierRepository()->Update(courier);
